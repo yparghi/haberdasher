@@ -1,2 +1,5 @@
 target/
 
+# For Yash's IntelliJ usage
+.idea/
+
