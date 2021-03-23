@@ -26,6 +26,7 @@ public class ExampleMainTest {
 
 
     @Before
+    // TODO: Figure out how to set this up correctly in Java.
     public void setUp() throws Exception {
         config = HBaseConfiguration.create();
         testUtil = new HBaseTestingUtility(config);
