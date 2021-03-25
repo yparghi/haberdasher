@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 
@@ -13,32 +12,57 @@ public final class Changeset {
 
     public static final class Builder {
 
-        private final ArrayList<SingleChange> changesSoFar;
+        private final ArrayList<AddChange> addChanges;
+        private final ArrayList<DeleteChange> deleteChanges;
+        private final ArrayList<ModifyChange> modifyChanges;
+        private final ArrayList<RenameChange> renameChanges;
 
         private Builder() {
-            changesSoFar = new ArrayList<>();
+            addChanges = new ArrayList<>();
+            deleteChanges = new ArrayList<>();
+            modifyChanges = new ArrayList<>();
+            renameChanges = new ArrayList<>();
         }
 
-        public Builder withChange(SingleChange change) {
-            changesSoFar.add(change);
+        public Builder withAddChange(AddChange addChange) {
+            addChanges.add(addChange);
+            return this;
+        }
+
+        public Builder withDeleteChange(DeleteChange deleteChange) {
+            deleteChanges.add(deleteChange);
+            return this;
+        }
+
+        public Builder withModifyChange(ModifyChange modifyChange) {
+            modifyChanges.add(modifyChange);
+            return this;
+        }
+
+        public Builder withRenameChange(RenameChange renameChange) {
+            renameChanges.add(renameChange);
             return this;
         }
 
         public Changeset build() {
-            return new Changeset(changesSoFar);
+            return new Changeset(addChanges, deleteChanges, modifyChanges, renameChanges);
         }
     }
 
 
-    private final ImmutableList<SingleChange> changes;
+    private final ImmutableList<AddChange> addChanges;
+    private final ImmutableList<DeleteChange> deleteChanges;
+    private final ImmutableList<ModifyChange> modifyChanges;
+    private final ImmutableList<RenameChange> renameChanges;
 
-    private Changeset(List<SingleChange> changes) {
-        checkNotNull(changes);
-        checkArgument(changes.size() > 0);
-        this.changes = ImmutableList.copyOf(changes);
-    }
-
-    public List<SingleChange> getChanges() {
-        return changes;
+    private Changeset(
+            List<AddChange> addChanges,
+            List<DeleteChange> deleteChanges,
+            List<ModifyChange> modifyChanges,
+            List<RenameChange> renameChanges) {
+        this.addChanges = ImmutableList.copyOf(checkNotNull(addChanges));
+        this.deleteChanges = ImmutableList.copyOf(checkNotNull(deleteChanges));
+        this.modifyChanges = ImmutableList.copyOf(checkNotNull(modifyChanges));
+        this.renameChanges = ImmutableList.copyOf(checkNotNull(renameChanges));
     }
 }
