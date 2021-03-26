@@ -12,9 +12,10 @@ public class ExampleMain {
     public static void main(String[] args) {
         System.out.println( "Hello Haberdasher!" );
 
-        HaberdasherServer server = HaberdasherServer.builder()
+        // TODO: Figure out the right way to set up an example cluster -- with some fake URL?
+        /*HaberdasherServer server = HaberdasherServer.builder()
                 .withDatastore(new HBaseDatastore())
-                .build();
+                .build();*/
 
         System.out.println("Done!");
     }
