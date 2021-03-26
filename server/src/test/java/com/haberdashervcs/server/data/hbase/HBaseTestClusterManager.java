@@ -10,6 +10,9 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
+import static com.google.common.base.Preconditions.checkState;
+
+
 /**
  * Manages the once-per-test-run setup and teardown of a MiniHBaseCluster via HBaseTestingUtility.
  */
@@ -27,15 +30,17 @@ public final class HBaseTestClusterManager {
     private Admin admin;
     private Connection conn;
     private boolean initialized = false;
-    private boolean tornDown = false;
 
     private HBaseTestClusterManager() {}
 
-    // TODO: Figure out how to properly shut down the cluster when all test execution ends.
+    // Re. teardown, the HBaseTestingUtility has its own shutdown hook.
     public synchronized void setUp() throws Exception {
         if (initialized) {
             return;
+        } else {
+            initialized = true;
         }
+
         config = HBaseConfiguration.create();
         testUtil = new HBaseTestingUtility(config);
         testUtil.startMiniCluster();
@@ -57,6 +62,7 @@ public final class HBaseTestClusterManager {
     }
 
     public Connection getConn() {
+        checkState(initialized);
         return conn;
     }
 }
