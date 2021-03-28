@@ -1,5 +1,7 @@
 package com.haberdashervcs.server.data.hbase;
 
+import com.haberdashervcs.util.logging.HdLogger;
+import com.haberdashervcs.util.logging.HdLoggers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
@@ -18,6 +20,8 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public final class HBaseTestClusterManager {
 
+    private static HdLogger LOG = HdLoggers.create(HBaseTestClusterManager.class);
+
     private static final HBaseTestClusterManager INSTANCE = new HBaseTestClusterManager();
 
     public static HBaseTestClusterManager getInstance() {
@@ -33,19 +37,16 @@ public final class HBaseTestClusterManager {
 
     private HBaseTestClusterManager() {}
 
-    // Re. teardown, the HBaseTestingUtility has its own shutdown hook.
     public synchronized void setUp() throws Exception {
-        if (initialized) {
-            return;
-        } else {
+        if (!initialized) {
+            LOG.info("Initializing the HBase test cluster.");
+            config = HBaseConfiguration.create();
+            testUtil = new HBaseTestingUtility(config);
+            testUtil.startMiniCluster();
+            conn = testUtil.getConnection();
+            admin = conn.getAdmin();
             initialized = true;
         }
-
-        config = HBaseConfiguration.create();
-        testUtil = new HBaseTestingUtility(config);
-        testUtil.startMiniCluster();
-        conn = testUtil.getConnection();
-        admin = conn.getAdmin();
 
         createTables();
     }
@@ -54,6 +55,8 @@ public final class HBaseTestClusterManager {
     // "HBase currently does not do well with anything above two or three column families so keep the number of column
     // families in your schema low."
     private void createTables() throws Exception {
+        LOG.info("Creating test tables.");
+
         TableDescriptor filesTableDesc = TableDescriptorBuilder
                 .newBuilder(TableName.valueOf("Files"))
                 .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
@@ -64,5 +67,11 @@ public final class HBaseTestClusterManager {
     public Connection getConn() {
         checkState(initialized);
         return conn;
+    }
+
+    // Re. shutdown, the HBaseTestingUtility has its own shutdown hook.
+    public synchronized void tearDownBetweenTests() throws Exception {
+        admin.disableTable(TableName.valueOf("Files"));
+        admin.deleteTable(TableName.valueOf("Files"));
     }
 }

@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +27,11 @@ public class ExampleMainTest {
         clusterManager = HBaseTestClusterManager.getInstance();
         clusterManager.setUp();
         conn = clusterManager.getConn();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        clusterManager.tearDownBetweenTests();
     }
 
     // TODO: Move this somewhere sensible.
