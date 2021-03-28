@@ -65,4 +65,20 @@ public final class Changeset {
         this.modifyChanges = ImmutableList.copyOf(checkNotNull(modifyChanges));
         this.renameChanges = ImmutableList.copyOf(checkNotNull(renameChanges));
     }
+
+    public List<AddChange> getAddChanges() {
+        return addChanges;
+    }
+
+    public List<DeleteChange> getDeleteChanges() {
+        return deleteChanges;
+    }
+
+    public List<ModifyChange> getModifyChanges() {
+        return modifyChanges;
+    }
+
+    public List<RenameChange> getRenameChanges() {
+        return renameChanges;
+    }
 }
