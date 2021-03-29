@@ -1,9 +1,10 @@
-package com.haberdashervcs.data.hbase;
+package com.haberdashervcs.datastore.hbase;
 
-import com.haberdashervcs.data.HdDatastore;
-import com.haberdashervcs.data.change.AddChange;
-import com.haberdashervcs.data.change.ApplyChangesetResult;
-import com.haberdashervcs.data.change.Changeset;
+import com.haberdashervcs.datastore.HdDatastore;
+import com.haberdashervcs.operations.change.AddChange;
+import com.haberdashervcs.operations.change.ApplyChangesetResult;
+import com.haberdashervcs.operations.change.Changeset;
+import com.haberdashervcs.operations.CheckoutStream;
 import com.haberdashervcs.util.logging.HdLogger;
 import com.haberdashervcs.util.logging.HdLoggers;
 import org.apache.hadoop.hbase.TableName;
@@ -30,14 +31,22 @@ public final class HBaseDatastore implements HdDatastore {
     @Override
     public ApplyChangesetResult applyChangeset(Changeset changeset) {
         try {
-            return internalApplyChangeset(changeset);
+            return applyChangesetInternal(changeset);
         } catch (IOException ioEx) {
             LOG.exception(ioEx, "Error applying Changeset");
             return ApplyChangesetResult.forStatus(ApplyChangesetResult.Status.FAILED);
         }
     }
 
-    private ApplyChangesetResult internalApplyChangeset(Changeset changeset) throws IOException {
+
+    @Override
+    public CheckoutStream checkout(String branchName, String path) {
+        // TODO
+        return null;
+    }
+
+
+    private ApplyChangesetResult applyChangesetInternal(Changeset changeset) throws IOException {
         // TODO: Some Transaction (or TransactionManager from the config) should do this, maybe by using the datastore
         // instance.
         final String branch = "main";

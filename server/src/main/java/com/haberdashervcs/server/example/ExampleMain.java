@@ -1,8 +1,5 @@
 package com.haberdashervcs.server.example;
 
-import com.haberdashervcs.config.HaberdasherServer;
-import com.haberdashervcs.data.hbase.HBaseDatastore;
-
 import com.haberdashervcs.util.logging.HdLogger;
 import com.haberdashervcs.util.logging.HdLoggers;
 

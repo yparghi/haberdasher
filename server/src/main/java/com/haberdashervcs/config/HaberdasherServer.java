@@ -1,6 +1,6 @@
 package com.haberdashervcs.config;
 
-import com.haberdashervcs.data.HdDatastore;
+import com.haberdashervcs.datastore.HdDatastore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;

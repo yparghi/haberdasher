@@ -1,4 +1,4 @@
-package com.haberdashervcs.data.change;
+package com.haberdashervcs.operations.change;
 
 import com.google.common.collect.ImmutableList;
 

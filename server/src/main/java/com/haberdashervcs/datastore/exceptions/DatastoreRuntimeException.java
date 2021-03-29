@@ -1,4 +1,4 @@
-package com.haberdashervcs.data.exceptions;
+package com.haberdashervcs.datastore.exceptions;
 
 import com.haberdashervcs.exceptions.HdRuntimeException;
 

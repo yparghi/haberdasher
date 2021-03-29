@@ -1,4 +1,4 @@
-package com.haberdashervcs.data.change;
+package com.haberdashervcs.operations.change;
 
 import java.util.Arrays;
 
