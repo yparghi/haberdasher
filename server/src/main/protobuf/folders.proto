@@ -1,0 +1,5 @@
+// TODO: Leave a note somewhere appropriate that we *do* check in generated code, to mitigate different people using
+// different versions of protoc. (Maybe this isn't the right decision, but it's what I think for now.)
+
+syntax = "proto3";
+
