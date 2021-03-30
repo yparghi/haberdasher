@@ -1,5 +1,9 @@
 # TODOs
 
+- Upgrade the JVM to whatever works with HBase.
+
+- Look at Java modules, for stuff like the HBase code.
+
 - Think about conflicts/merging:
     - Like, what if a file in your push has since been changed by someone else?
     - Does a changeset always set a base commit for a file? (Like, only push this changeset if this file is still at commit xyz.)
