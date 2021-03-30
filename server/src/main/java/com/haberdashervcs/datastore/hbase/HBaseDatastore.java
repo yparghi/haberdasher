@@ -4,6 +4,7 @@ import com.haberdashervcs.core.logging.HdLogger;
 import com.haberdashervcs.core.logging.HdLoggers;
 import com.haberdashervcs.datastore.HdDatastore;
 import com.haberdashervcs.operations.CheckoutResult;
+import com.haberdashervcs.operations.FolderListing;
 import com.haberdashervcs.operations.change.AddChange;
 import com.haberdashervcs.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.operations.change.Changeset;
@@ -56,30 +57,29 @@ public final class HBaseDatastore implements HdDatastore {
     private CheckoutResult checkoutInternal(String branchName, String folderPath) throws IOException {
         Path path = Paths.get(folderPath);
 
-        Result currentFolder = getFolder(null, null);
+        FolderListing currentFolderListing = getFolderListing(null, null);
         for (Path folderName : path) {
 
         }
         return null;
     }
 
-    private Result getFolder(Result currentFolder, String nextFolderName) throws IOException {
-        final Table filesTable = conn.getTable(TableName.valueOf("Folders"));
+    private FolderListing getFolderListing(Result currentFolder, String nextFolderName) throws IOException {
+        final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
 
         // TODO: encapsulate currentFolder in some POJO representation that gives me its list of contained
         // files/subfolders. Iterate through that and make sure the next folder name is actually in the list of folders
         // within currentFolder.
-        final String rowKey = // TODO commits/refs in the row key?
+        final String rowKey = nextFolderName; // TODO commits/refs in the row key?
 
         // TODO if not exists, throw an exception?
         Get get = new Get(Bytes.toBytes(rowKey));
-        Result result = filesTable.get(get);
-        String cellContents = Bytes.toString(result.getValue(
-                Bytes.toBytes(columnFamilyName), Bytes.toBytes(columnName)));
-        assertEquals("cellContents", cellContents);
+        Result result = foldersTable.get(get);
+        byte[] folderValue = result.getValue(
+                Bytes.toBytes(columnFamilyName), Bytes.toBytes("listing"));
 
-        return null;
+        return FolderListing.fromBytes(folderValue);
     }
 
 
