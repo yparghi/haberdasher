@@ -1,4 +1,4 @@
-package com.haberdashervcs.util.logging;
+package com.haberdashervcs.core.logging;
 
 
 // Since I don't want concrete logging dependencies in every class (be they slf4j or log4j or whatever), I wrap them

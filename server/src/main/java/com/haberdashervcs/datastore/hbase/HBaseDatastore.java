@@ -1,19 +1,23 @@
 package com.haberdashervcs.datastore.hbase;
 
+import com.haberdashervcs.core.logging.HdLogger;
+import com.haberdashervcs.core.logging.HdLoggers;
 import com.haberdashervcs.datastore.HdDatastore;
+import com.haberdashervcs.operations.CheckoutResult;
 import com.haberdashervcs.operations.change.AddChange;
 import com.haberdashervcs.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.operations.change.Changeset;
-import com.haberdashervcs.operations.CheckoutStream;
-import com.haberdashervcs.util.logging.HdLogger;
-import com.haberdashervcs.util.logging.HdLoggers;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 
@@ -40,8 +44,41 @@ public final class HBaseDatastore implements HdDatastore {
 
 
     @Override
-    public CheckoutStream checkout(String branchName, String path) {
-        // TODO
+    public CheckoutResult checkout(String branchName, String folderPath) {
+        try {
+            return checkoutInternal(branchName, folderPath);
+        } catch (IOException ioEx) {
+            LOG.exception(ioEx, "Error applying Changeset");
+            return CheckoutResult.failed(ioEx.getMessage());
+        }
+    }
+
+    private CheckoutResult checkoutInternal(String branchName, String folderPath) throws IOException {
+        Path path = Paths.get(folderPath);
+
+        Result currentFolder = getFolder(null, null);
+        for (Path folderName : path) {
+
+        }
+        return null;
+    }
+
+    private Result getFolder(Result currentFolder, String nextFolderName) throws IOException {
+        final Table filesTable = conn.getTable(TableName.valueOf("Folders"));
+        final String columnFamilyName = "cfMain";
+
+        // TODO: encapsulate currentFolder in some POJO representation that gives me its list of contained
+        // files/subfolders. Iterate through that and make sure the next folder name is actually in the list of folders
+        // within currentFolder.
+        final String rowKey = // TODO commits/refs in the row key?
+
+        // TODO if not exists, throw an exception?
+        Get get = new Get(Bytes.toBytes(rowKey));
+        Result result = filesTable.get(get);
+        String cellContents = Bytes.toString(result.getValue(
+                Bytes.toBytes(columnFamilyName), Bytes.toBytes(columnName)));
+        assertEquals("cellContents", cellContents);
+
         return null;
     }
 

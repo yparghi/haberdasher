@@ -1,7 +1,7 @@
 package com.haberdashervcs.server.example;
 
-import com.haberdashervcs.util.logging.HdLogger;
-import com.haberdashervcs.util.logging.HdLoggers;
+import com.haberdashervcs.core.logging.HdLogger;
+import com.haberdashervcs.core.logging.HdLoggers;
 
 
 /**

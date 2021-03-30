@@ -1,4 +1,4 @@
-package com.haberdashervcs.util.logging;
+package com.haberdashervcs.core.logging;
 
 public interface HdLogger {
 
