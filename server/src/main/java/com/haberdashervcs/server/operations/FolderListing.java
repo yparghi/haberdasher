@@ -1,8 +1,8 @@
 package com.haberdashervcs.server.operations;
 
-import com.haberdashervcs.server.protobuf.FoldersProto;
-
 import java.io.IOException;
+
+import com.haberdashervcs.server.protobuf.FoldersProto;
 
 
 public final class FolderListing {

@@ -1,5 +1,10 @@
 package com.haberdashervcs.server.datastore.hbase;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
@@ -15,11 +20,6 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 
 public final class HBaseDatastore implements HdDatastore {
@@ -49,7 +49,7 @@ public final class HBaseDatastore implements HdDatastore {
         try {
             return checkoutInternal(branchName, folderPath);
         } catch (IOException ioEx) {
-            LOG.exception(ioEx, "Error applying Changeset");
+            LOG.exception(ioEx, "Error checking out path: " + folderPath);
             return CheckoutResult.failed(ioEx.getMessage());
         }
     }
@@ -57,7 +57,9 @@ public final class HBaseDatastore implements HdDatastore {
     private CheckoutResult checkoutInternal(String branchName, String folderPath) throws IOException {
         Path path = Paths.get(folderPath);
 
-        FolderListing currentFolderListing = getFolderListing(null, null);
+        String pathSoFar = "";
+        FolderListing currentFolderListing = null;
+        // TODO!
         for (Path folderName : path) {
 
         }
