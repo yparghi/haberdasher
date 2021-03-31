@@ -3,6 +3,7 @@ package com.haberdashervcs.server.operations;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.haberdashervcs.server.protobuf.FoldersProto;
 
@@ -17,7 +18,8 @@ public final class FolderListing {
             FolderEntry entry = new FolderEntry(
                     (protoEntry.getType() == FoldersProto.FolderListingEntry.Type.FILE)
                             ? FolderEntry.Type.FILE : FolderEntry.Type.FOLDER,
-                    protoEntry.getName());
+                    protoEntry.getName(),
+                    protoEntry.getFileId());
         }
         return new FolderListing(entries.build());
     }
@@ -30,10 +32,12 @@ public final class FolderListing {
 
         private final Type type;
         private final String name;
+        private final String fileId;
 
-        private FolderEntry(Type type, String name) {
+        private FolderEntry(Type type, String name, String fileId) {
             this.type = type;
             this.name = name;
+            this.fileId = fileId;
         }
 
         public Type getType() {
@@ -42,6 +46,11 @@ public final class FolderListing {
 
         public String getName() {
             return name;
+        }
+
+        public String getFileId() {
+            Preconditions.checkState(type == Type.FILE);
+            return fileId;
         }
     }
 

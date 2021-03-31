@@ -30,24 +30,28 @@ public final class FoldersProto {
     com.haberdashervcs.server.protobuf.FoldersProto.FolderListingEntry.Type getType();
 
     /**
-     * <pre>
-     * TODO something about its commit/tree/blob id?
-     * </pre>
-     *
      * <code>string name = 2;</code>
      * @return The name.
      */
     java.lang.String getName();
     /**
-     * <pre>
-     * TODO something about its commit/tree/blob id?
-     * </pre>
-     *
      * <code>string name = 2;</code>
      * @return The bytes for name.
      */
     com.google.protobuf.ByteString
         getNameBytes();
+
+    /**
+     * <code>string fileId = 3;</code>
+     * @return The fileId.
+     */
+    java.lang.String getFileId();
+    /**
+     * <code>string fileId = 3;</code>
+     * @return The bytes for fileId.
+     */
+    com.google.protobuf.ByteString
+        getFileIdBytes();
   }
   /**
    * Protobuf type {@code FolderListingEntry}
@@ -64,6 +68,7 @@ public final class FoldersProto {
     private FolderListingEntry() {
       type_ = 0;
       name_ = "";
+      fileId_ = "";
     }
 
     @java.lang.Override
@@ -106,6 +111,12 @@ public final class FoldersProto {
               java.lang.String s = input.readStringRequireUtf8();
 
               name_ = s;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              fileId_ = s;
               break;
             }
             default: {
@@ -270,10 +281,6 @@ public final class FoldersProto {
     public static final int NAME_FIELD_NUMBER = 2;
     private volatile java.lang.Object name_;
     /**
-     * <pre>
-     * TODO something about its commit/tree/blob id?
-     * </pre>
-     *
      * <code>string name = 2;</code>
      * @return The name.
      */
@@ -291,10 +298,6 @@ public final class FoldersProto {
       }
     }
     /**
-     * <pre>
-     * TODO something about its commit/tree/blob id?
-     * </pre>
-     *
      * <code>string name = 2;</code>
      * @return The bytes for name.
      */
@@ -307,6 +310,44 @@ public final class FoldersProto {
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int FILEID_FIELD_NUMBER = 3;
+    private volatile java.lang.Object fileId_;
+    /**
+     * <code>string fileId = 3;</code>
+     * @return The fileId.
+     */
+    @java.lang.Override
+    public java.lang.String getFileId() {
+      java.lang.Object ref = fileId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        fileId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string fileId = 3;</code>
+     * @return The bytes for fileId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getFileIdBytes() {
+      java.lang.Object ref = fileId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        fileId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -333,6 +374,9 @@ public final class FoldersProto {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, name_);
       }
+      if (!getFileIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, fileId_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -348,6 +392,9 @@ public final class FoldersProto {
       }
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, name_);
+      }
+      if (!getFileIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, fileId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -367,6 +414,8 @@ public final class FoldersProto {
       if (type_ != other.type_) return false;
       if (!getName()
           .equals(other.getName())) return false;
+      if (!getFileId()
+          .equals(other.getFileId())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -382,6 +431,8 @@ public final class FoldersProto {
       hash = (53 * hash) + type_;
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
+      hash = (37 * hash) + FILEID_FIELD_NUMBER;
+      hash = (53 * hash) + getFileId().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -519,6 +570,8 @@ public final class FoldersProto {
 
         name_ = "";
 
+        fileId_ = "";
+
         return this;
       }
 
@@ -547,6 +600,7 @@ public final class FoldersProto {
         com.haberdashervcs.server.protobuf.FoldersProto.FolderListingEntry result = new com.haberdashervcs.server.protobuf.FoldersProto.FolderListingEntry(this);
         result.type_ = type_;
         result.name_ = name_;
+        result.fileId_ = fileId_;
         onBuilt();
         return result;
       }
@@ -600,6 +654,10 @@ public final class FoldersProto {
         }
         if (!other.getName().isEmpty()) {
           name_ = other.name_;
+          onChanged();
+        }
+        if (!other.getFileId().isEmpty()) {
+          fileId_ = other.fileId_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -687,10 +745,6 @@ public final class FoldersProto {
 
       private java.lang.Object name_ = "";
       /**
-       * <pre>
-       * TODO something about its commit/tree/blob id?
-       * </pre>
-       *
        * <code>string name = 2;</code>
        * @return The name.
        */
@@ -707,10 +761,6 @@ public final class FoldersProto {
         }
       }
       /**
-       * <pre>
-       * TODO something about its commit/tree/blob id?
-       * </pre>
-       *
        * <code>string name = 2;</code>
        * @return The bytes for name.
        */
@@ -728,10 +778,6 @@ public final class FoldersProto {
         }
       }
       /**
-       * <pre>
-       * TODO something about its commit/tree/blob id?
-       * </pre>
-       *
        * <code>string name = 2;</code>
        * @param value The name to set.
        * @return This builder for chaining.
@@ -747,10 +793,6 @@ public final class FoldersProto {
         return this;
       }
       /**
-       * <pre>
-       * TODO something about its commit/tree/blob id?
-       * </pre>
-       *
        * <code>string name = 2;</code>
        * @return This builder for chaining.
        */
@@ -761,10 +803,6 @@ public final class FoldersProto {
         return this;
       }
       /**
-       * <pre>
-       * TODO something about its commit/tree/blob id?
-       * </pre>
-       *
        * <code>string name = 2;</code>
        * @param value The bytes for name to set.
        * @return This builder for chaining.
@@ -777,6 +815,82 @@ public final class FoldersProto {
   checkByteStringIsUtf8(value);
         
         name_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object fileId_ = "";
+      /**
+       * <code>string fileId = 3;</code>
+       * @return The fileId.
+       */
+      public java.lang.String getFileId() {
+        java.lang.Object ref = fileId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          fileId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string fileId = 3;</code>
+       * @return The bytes for fileId.
+       */
+      public com.google.protobuf.ByteString
+          getFileIdBytes() {
+        java.lang.Object ref = fileId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          fileId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string fileId = 3;</code>
+       * @param value The fileId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFileId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        fileId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string fileId = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFileId() {
+        
+        fileId_ = getDefaultInstance().getFileId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string fileId = 3;</code>
+       * @param value The bytes for fileId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFileIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        fileId_ = value;
         onChanged();
         return this;
       }
@@ -1645,12 +1759,13 @@ public final class FoldersProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rfolders.proto\"h\n\022FolderListingEntry\022&\n" +
+      "\n\rfolders.proto\"x\n\022FolderListingEntry\022&\n" +
       "\004type\030\001 \001(\0162\030.FolderListingEntry.Type\022\014\n" +
-      "\004name\030\002 \001(\t\"\034\n\004Type\022\010\n\004FILE\020\000\022\n\n\006FOLDER\020" +
-      "\001\"5\n\rFolderListing\022$\n\007entries\030\001 \003(\0132\023.Fo" +
-      "lderListingEntryB4\n\"com.haberdashervcs.s" +
-      "erver.protobufB\014FoldersProtoP\000b\006proto3"
+      "\004name\030\002 \001(\t\022\016\n\006fileId\030\003 \001(\t\"\034\n\004Type\022\010\n\004F" +
+      "ILE\020\000\022\n\n\006FOLDER\020\001\"5\n\rFolderListing\022$\n\007en" +
+      "tries\030\001 \003(\0132\023.FolderListingEntryB4\n\"com." +
+      "haberdashervcs.server.protobufB\014FoldersP" +
+      "rotoP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1661,7 +1776,7 @@ public final class FoldersProto {
     internal_static_FolderListingEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_FolderListingEntry_descriptor,
-        new java.lang.String[] { "Type", "Name", });
+        new java.lang.String[] { "Type", "Name", "FileId", });
     internal_static_FolderListing_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_FolderListing_fieldAccessorTable = new

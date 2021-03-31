@@ -9,6 +9,7 @@ import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.server.operations.CheckoutResult;
+import com.haberdashervcs.server.operations.FileEntry;
 import com.haberdashervcs.server.operations.FolderListing;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
@@ -87,13 +88,13 @@ public final class HBaseDatastore implements HdDatastore {
         }
     }
 
-    private HBaseCheckoutStream crawlFiles(String rootPath, FolderListing rootListing) {
+    private HBaseCheckoutStream crawlFiles(String rootPath, FolderListing rootListing) throws IOException {
         HBaseCheckoutStream.Builder out = HBaseCheckoutStream.Builder.atRoot(rootPath, rootListing);
         LinkedList<CrawlEntry> foldersToBrowse = new LinkedList<>();
         foldersToBrowse.add(new CrawlEntry(rootPath, rootListing));
 
         while (!foldersToBrowse.isEmpty()) {
-            CrawlEntry thisCrawlEntry = foldersToBrowse.getFirst();
+            CrawlEntry thisCrawlEntry = foldersToBrowse.pop();
             for (FolderListing.FolderEntry entryInFolder : thisCrawlEntry.listing.getEntries()) {
                 if (entryInFolder.getType() == FolderListing.FolderEntry.Type.FOLDER) {
                     // TODO get the FolderListing here...
@@ -102,7 +103,9 @@ public final class HBaseDatastore implements HdDatastore {
                             thisCrawlEntry.path + "/" + entryInFolder.getName(), thisEntryFolderListing));
 
                 } else {
-                    // TODO how do I get a file and its contents?
+                    String fileRowKey = entryInFolder.getFileId();
+                    FileEntry fileEntry = getFile(fileRowKey);
+                    out.addFile(thisCrawlEntry.path, fileEntry.getContents());
                 }
             }
         }
@@ -111,10 +114,23 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
+    private FileEntry getFile(String rowKey) throws IOException {
+        // TODO: Is it better to cache these Table objects?
+        final Table filesTable = conn.getTable(TableName.valueOf("Files"));
+        final String columnFamilyName = "cfMain";
+
+        Get get = new Get(Bytes.toBytes(rowKey));
+        Result result = filesTable.get(get);
+        byte[] fileValue = result.getValue(
+                Bytes.toBytes(columnFamilyName), Bytes.toBytes("contents"));
+
+        return FileEntry.fromBytes(fileValue);
+    }
+
+
     private FolderListing getFolderListing(FolderListing parentFolderListing, String nextFolderName) throws IOException {
         final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
-
 
         final String rowKey = nextFolderName; // TODO commits/refs in the row key?
 
