@@ -23,7 +23,7 @@ public final class FolderListing {
     }
 
     public static class FolderEntry {
-        enum Type {
+        public enum Type {
             FILE,
             FOLDER
         }
@@ -35,11 +35,23 @@ public final class FolderListing {
             this.type = type;
             this.name = name;
         }
+
+        public Type getType() {
+            return type;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     private final ImmutableList<FolderEntry> entries;
 
     private FolderListing(List<FolderEntry> entries) {
         this.entries = ImmutableList.copyOf(entries);
+    }
+
+    public List<FolderEntry> getEntries() {
+        return entries;
     }
 }

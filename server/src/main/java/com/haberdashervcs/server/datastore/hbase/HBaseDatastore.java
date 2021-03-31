@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -71,11 +72,44 @@ public final class HBaseDatastore implements HdDatastore {
         HBaseCheckoutStream result = crawlFiles(pathSoFar, checkoutRoot);
         return CheckoutResult.forStream(result);
     }
-    
+
+
+    // For tracking built-up paths like "/some/dir/in/the/tree/<filename goes here>"
+    // TODO break out this crawling stuff
+    private static class CrawlEntry {
+        private String path;
+
+        private FolderListing listing;
+
+        public CrawlEntry(String path, FolderListing listing) {
+            this.path = path;
+            this.listing = listing;
+        }
+    }
+
     private HBaseCheckoutStream crawlFiles(String rootPath, FolderListing rootListing) {
         HBaseCheckoutStream.Builder out = HBaseCheckoutStream.Builder.atRoot(rootPath, rootListing);
+        LinkedList<CrawlEntry> foldersToBrowse = new LinkedList<>();
+        foldersToBrowse.add(new CrawlEntry(rootPath, rootListing));
+
+        while (!foldersToBrowse.isEmpty()) {
+            CrawlEntry thisCrawlEntry = foldersToBrowse.getFirst();
+            for (FolderListing.FolderEntry entryInFolder : thisCrawlEntry.listing.getEntries()) {
+                if (entryInFolder.getType() == FolderListing.FolderEntry.Type.FOLDER) {
+                    // TODO get the FolderListing here...
+                    FolderListing thisEntryFolderListing = null;
+                    foldersToBrowse.add(new CrawlEntry(
+                            thisCrawlEntry.path + "/" + entryInFolder.getName(), thisEntryFolderListing));
+
+                } else {
+                    // TODO how do I get a file and its contents?
+                }
+            }
+        }
+
         return out.build();
     }
+
 
     private FolderListing getFolderListing(FolderListing parentFolderListing, String nextFolderName) throws IOException {
         final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
