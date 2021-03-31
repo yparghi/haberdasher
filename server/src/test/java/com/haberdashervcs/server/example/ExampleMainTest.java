@@ -1,6 +1,6 @@
 package com.haberdashervcs.server.example;
 
-import com.haberdashervcs.server.data.hbase.HBaseTestClusterManager;
+import com.haberdashervcs.server.server.data.hbase.HBaseTestClusterManager;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;

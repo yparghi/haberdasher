@@ -1,5 +1,20 @@
-// TODO: Leave a note somewhere appropriate that we *do* check in generated code, to mitigate different people using
-// different versions of protoc. (Maybe this isn't the right decision, but it's what I think for now.)
-
 syntax = "proto3";
 
+option java_package = "com.haberdashervcs.server.protobuf";
+option java_outer_classname = "FoldersProto";
+option java_multiple_files = false;
+
+message FolderListingEntry {
+    enum Type {
+        FILE = 0;
+        FOLDER = 1;
+    }
+
+    Type type = 1;
+    string name = 2;
+    // TODO something about its commit/tree/blob id?
+}
+
+message FolderListing {
+    repeated FolderListingEntry entries = 1;
+}
