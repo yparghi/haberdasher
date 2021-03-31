@@ -13,4 +13,5 @@
 - SSL/TLS for socket communications from client to server?
     - The server socket/communication config should be configurable from main?
 
+- Encrypted storage?
 
