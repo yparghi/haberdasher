@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
@@ -55,24 +56,29 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
     private CheckoutResult checkoutInternal(String branchName, String folderPath) throws IOException {
-        Path path = Paths.get(folderPath);
-
+        String[] pathParts = folderPath.split(Pattern.quote("/"));
         String pathSoFar = "";
         FolderListing currentFolderListing = null;
-        // TODO!
-        for (Path folderName : path) {
+        int currentPathIndex = 0;
 
+        while (!pathSoFar.equals(folderPath)) {
+            final String nextFolderName = pathParts[currentPathIndex];
+            currentFolderListing = getFolderListing(currentFolderListing, nextFolderName);
+
+            pathSoFar += "/" + nextFolderName;
+            ++currentPathIndex;
         }
+
+        // TODO! check out (crawl) every file underneath folderPath, now that we've found its listing in currentFolderListing
+
         return null;
     }
 
-    private FolderListing getFolderListing(Result currentFolder, String nextFolderName) throws IOException {
+    private FolderListing getFolderListing(FolderListing parentFolderListing, String nextFolderName) throws IOException {
         final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
 
-        // TODO: encapsulate currentFolder in some POJO representation that gives me its list of contained
-        // files/subfolders. Iterate through that and make sure the next folder name is actually in the list of folders
-        // within currentFolder.
+
         final String rowKey = nextFolderName; // TODO commits/refs in the row key?
 
         // TODO if not exists, throw an exception?
