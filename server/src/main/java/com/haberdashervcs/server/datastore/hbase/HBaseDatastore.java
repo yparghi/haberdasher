@@ -1,8 +1,6 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -69,9 +67,14 @@ public final class HBaseDatastore implements HdDatastore {
             ++currentPathIndex;
         }
 
-        // TODO! check out (crawl) every file underneath folderPath, now that we've found its listing in currentFolderListing
-
-        return null;
+        final FolderListing checkoutRoot = currentFolderListing;
+        HBaseCheckoutStream result = crawlFiles(pathSoFar, checkoutRoot);
+        return CheckoutResult.forStream(result);
+    }
+    
+    private HBaseCheckoutStream crawlFiles(String rootPath, FolderListing rootListing) {
+        HBaseCheckoutStream.Builder out = HBaseCheckoutStream.Builder.atRoot(rootPath, rootListing);
+        return out.build();
     }
 
     private FolderListing getFolderListing(FolderListing parentFolderListing, String nextFolderName) throws IOException {
