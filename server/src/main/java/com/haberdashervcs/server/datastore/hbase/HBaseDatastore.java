@@ -9,11 +9,13 @@ import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.server.operations.CheckoutResult;
+import com.haberdashervcs.server.operations.CommitEntry;
 import com.haberdashervcs.server.operations.FileEntry;
 import com.haberdashervcs.server.operations.FolderListing;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
+import com.haberdashervcs.server.protobuf.CommitsProto;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
@@ -60,8 +62,17 @@ public final class HBaseDatastore implements HdDatastore {
         }
     }
 
-    private CheckoutResult checkoutInternal(String branchName, String folderPath) throws IOException {
+    private CheckoutResult checkoutInternal(String commitId, String folderPath) throws IOException {
+        CommitEntry commitEntry = getCommit(commitId);
+
         String[] pathParts = folderPath.split(Pattern.quote("/"));
+        for (String nextFolderName : pathParts) {
+
+        }
+
+
+
+        // TODO! toss below what I can
         String pathSoFar = "";
         FolderListing currentFolderListing = null;
         int currentPathIndex = 0;
@@ -117,6 +128,17 @@ public final class HBaseDatastore implements HdDatastore {
         return out.build();
     }
 
+    private CommitEntry getCommit(String rowKey) throws IOException {
+        final Table commitsTable = conn.getTable(TableName.valueOf("Commits"));
+        final String columnFamilyName = "cfMain";
+
+        Get get = new Get(Bytes.toBytes(rowKey));
+        Result result = commitsTable.get(get);
+        byte[] commitEntryBytes = result.getValue(
+                Bytes.toBytes(columnFamilyName), Bytes.toBytes("entry"));
+
+        return CommitEntry.fromBytes(commitEntryBytes);
+    }
 
     private FileEntry getFile(String rowKey) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
@@ -131,6 +153,7 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
+    // TODO! keep this? refactor it?
     private FolderListing getFolderListing(FolderListing parentFolderListing, String nextFolderName) throws IOException {
         final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
