@@ -9,6 +9,5 @@ public interface HdDatastore {
 
     ApplyChangesetResult applyChangeset(Changeset changeset);
 
-    // TODO: Will I need to use some kind of general ref instead of a branch?
-    CheckoutResult checkout(String branchName, String folderPath);
+    CheckoutResult checkout(String commitId, String folderToCheckout);
 }

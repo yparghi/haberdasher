@@ -12,4 +12,4 @@ PROTOC_PATH="$1"
 "$PROTOC_PATH" \
     --proto_path="server/src/main/protobuf" \
     --java_out="server/src/main/java" \
-    files.proto folders.proto
+    commits.proto files.proto folders.proto

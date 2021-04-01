@@ -51,11 +51,11 @@ public final class HBaseDatastore implements HdDatastore {
 
 
     @Override
-    public CheckoutResult checkout(String branchName, String folderPath) {
+    public CheckoutResult checkout(String commitId, String folderToCheckout) {
         try {
-            return checkoutInternal(branchName, folderPath);
+            return checkoutInternal(commitId, folderToCheckout);
         } catch (IOException ioEx) {
-            LOG.exception(ioEx, "Error checking out path: " + folderPath);
+            LOG.exception(ioEx, "Error checking out path: " + folderToCheckout);
             return CheckoutResult.failed(ioEx.getMessage());
         }
     }

@@ -31,6 +31,10 @@ public final class CheckoutResult {
         this.errorMessage = Optional.ofNullable(errorMessage);
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     public CheckoutStream getStream() {
         Preconditions.checkState(status == Status.OK && stream.isPresent());
         return stream.get();
