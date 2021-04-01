@@ -28,9 +28,14 @@ public final class HBaseDatastore implements HdDatastore {
     private static HdLogger LOG = HdLoggers.create(HBaseDatastore.class);
 
 
+    public static HBaseDatastore forConnection (Connection conn) {
+        return new HBaseDatastore(conn);
+    }
+
+
     private final Connection conn;
 
-    public HBaseDatastore(Connection conn) {
+    private HBaseDatastore(Connection conn) {
         this.conn = conn;
     }
 
@@ -97,7 +102,6 @@ public final class HBaseDatastore implements HdDatastore {
             CrawlEntry thisCrawlEntry = foldersToBrowse.pop();
             for (FolderListing.FolderEntry entryInFolder : thisCrawlEntry.listing.getEntries()) {
                 if (entryInFolder.getType() == FolderListing.FolderEntry.Type.FOLDER) {
-                    // TODO get the FolderListing here...
                     FolderListing thisEntryFolderListing = null;
                     foldersToBrowse.add(new CrawlEntry(
                             thisCrawlEntry.path + "/" + entryInFolder.getName(), thisEntryFolderListing));
@@ -115,7 +119,6 @@ public final class HBaseDatastore implements HdDatastore {
 
 
     private FileEntry getFile(String rowKey) throws IOException {
-        // TODO: Is it better to cache these Table objects?
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
         final String columnFamilyName = "cfMain";
 
