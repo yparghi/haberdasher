@@ -1,5 +1,12 @@
 # TODOs
 
+## Small
+
+- In `checkout()`, does DFS perform better than BFS due to locality?
+
+
+## Big
+
 - How can I take of advantage of ROW LOCALITY to group data together for faster reads/checkouts?
     - Should the file row key include the folder id, to group files in a folder together?
         - What about revisions to that folder that DON'T touch most of the files? Would that screw up the locality?
