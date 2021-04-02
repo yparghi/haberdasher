@@ -63,4 +63,13 @@ public final class FolderListing {
     public List<FolderEntry> getEntries() {
         return entries;
     }
+
+    public String getSubfolderId(String subfolderName) {
+        for (FolderEntry entry : entries) {
+            if (entry.getType() == FolderEntry.Type.FOLDER && entry.getName().equals(subfolderName)) {
+                return entry.getFileId();
+            }
+        }
+        throw new IllegalArgumentException("Subfolder not found: " + subfolderName);
+    }
 }

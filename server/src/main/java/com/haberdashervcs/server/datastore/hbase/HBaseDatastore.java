@@ -63,30 +63,16 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
     private CheckoutResult checkoutInternal(String commitId, String folderPath) throws IOException {
-        CommitEntry commitEntry = getCommit(commitId);
+        final CommitEntry commitEntry = getCommit(commitId);
+        FolderListing parentFolder = getFolder(commitEntry.getRootFolderId());
 
         String[] pathParts = folderPath.split(Pattern.quote("/"));
         for (String nextFolderName : pathParts) {
-
+            parentFolder = getFolder(parentFolder.getSubfolderId(nextFolderName));
         }
 
-
-
-        // TODO! toss below what I can
-        String pathSoFar = "";
-        FolderListing currentFolderListing = null;
-        int currentPathIndex = 0;
-
-        while (!pathSoFar.equals(folderPath)) {
-            final String nextFolderName = pathParts[currentPathIndex];
-            currentFolderListing = getFolderListing(currentFolderListing, nextFolderName);
-
-            pathSoFar += "/" + nextFolderName;
-            ++currentPathIndex;
-        }
-
-        final FolderListing checkoutRoot = currentFolderListing;
-        HBaseCheckoutStream result = crawlFiles(pathSoFar, checkoutRoot);
+        final FolderListing checkoutRoot = parentFolder;
+        HBaseCheckoutStream result = crawlFiles(folderPath, checkoutRoot);
         return CheckoutResult.forStream(result);
     }
 
@@ -153,14 +139,12 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
-    // TODO! keep this? refactor it?
-    private FolderListing getFolderListing(FolderListing parentFolderListing, String nextFolderName) throws IOException {
+    private FolderListing getFolder(String folderId) throws IOException {
         final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
 
-        final String rowKey = nextFolderName; // TODO commits/refs in the row key?
+        final String rowKey = folderId; // TODO commits/refs in the row key?
 
-        // TODO if not exists, throw an exception?
         Get get = new Get(Bytes.toBytes(rowKey));
         Result result = foldersTable.get(get);
         byte[] folderValue = result.getValue(

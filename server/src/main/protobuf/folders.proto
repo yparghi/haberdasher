@@ -12,7 +12,7 @@ message FolderListingEntry {
 
     Type type = 1;
     string name = 2;
-    string fileId = 3;
+    string fileId = 3;  // TODO! rename to just "id" since it could be a file or a folder?
 }
 
 message FolderListing {

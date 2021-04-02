@@ -15,3 +15,5 @@
 
 - Encrypted storage?
 
+- Compression in storage?
+
