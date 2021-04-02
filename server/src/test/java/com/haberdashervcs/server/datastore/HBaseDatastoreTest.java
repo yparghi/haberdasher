@@ -139,13 +139,14 @@ public class HBaseDatastoreTest {
         assertEquals(CheckoutResult.Status.OK, result.getStatus());
 
         ArrayList<CheckoutStream.CheckoutFile> resultFiles = new ArrayList<>();
-        // TODO: unordered check, and check contents
-        while (result.getStream().hasNextFile()) {
-            resultFiles.add(result.getStream().nextFile());
+        for (CheckoutStream.CheckoutFile file : result.getStream()) {
+            resultFiles.add(file);
         }
+
+        // TODO: unordered check, and check contents
         assertEquals(2, resultFiles.size());
-        assertEquals("apple.txt", resultFiles.get(0).getPath());
-        assertEquals("banana.txt", resultFiles.get(1).getPath());
+        assertEquals("/apple.txt", resultFiles.get(0).getPath());
+        assertEquals("/banana.txt", resultFiles.get(1).getPath());
     }
 
 

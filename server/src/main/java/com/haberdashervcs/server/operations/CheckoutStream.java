@@ -3,9 +3,15 @@ package com.haberdashervcs.server.operations;
 import com.haberdashervcs.server.core.HdBytes;
 
 
-public interface CheckoutStream {
+public interface CheckoutStream extends Iterable<CheckoutStream.CheckoutFile> {
 
     final class CheckoutFile {
+
+        public static CheckoutFile of(String path, HdBytes contents) {
+            return new CheckoutFile(path, contents);
+        }
+
+
         private final String path;
         private final HdBytes contents;
 
@@ -22,9 +28,4 @@ public interface CheckoutStream {
             return contents;
         }
     }
-
-
-    boolean hasNextFile();
-
-    CheckoutFile nextFile();
 }

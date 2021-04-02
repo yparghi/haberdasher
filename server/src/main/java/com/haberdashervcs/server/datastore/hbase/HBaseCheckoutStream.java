@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
@@ -39,6 +40,28 @@ class HBaseCheckoutStream implements CheckoutStream {
         }
     }
 
+    private static class CheckoutFileIterator implements Iterator<CheckoutFile> {
+
+        private final ImmutableMap<String, HdBytes> foundFiles;
+        private Iterator<Map.Entry<String, HdBytes>> foundFilesIterator;
+
+        private CheckoutFileIterator(ImmutableMap<String, HdBytes> foundFiles) {
+            this.foundFiles = foundFiles;
+            this.foundFilesIterator = foundFiles.entrySet().iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return (foundFilesIterator.hasNext());
+        }
+
+        @Override
+        public CheckoutFile next() {
+            Map.Entry<String, HdBytes> nextEntry = foundFilesIterator.next();
+            return CheckoutFile.of(nextEntry.getKey(), nextEntry.getValue());
+        }
+    }
+
 
     private final String rootPath;
     private final FolderListing rootListing;
@@ -51,13 +74,7 @@ class HBaseCheckoutStream implements CheckoutStream {
     }
 
     @Override
-    // TODO: Separate Iterator instance?
-    public boolean hasNextFile() {
-        return false;
-    }
-
-    @Override
-    public CheckoutFile nextFile() {
-        return null;
+    public Iterator<CheckoutFile> iterator() {
+        return new CheckoutFileIterator(foundFiles);
     }
 }
