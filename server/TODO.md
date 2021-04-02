@@ -1,5 +1,10 @@
 # TODOs
 
+- How can I take of advantage of ROW LOCALITY to group data together for faster reads/checkouts?
+    - Should the file row key include the folder id, to group files in a folder together?
+        - What about revisions to that folder that DON'T touch most of the files? Would that screw up the locality?
+    - And how do renames affect this?
+
 - Upgrade the JVM to whatever works with HBase.
 
 - Look at Java modules, for stuff like the HBase code.
