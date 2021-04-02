@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.datastore;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
 import com.haberdashervcs.server.operations.CheckoutResult;
+import com.haberdashervcs.server.operations.CheckoutStream;
 import com.haberdashervcs.server.protobuf.CommitsProto;
 import com.haberdashervcs.server.protobuf.FilesProto;
 import com.haberdashervcs.server.protobuf.FoldersProto;
@@ -46,7 +48,7 @@ public class HBaseDatastoreTest {
     }
 
 
-    private String putFile(String contents) throws IOException {
+    private String putFileRaw(String contents) throws IOException {
         final String fileId = UUID.randomUUID().toString();
 
         Table filesTable = conn.getTable(TableName.valueOf("Files"));
@@ -68,7 +70,7 @@ public class HBaseDatastoreTest {
         return fileId;
     }
 
-    private String putFolder(List<String> fileIds, List<String> fileNames) throws IOException {
+    private String putFolderRaw(List<String> fileIds, List<String> fileNames) throws IOException {
         Preconditions.checkArgument(fileIds.size() == fileNames.size());
 
         final String folderId = UUID.randomUUID().toString();
@@ -98,7 +100,7 @@ public class HBaseDatastoreTest {
         return folderId;
     }
 
-    private String putCommit(String rootFolderId) throws IOException {
+    private String putCommitRaw(String rootFolderId) throws IOException {
         final String commitId = UUID.randomUUID().toString();
 
         Table commitsTable = conn.getTable(TableName.valueOf("Commits"));
@@ -122,20 +124,28 @@ public class HBaseDatastoreTest {
 
     @Test
     public void basicRootFolderCheckout() throws Exception {
-        String firstFileId = putFile("apple");
-        String secondFileId = putFile("banana");
+        String firstFileId = putFileRaw("apple");
+        String secondFileId = putFileRaw("banana");
 
-        String folderId = putFolder(
+        String folderId = putFolderRaw(
                 Arrays.asList(firstFileId, secondFileId),
                 Arrays.asList("apple.txt", "banana.txt"));
 
-        String commitId = putCommit(folderId);
+        String commitId = putCommitRaw(folderId);
 
         HBaseDatastore datastore = HBaseDatastore.forConnection(conn);
         CheckoutResult result = datastore.checkout(commitId.toString(), "");
 
         assertEquals(CheckoutResult.Status.OK, result.getStatus());
-        // TODO check contents
+
+        ArrayList<CheckoutStream.CheckoutFile> resultFiles = new ArrayList<>();
+        // TODO: unordered check, and check contents
+        while (result.getStream().hasNextFile()) {
+            resultFiles.add(result.getStream().nextFile());
+        }
+        assertEquals(2, resultFiles.size());
+        assertEquals("apple.txt", resultFiles.get(0).getPath());
+        assertEquals("banana.txt", resultFiles.get(1).getPath());
     }
 
 

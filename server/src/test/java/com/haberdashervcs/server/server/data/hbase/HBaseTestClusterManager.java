@@ -1,5 +1,7 @@
 package com.haberdashervcs.server.server.data.hbase;
 
+import java.util.Arrays;
+
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import org.apache.hadoop.conf.Configuration;
@@ -62,6 +64,18 @@ public final class HBaseTestClusterManager {
                 .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
                 .build();
         admin.createTable(filesTableDesc);
+
+        TableDescriptor foldersTableDesc = TableDescriptorBuilder
+                .newBuilder(TableName.valueOf("Folders"))
+                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
+                .build();
+        admin.createTable(foldersTableDesc);
+
+        TableDescriptor commitsTableDesc = TableDescriptorBuilder
+                .newBuilder(TableName.valueOf("Commits"))
+                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
+                .build();
+        admin.createTable(commitsTableDesc);
     }
 
     public Connection getConn() {
@@ -71,7 +85,9 @@ public final class HBaseTestClusterManager {
 
     // Re. shutdown, the HBaseTestingUtility has its own shutdown hook.
     public synchronized void tearDownBetweenTests() throws Exception {
-        admin.disableTable(TableName.valueOf("Files"));
-        admin.deleteTable(TableName.valueOf("Files"));
+        for (String tableName : Arrays.asList("Files", "Folders", "Commits")) {
+            admin.disableTable(TableName.valueOf(tableName));
+            admin.deleteTable(TableName.valueOf(tableName));
+        }
     }
 }
