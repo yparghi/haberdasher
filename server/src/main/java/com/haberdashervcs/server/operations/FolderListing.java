@@ -20,6 +20,7 @@ public final class FolderListing {
                             ? FolderEntry.Type.FILE : FolderEntry.Type.FOLDER,
                     protoEntry.getName(),
                     protoEntry.getFileId());
+            entries.add(entry);
         }
         return new FolderListing(entries.build());
     }

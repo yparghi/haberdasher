@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Preconditions;
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
@@ -62,6 +63,8 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
     private CheckoutResult checkoutInternal(String commitId, String folderPath) throws IOException {
+        // TODO How do I generalize this check?
+        Preconditions.checkArgument(folderPath.startsWith("/"));
         final CommitEntry commitEntry = getCommit(commitId);
         FolderListing parentFolder = getFolder(commitEntry.getRootFolderId());
 
@@ -105,7 +108,7 @@ public final class HBaseDatastore implements HdDatastore {
                 } else {
                     String fileRowKey = entryInFolder.getFileId();
                     FileEntry fileEntry = getFile(fileRowKey);
-                    out.addFile(thisCrawlEntry.path, fileEntry.getContents());
+                    out.addFile(thisCrawlEntry.path + entryInFolder.getName(), fileEntry.getContents());
                 }
             }
         }
