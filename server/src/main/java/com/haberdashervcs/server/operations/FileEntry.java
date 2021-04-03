@@ -8,8 +8,8 @@ import com.haberdashervcs.server.protobuf.FilesProto;
 
 public class FileEntry {
 
-    public static FileEntry fromBytes(byte[] bytes) throws IOException {
-        FilesProto.FileEntry proto = FilesProto.FileEntry.parseFrom(bytes);
+    public static FileEntry fromBytes(HdBytes bytes) throws IOException {
+        FilesProto.FileEntry proto = FilesProto.FileEntry.parseFrom(bytes.getRawBytes());
         return new FileEntry(proto.getContents().toByteArray());
     }
 

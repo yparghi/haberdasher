@@ -142,24 +142,12 @@ public final class FilesProto {
     com.google.protobuf.ByteString getContents();
 
     /**
-     * <code>string commitId = 2;</code>
-     * @return The commitId.
-     */
-    java.lang.String getCommitId();
-    /**
-     * <code>string commitId = 2;</code>
-     * @return The bytes for commitId.
-     */
-    com.google.protobuf.ByteString
-        getCommitIdBytes();
-
-    /**
-     * <code>.ChangeType changeType = 3;</code>
+     * <code>.ChangeType changeType = 2;</code>
      * @return The enum numeric value on the wire for changeType.
      */
     int getChangeTypeValue();
     /**
-     * <code>.ChangeType changeType = 3;</code>
+     * <code>.ChangeType changeType = 2;</code>
      * @return The changeType.
      */
     com.haberdashervcs.server.protobuf.FilesProto.ChangeType getChangeType();
@@ -178,7 +166,6 @@ public final class FilesProto {
     }
     private FileEntry() {
       contents_ = com.google.protobuf.ByteString.EMPTY;
-      commitId_ = "";
       changeType_ = 0;
     }
 
@@ -217,13 +204,7 @@ public final class FilesProto {
               contents_ = input.readBytes();
               break;
             }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              commitId_ = s;
-              break;
-            }
-            case 24: {
+            case 16: {
               int rawValue = input.readEnum();
 
               changeType_ = rawValue;
@@ -272,55 +253,17 @@ public final class FilesProto {
       return contents_;
     }
 
-    public static final int COMMITID_FIELD_NUMBER = 2;
-    private volatile java.lang.Object commitId_;
-    /**
-     * <code>string commitId = 2;</code>
-     * @return The commitId.
-     */
-    @java.lang.Override
-    public java.lang.String getCommitId() {
-      java.lang.Object ref = commitId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        commitId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string commitId = 2;</code>
-     * @return The bytes for commitId.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getCommitIdBytes() {
-      java.lang.Object ref = commitId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        commitId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int CHANGETYPE_FIELD_NUMBER = 3;
+    public static final int CHANGETYPE_FIELD_NUMBER = 2;
     private int changeType_;
     /**
-     * <code>.ChangeType changeType = 3;</code>
+     * <code>.ChangeType changeType = 2;</code>
      * @return The enum numeric value on the wire for changeType.
      */
     @java.lang.Override public int getChangeTypeValue() {
       return changeType_;
     }
     /**
-     * <code>.ChangeType changeType = 3;</code>
+     * <code>.ChangeType changeType = 2;</code>
      * @return The changeType.
      */
     @java.lang.Override public com.haberdashervcs.server.protobuf.FilesProto.ChangeType getChangeType() {
@@ -346,11 +289,8 @@ public final class FilesProto {
       if (!contents_.isEmpty()) {
         output.writeBytes(1, contents_);
       }
-      if (!getCommitIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, commitId_);
-      }
       if (changeType_ != com.haberdashervcs.server.protobuf.FilesProto.ChangeType.ADD.getNumber()) {
-        output.writeEnum(3, changeType_);
+        output.writeEnum(2, changeType_);
       }
       unknownFields.writeTo(output);
     }
@@ -365,12 +305,9 @@ public final class FilesProto {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(1, contents_);
       }
-      if (!getCommitIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, commitId_);
-      }
       if (changeType_ != com.haberdashervcs.server.protobuf.FilesProto.ChangeType.ADD.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, changeType_);
+          .computeEnumSize(2, changeType_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -389,8 +326,6 @@ public final class FilesProto {
 
       if (!getContents()
           .equals(other.getContents())) return false;
-      if (!getCommitId()
-          .equals(other.getCommitId())) return false;
       if (changeType_ != other.changeType_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -405,8 +340,6 @@ public final class FilesProto {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CONTENTS_FIELD_NUMBER;
       hash = (53 * hash) + getContents().hashCode();
-      hash = (37 * hash) + COMMITID_FIELD_NUMBER;
-      hash = (53 * hash) + getCommitId().hashCode();
       hash = (37 * hash) + CHANGETYPE_FIELD_NUMBER;
       hash = (53 * hash) + changeType_;
       hash = (29 * hash) + unknownFields.hashCode();
@@ -544,8 +477,6 @@ public final class FilesProto {
         super.clear();
         contents_ = com.google.protobuf.ByteString.EMPTY;
 
-        commitId_ = "";
-
         changeType_ = 0;
 
         return this;
@@ -575,7 +506,6 @@ public final class FilesProto {
       public com.haberdashervcs.server.protobuf.FilesProto.FileEntry buildPartial() {
         com.haberdashervcs.server.protobuf.FilesProto.FileEntry result = new com.haberdashervcs.server.protobuf.FilesProto.FileEntry(this);
         result.contents_ = contents_;
-        result.commitId_ = commitId_;
         result.changeType_ = changeType_;
         onBuilt();
         return result;
@@ -627,10 +557,6 @@ public final class FilesProto {
         if (other == com.haberdashervcs.server.protobuf.FilesProto.FileEntry.getDefaultInstance()) return this;
         if (other.getContents() != com.google.protobuf.ByteString.EMPTY) {
           setContents(other.getContents());
-        }
-        if (!other.getCommitId().isEmpty()) {
-          commitId_ = other.commitId_;
-          onChanged();
         }
         if (other.changeType_ != 0) {
           setChangeTypeValue(other.getChangeTypeValue());
@@ -698,92 +624,16 @@ public final class FilesProto {
         return this;
       }
 
-      private java.lang.Object commitId_ = "";
-      /**
-       * <code>string commitId = 2;</code>
-       * @return The commitId.
-       */
-      public java.lang.String getCommitId() {
-        java.lang.Object ref = commitId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          commitId_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string commitId = 2;</code>
-       * @return The bytes for commitId.
-       */
-      public com.google.protobuf.ByteString
-          getCommitIdBytes() {
-        java.lang.Object ref = commitId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          commitId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string commitId = 2;</code>
-       * @param value The commitId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setCommitId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        commitId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string commitId = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearCommitId() {
-        
-        commitId_ = getDefaultInstance().getCommitId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string commitId = 2;</code>
-       * @param value The bytes for commitId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setCommitIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        commitId_ = value;
-        onChanged();
-        return this;
-      }
-
       private int changeType_ = 0;
       /**
-       * <code>.ChangeType changeType = 3;</code>
+       * <code>.ChangeType changeType = 2;</code>
        * @return The enum numeric value on the wire for changeType.
        */
       @java.lang.Override public int getChangeTypeValue() {
         return changeType_;
       }
       /**
-       * <code>.ChangeType changeType = 3;</code>
+       * <code>.ChangeType changeType = 2;</code>
        * @param value The enum numeric value on the wire for changeType to set.
        * @return This builder for chaining.
        */
@@ -794,7 +644,7 @@ public final class FilesProto {
         return this;
       }
       /**
-       * <code>.ChangeType changeType = 3;</code>
+       * <code>.ChangeType changeType = 2;</code>
        * @return The changeType.
        */
       @java.lang.Override
@@ -804,7 +654,7 @@ public final class FilesProto {
         return result == null ? com.haberdashervcs.server.protobuf.FilesProto.ChangeType.UNRECOGNIZED : result;
       }
       /**
-       * <code>.ChangeType changeType = 3;</code>
+       * <code>.ChangeType changeType = 2;</code>
        * @param value The changeType to set.
        * @return This builder for chaining.
        */
@@ -818,7 +668,7 @@ public final class FilesProto {
         return this;
       }
       /**
-       * <code>.ChangeType changeType = 3;</code>
+       * <code>.ChangeType changeType = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearChangeType() {
@@ -894,12 +744,11 @@ public final class FilesProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013files.proto\"P\n\tFileEntry\022\020\n\010contents\030\001" +
-      " \001(\014\022\020\n\010commitId\030\002 \001(\t\022\037\n\nchangeType\030\003 \001" +
-      "(\0162\013.ChangeType*-\n\nChangeType\022\007\n\003ADD\020\000\022\n" +
-      "\n\006MODIFY\020\001\022\n\n\006RENAME\020\002B2\n\"com.haberdashe" +
-      "rvcs.server.protobufB\nFilesProtoP\000b\006prot" +
-      "o3"
+      "\n\013files.proto\">\n\tFileEntry\022\020\n\010contents\030\001" +
+      " \001(\014\022\037\n\nchangeType\030\002 \001(\0162\013.ChangeType*-\n" +
+      "\nChangeType\022\007\n\003ADD\020\000\022\n\n\006MODIFY\020\001\022\n\n\006RENA" +
+      "ME\020\002B2\n\"com.haberdashervcs.server.protob" +
+      "ufB\nFilesProtoP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -910,7 +759,7 @@ public final class FilesProto {
     internal_static_FileEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_FileEntry_descriptor,
-        new java.lang.String[] { "Contents", "CommitId", "ChangeType", });
+        new java.lang.String[] { "Contents", "ChangeType", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

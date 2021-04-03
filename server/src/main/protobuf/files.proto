@@ -13,6 +13,5 @@ enum ChangeType {
 
 message FileEntry {
     bytes contents = 1;
-    string commitId = 2;
-    ChangeType changeType = 3;
+    ChangeType changeType = 2;
 }

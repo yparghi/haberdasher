@@ -2,6 +2,8 @@ package com.haberdashervcs.server.operations.change;
 
 import java.util.Arrays;
 
+import com.haberdashervcs.server.core.HdBytes;
+
 
 public final class AddChange {
 
@@ -10,14 +12,13 @@ public final class AddChange {
     }
 
 
-    // TODO: Some immutable wrapper for the bytes?
-    private final byte[] contents;
+    private final HdBytes contents;
 
     private AddChange(byte[] contents) {
-        this.contents = Arrays.copyOf(contents, contents.length);
+        this.contents = HdBytes.of(Arrays.copyOf(contents, contents.length));
     }
 
-    public byte[] getContents() {
-        return Arrays.copyOf(contents, contents.length);
+    public HdBytes getContents() {
+        return contents;
     }
 }

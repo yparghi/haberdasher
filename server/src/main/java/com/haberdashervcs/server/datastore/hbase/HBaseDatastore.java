@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
+import com.haberdashervcs.server.core.HdBytes;
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
@@ -18,7 +18,9 @@ import com.haberdashervcs.server.operations.FolderListing;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
 import com.haberdashervcs.server.operations.change.ParsedChangeTree;
+import com.haberdashervcs.server.protobuf.CommitsProto;
 import com.haberdashervcs.server.protobuf.FilesProto;
+import com.haberdashervcs.server.protobuf.FoldersProto;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
@@ -140,7 +142,7 @@ public final class HBaseDatastore implements HdDatastore {
         byte[] fileValue = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("contents"));
 
-        return FileEntry.fromBytes(fileValue);
+        return FileEntry.fromBytes(HdBytes.of(fileValue));
     }
 
 
@@ -159,7 +161,7 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
-    private String putFileAdd(FileEntry fileEntry, String commitId) throws IOException {
+    private String putFileAdd(FileEntry fileEntry) throws IOException {
         final String fileId = UUID.randomUUID().toString();
 
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
@@ -171,7 +173,6 @@ public final class HBaseDatastore implements HdDatastore {
         // TODO compress the commit id and other string fields to bytes? Is that necessary?
         FilesProto.FileEntry fileProto = FilesProto.FileEntry.newBuilder()
                 .setContents(ByteString.copyFrom(fileEntry.getContents().getRawBytes()))
-                .setCommitId(commitId)
                 .setChangeType(FilesProto.ChangeType.ADD)
                 .build();
 
@@ -183,6 +184,64 @@ public final class HBaseDatastore implements HdDatastore {
         filesTable.put(put);
 
         return fileId;
+    }
+
+    private FoldersProto.FolderListing convertFolderToProto(FolderListing folderListing) {
+        FoldersProto.FolderListing.Builder out = FoldersProto.FolderListing.newBuilder();
+
+        for (FolderListing.FolderEntry entry : folderListing.getEntries()) {
+            FoldersProto.FolderListingEntry protoEntry = FoldersProto.FolderListingEntry.newBuilder()
+                    .setFileId(entry.getFileId())
+                    .setName(entry.getName())
+                    .setType(entry.getType() == FolderListing.FolderEntry.Type.FILE
+                            ? FoldersProto.FolderListingEntry.Type.FILE
+                            : FoldersProto.FolderListingEntry.Type.FOLDER)
+                    .build();
+            out.addEntries(protoEntry);
+        }
+
+        return out.build();
+    }
+
+    private String putFolder(FolderListing folderListing) throws IOException {
+        final String folderId = UUID.randomUUID().toString();
+
+        final Table filesTable = conn.getTable(TableName.valueOf("Folders"));
+        final String columnFamilyName = "cfMain";
+        final String columnName = "listing";
+
+        final String rowKey = folderId;
+
+        // TODO compress the commit id and other string fields to bytes? Is that necessary?
+        FoldersProto.FolderListing folderProto = convertFolderToProto(folderListing);
+
+        Put put = new Put(Bytes.toBytes(rowKey));
+        put.addColumn(
+                Bytes.toBytes(columnFamilyName),
+                Bytes.toBytes(columnName),
+                folderProto.toByteArray());
+        filesTable.put(put);
+
+        return folderId;
+    }
+
+    private void putCommit(String commitId, String rootFolderId) throws IOException {
+        final Table commitsTable = conn.getTable(TableName.valueOf("Commits"));
+        final String columnFamilyName = "cfMain";
+        final String columnName = "entry";
+
+        final String rowKey = commitId;
+
+        CommitsProto.CommitEntry commitProto = CommitsProto.CommitEntry.newBuilder()
+                .setRootFolderId(rootFolderId)
+                .build();
+
+        Put put = new Put(Bytes.toBytes(rowKey));
+        put.addColumn(
+                Bytes.toBytes(columnFamilyName),
+                Bytes.toBytes(columnName),
+                commitProto.toByteArray());
+        commitsTable.put(put);
     }
 
 
@@ -205,13 +264,20 @@ public final class HBaseDatastore implements HdDatastore {
 
         // TODO: Should file ids be based on (hashed from?) the file contents? Or is that the client's problem to solve,
         // in tracking/storing/sending which files are changed?
+        //
+        // TODO!!! what ID do I use for the file? how do I cross-reference that with the folder listing for this file??
+        // Is that the client's job?
         for (FileEntry addedFile : parsed.getAddedFiles()) {
-            putFileAdd(addedFile, thisCommitId);
+            putFileAdd(addedFile);
         }
 
+        // TODO! shouldn't this have a path? should ParsedChangeTree parse out path + listing?
         for (FolderListing changedFolder : parsed.getChangedFolders()) {
-            // TODO...
+            // TODO: if path == "/" then use the set rootFolderId?
+            changedFolder.getPath() // ?????
         }
+
+        putCommit(thisCommitId, rootFolderId);
 
         return ApplyChangesetResult.forStatus(ApplyChangesetResult.Status.OK);
     }

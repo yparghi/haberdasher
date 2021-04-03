@@ -10,6 +10,9 @@ import com.haberdashervcs.server.protobuf.FoldersProto;
 
 public final class FolderListing {
 
+    // TODO Factory method from POJOs, for testing?
+
+    // TODO: Some iface for the bytes-from-datastore -> object converter? (so that protobuf isn't hardcoded here)
     public static FolderListing fromBytes(byte[] listingBytes) throws IOException {
         FoldersProto.FolderListing listingProto = FoldersProto.FolderListing.parseFrom(listingBytes);
         ImmutableList.Builder<FolderEntry> entries = ImmutableList.builder();
