@@ -5,6 +5,14 @@ option java_outer_classname = "FilesProto";
 option java_multiple_files = false;
 
 
+enum ChangeType {
+    ADD = 0;
+    MODIFY = 1;
+    RENAME = 2;
+}
+
 message FileEntry {
     bytes contents = 1;
+    string commitId = 2;
+    ChangeType changeType = 3;
 }

@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.protobuf.ByteString;
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
@@ -13,9 +15,10 @@ import com.haberdashervcs.server.operations.CheckoutResult;
 import com.haberdashervcs.server.operations.CommitEntry;
 import com.haberdashervcs.server.operations.FileEntry;
 import com.haberdashervcs.server.operations.FolderListing;
-import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
+import com.haberdashervcs.server.operations.change.ParsedChangeTree;
+import com.haberdashervcs.server.protobuf.FilesProto;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
@@ -156,37 +159,58 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
-    private ApplyChangesetResult applyChangesetInternal(Changeset changeset) throws IOException {
-        // TODO: Some Transaction (or TransactionManager from the config) should do this, maybe by using the datastore
-        // instance.
-        final String branch = "main";
-        final String branchHeadCommit = "head_commit_0x123"; // TODO: getHeadCommit(branchName) or something?
-        final String thisCommitId = UUID.randomUUID().toString();
+    private String putFileAdd(FileEntry fileEntry, String commitId) throws IOException {
+        final String fileId = UUID.randomUUID().toString();
 
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
         final String columnFamilyName = "cfMain";
+        final String columnName = "contents";
 
-        for (AddChange addChange : changeset.getAddChanges()) {
-            final String rowKey = "someRow";
-            Put put = new Put(Bytes.toBytes(rowKey));
+        final String rowKey = fileId;
 
-            put.addColumn(
-                    Bytes.toBytes(columnFamilyName),
-                    Bytes.toBytes("commit_id"),
-                    Bytes.toBytes(thisCommitId));
+        // TODO compress the commit id and other string fields to bytes? Is that necessary?
+        FilesProto.FileEntry fileProto = FilesProto.FileEntry.newBuilder()
+                .setContents(ByteString.copyFrom(fileEntry.getContents().getRawBytes()))
+                .setCommitId(commitId)
+                .setChangeType(FilesProto.ChangeType.ADD)
+                .build();
 
-            // TODO: Make change_type some enum like add / modify_keyframe / modify_diff / modify_binarydiff?
-            put.addColumn(
-                    Bytes.toBytes(columnFamilyName),
-                    Bytes.toBytes("change_type"),
-                    Bytes.toBytes("add"));
+        Put put = new Put(Bytes.toBytes(rowKey));
+        put.addColumn(
+                Bytes.toBytes(columnFamilyName),
+                Bytes.toBytes(columnName),
+                fileProto.toByteArray());
+        filesTable.put(put);
 
-            put.addColumn(
-                    Bytes.toBytes(columnFamilyName),
-                    Bytes.toBytes("fileContents"),
-                    addChange.getContents());
+        return fileId;
+    }
 
-            filesTable.put(put);
+
+    // TODO Implement, you know, versioning (using row keys?)
+    private ApplyChangesetResult applyChangesetInternal(Changeset changeset) throws IOException {
+        // TODO: Some Transaction (or TransactionManager from the config) should do this, maybe by using the datastore
+        // instance.
+
+        // TODO Set up branches (just mapping to a head commit id? proto BranchEntry?)
+        final String thisCommitId = UUID.randomUUID().toString();
+        final String rootFolderId = UUID.randomUUID().toString();
+
+        ParsedChangeTree parsed = ParsedChangeTree.fromChangeset(changeset);
+
+        // For atomicity, apply the change from the bottom up:
+        // - Create/modify files.
+        // - Create new folder listings.
+        // - Create the new commit with the new root folder listing.
+        // - Update the branch to point to the new commit (TODO).
+
+        // TODO: Should file ids be based on (hashed from?) the file contents? Or is that the client's problem to solve,
+        // in tracking/storing/sending which files are changed?
+        for (FileEntry addedFile : parsed.getAddedFiles()) {
+            putFileAdd(addedFile, thisCommitId);
+        }
+
+        for (FolderListing changedFolder : parsed.getChangedFolders()) {
+            // TODO...
         }
 
         return ApplyChangesetResult.forStatus(ApplyChangesetResult.Status.OK);

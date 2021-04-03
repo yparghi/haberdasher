@@ -19,7 +19,7 @@ public class HdBytes {
         this.contents = Arrays.copyOf(contents, contents.length);
     }
 
-    public byte[] getContents() {
+    public byte[] getRawBytes() {
         return Arrays.copyOf(contents, contents.length);
     }
 }

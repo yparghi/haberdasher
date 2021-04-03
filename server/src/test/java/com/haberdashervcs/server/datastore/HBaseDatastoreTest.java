@@ -134,7 +134,7 @@ public class HBaseDatastoreTest {
         String commitId = putCommitRaw(folderId);
 
         HBaseDatastore datastore = HBaseDatastore.forConnection(conn);
-        CheckoutResult result = datastore.checkout(commitId.toString(), "/");
+        CheckoutResult result = datastore.checkout(commitId, "/");
 
         assertEquals(CheckoutResult.Status.OK, result.getStatus());
 
@@ -151,8 +151,14 @@ public class HBaseDatastoreTest {
 
 
     @Test
-    // TODO: Replace this with a real 2nd test, e.g. checking out a non-root folder.
-    public void secondTestSetupAndTeardown() throws Exception {
+    public void basicInnerFolderCheckout() throws Exception {
+        // TODO
+        assertTrue(true);
+    }
+
+
+    @Test
+    public void basicApplyChangeset() throws Exception {
         assertTrue(true);
     }
 }

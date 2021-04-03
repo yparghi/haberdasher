@@ -42,11 +42,19 @@ public final class FoldersProto {
         getNameBytes();
 
     /**
+     * <pre>
+     * TODO! rename to just "id" since it could be a file or a folder?
+     * </pre>
+     *
      * <code>string fileId = 3;</code>
      * @return The fileId.
      */
     java.lang.String getFileId();
     /**
+     * <pre>
+     * TODO! rename to just "id" since it could be a file or a folder?
+     * </pre>
+     *
      * <code>string fileId = 3;</code>
      * @return The bytes for fileId.
      */
@@ -319,6 +327,10 @@ public final class FoldersProto {
     public static final int FILEID_FIELD_NUMBER = 3;
     private volatile java.lang.Object fileId_;
     /**
+     * <pre>
+     * TODO! rename to just "id" since it could be a file or a folder?
+     * </pre>
+     *
      * <code>string fileId = 3;</code>
      * @return The fileId.
      */
@@ -336,6 +348,10 @@ public final class FoldersProto {
       }
     }
     /**
+     * <pre>
+     * TODO! rename to just "id" since it could be a file or a folder?
+     * </pre>
+     *
      * <code>string fileId = 3;</code>
      * @return The bytes for fileId.
      */
@@ -821,6 +837,10 @@ public final class FoldersProto {
 
       private java.lang.Object fileId_ = "";
       /**
+       * <pre>
+       * TODO! rename to just "id" since it could be a file or a folder?
+       * </pre>
+       *
        * <code>string fileId = 3;</code>
        * @return The fileId.
        */
@@ -837,6 +857,10 @@ public final class FoldersProto {
         }
       }
       /**
+       * <pre>
+       * TODO! rename to just "id" since it could be a file or a folder?
+       * </pre>
+       *
        * <code>string fileId = 3;</code>
        * @return The bytes for fileId.
        */
@@ -854,6 +878,10 @@ public final class FoldersProto {
         }
       }
       /**
+       * <pre>
+       * TODO! rename to just "id" since it could be a file or a folder?
+       * </pre>
+       *
        * <code>string fileId = 3;</code>
        * @param value The fileId to set.
        * @return This builder for chaining.
@@ -869,6 +897,10 @@ public final class FoldersProto {
         return this;
       }
       /**
+       * <pre>
+       * TODO! rename to just "id" since it could be a file or a folder?
+       * </pre>
+       *
        * <code>string fileId = 3;</code>
        * @return This builder for chaining.
        */
@@ -879,6 +911,10 @@ public final class FoldersProto {
         return this;
       }
       /**
+       * <pre>
+       * TODO! rename to just "id" since it could be a file or a folder?
+       * </pre>
+       *
        * <code>string fileId = 3;</code>
        * @param value The bytes for fileId to set.
        * @return This builder for chaining.
