@@ -7,10 +7,10 @@ import com.google.common.collect.ImmutableList;
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
 import com.haberdashervcs.server.operations.FileEntry;
-import com.haberdashervcs.server.operations.FolderListing;
+import com.haberdashervcs.server.operations.FolderWithPath;
 
 
-// TODO Do I really need this class, separate from Changeset? Maybe it will grow to do some real parsing.
+// TODO Do I need this class, or can Changeset do/hold everything?
 public final class ParsedChangeTree {
 
     private static HdLogger LOG = HdLoggers.create(ParsedChangeTree.class);
@@ -47,7 +47,7 @@ public final class ParsedChangeTree {
         return addedFiles;
     }
 
-    public List<FolderListing> getChangedFolders() {
+    public List<FolderWithPath> getChangedFolders() {
         return changeset.getChangedFolders();
     }
 }

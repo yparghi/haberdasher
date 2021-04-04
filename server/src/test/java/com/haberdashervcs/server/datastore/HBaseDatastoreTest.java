@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.datastore;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,10 @@ import com.google.protobuf.ByteString;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
 import com.haberdashervcs.server.operations.CheckoutResult;
 import com.haberdashervcs.server.operations.CheckoutStream;
+import com.haberdashervcs.server.operations.FolderListing;
+import com.haberdashervcs.server.operations.change.AddChange;
+import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
+import com.haberdashervcs.server.operations.change.Changeset;
 import com.haberdashervcs.server.protobuf.CommitsProto;
 import com.haberdashervcs.server.protobuf.FilesProto;
 import com.haberdashervcs.server.protobuf.FoldersProto;
@@ -70,6 +75,7 @@ public class HBaseDatastoreTest {
         return fileId;
     }
 
+    // TODO! Raw interface/helper to HBase, that does these puts and gets?
     private String putFolderRaw(List<String> fileIds, List<String> fileNames) throws IOException {
         Preconditions.checkArgument(fileIds.size() == fileNames.size());
 
@@ -159,6 +165,30 @@ public class HBaseDatastoreTest {
 
     @Test
     public void basicApplyChangeset() throws Exception {
-        assertTrue(true);
+        Changeset.Builder changeset = Changeset.builder();
+
+        AddChange fileA = AddChange.forContents("fileA_id", "apple".getBytes(StandardCharsets.UTF_8));
+        AddChange fileB = AddChange.forContents("fileB_id", "banana".getBytes(StandardCharsets.UTF_8));
+        changeset.withAddChange(fileA);
+        changeset.withAddChange(fileB);
+
+        FoldersProto.FolderListing.Builder folderProto = FoldersProto.FolderListing.newBuilder()
+                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
+                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
+                        .setName("apple.txt")
+                        .setFileId(fileA.getId()))
+                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
+                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
+                        .setName("banana.txt")
+                        .setFileId(fileB.getId()));
+        FolderListing folder = FolderListing.fromBytes(folderProto.build().toByteArray());
+        changeset.withFolderAndPath("/", folder);
+
+        final HdDatastore datastore = HBaseDatastore.forConnection(conn);
+        ApplyChangesetResult result = datastore.applyChangeset(changeset.build());
+
+        assertEquals(ApplyChangesetResult.Status.OK, result.getStatus());
+
+        // TODO! Check the state of the data here -- do that "raw helper" TODO for puts/gets
     }
 }

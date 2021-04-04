@@ -11,9 +11,14 @@ public final class ApplyChangesetResult {
         return new ApplyChangesetResult(status);
     }
 
+
     private final Status status;
 
     private ApplyChangesetResult(Status status) {
         this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 }

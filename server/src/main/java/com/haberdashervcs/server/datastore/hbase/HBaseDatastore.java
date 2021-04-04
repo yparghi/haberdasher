@@ -15,6 +15,7 @@ import com.haberdashervcs.server.operations.CheckoutResult;
 import com.haberdashervcs.server.operations.CommitEntry;
 import com.haberdashervcs.server.operations.FileEntry;
 import com.haberdashervcs.server.operations.FolderListing;
+import com.haberdashervcs.server.operations.FolderWithPath;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
 import com.haberdashervcs.server.operations.change.ParsedChangeTree;
@@ -203,9 +204,7 @@ public final class HBaseDatastore implements HdDatastore {
         return out.build();
     }
 
-    private String putFolder(FolderListing folderListing) throws IOException {
-        final String folderId = UUID.randomUUID().toString();
-
+    private String putFolder(FolderListing folderListing, final String folderId) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
         final String columnName = "listing";
@@ -245,7 +244,6 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
-    // TODO Implement, you know, versioning (using row keys?)
     private ApplyChangesetResult applyChangesetInternal(Changeset changeset) throws IOException {
         // TODO: Some Transaction (or TransactionManager from the config) should do this, maybe by using the datastore
         // instance.
@@ -271,10 +269,14 @@ public final class HBaseDatastore implements HdDatastore {
             putFileAdd(addedFile);
         }
 
-        // TODO! shouldn't this have a path? should ParsedChangeTree parse out path + listing?
-        for (FolderListing changedFolder : parsed.getChangedFolders()) {
-            // TODO: if path == "/" then use the set rootFolderId?
-            changedFolder.getPath() // ?????
+        for (FolderWithPath changedFolder : parsed.getChangedFolders()) {
+            String folderId;
+            if (changedFolder.getPath().equals("")) {
+                folderId = rootFolderId;
+            } else {
+                folderId = UUID.randomUUID().toString();
+            }
+            putFolder(changedFolder.getListing(), folderId);
         }
 
         putCommit(thisCommitId, rootFolderId);

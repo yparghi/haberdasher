@@ -1,10 +1,11 @@
 package com.haberdashervcs.server.operations.change;
 
-import com.google.common.collect.ImmutableList;
-import com.haberdashervcs.server.operations.FolderListing;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+import com.haberdashervcs.server.operations.FolderListing;
+import com.haberdashervcs.server.operations.FolderWithPath;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -13,7 +14,7 @@ public final class Changeset {
 
     public static final class Builder {
 
-        private final ArrayList<FolderListing> changedFolders;
+        private final ArrayList<FolderWithPath> changedFolders;
         private final ArrayList<AddChange> addChanges;
         private final ArrayList<DeleteChange> deleteChanges;
         private final ArrayList<ModifyChange> modifyChanges;
@@ -25,6 +26,10 @@ public final class Changeset {
             deleteChanges = new ArrayList<>();
             modifyChanges = new ArrayList<>();
             renameChanges = new ArrayList<>();
+        }
+
+        public Builder withFolderAndPath(String path, FolderListing listing) {
+            return this;
         }
 
         public Builder withAddChange(AddChange addChange) {
@@ -53,15 +58,19 @@ public final class Changeset {
         }
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    private final ImmutableList<FolderListing> changedFolders;
+
+    private final ImmutableList<FolderWithPath> changedFolders;
     private final ImmutableList<AddChange> addChanges;
     private final ImmutableList<DeleteChange> deleteChanges;
     private final ImmutableList<ModifyChange> modifyChanges;
     private final ImmutableList<RenameChange> renameChanges;
 
     private Changeset(
-            List<FolderListing> changedFolders,
+            List<FolderWithPath> changedFolders,
             List<AddChange> addChanges,
             List<DeleteChange> deleteChanges,
             List<ModifyChange> modifyChanges,
@@ -91,7 +100,7 @@ public final class Changeset {
 
     // TODO some parsing or checking that makes sure when a folder is changed, all of its parent folders on the path
     // have change entries also?
-    public List<FolderListing> getChangedFolders() {
+    public List<FolderWithPath> getChangedFolders() {
         return changedFolders;
     }
 }
