@@ -4,6 +4,9 @@
 
 - In `checkout()`, does DFS perform better than BFS due to locality?
 
+- Org and repo id's: Use some small randomly generated ID instead of what's typed in (which can just be a display name)?
+    - Then the small random ID would be used in the row keys.
+
 
 ## Big
 
