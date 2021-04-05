@@ -2,23 +2,17 @@ package com.haberdashervcs.server.operations;
 
 public final class FolderWithPath {
 
-    public static FolderWithPath forPathAndListing(String id, String path, FolderListing listing) {
-        return new FolderWithPath(id, path, listing);
+    public static FolderWithPath forPathAndListing(String path, FolderListing listing) {
+        return new FolderWithPath(path, listing);
     }
 
 
-    private final String id;
     private final String path;
     private final FolderListing listing;
 
-    private FolderWithPath(String id, String path, FolderListing listing) {
-        this.id = id;
+    private FolderWithPath(String path, FolderListing listing) {
         this.path = path;
         this.listing = listing;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getPath() {

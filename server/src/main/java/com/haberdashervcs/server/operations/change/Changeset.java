@@ -2,6 +2,7 @@ package com.haberdashervcs.server.operations.change;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 import com.haberdashervcs.server.operations.FolderListing;
@@ -29,6 +30,7 @@ public final class Changeset {
         }
 
         public Builder withFolderAndPath(String path, FolderListing listing) {
+            changedFolders.add(FolderWithPath.forPathAndListing(path, listing));
             return this;
         }
 
@@ -69,6 +71,9 @@ public final class Changeset {
     private final ImmutableList<ModifyChange> modifyChanges;
     private final ImmutableList<RenameChange> renameChanges;
 
+    private final String proposedCommitId;
+    private final String proposedRootFolderId;
+
     private Changeset(
             List<FolderWithPath> changedFolders,
             List<AddChange> addChanges,
@@ -80,6 +85,10 @@ public final class Changeset {
         this.deleteChanges = ImmutableList.copyOf(checkNotNull(deleteChanges));
         this.modifyChanges = ImmutableList.copyOf(checkNotNull(modifyChanges));
         this.renameChanges = ImmutableList.copyOf(checkNotNull(renameChanges));
+
+        // TODO where *should* these id's come from?
+        this.proposedCommitId = UUID.randomUUID().toString();
+        this.proposedRootFolderId = UUID.randomUUID().toString();
     }
 
     public List<AddChange> getAddChanges() {
@@ -102,5 +111,13 @@ public final class Changeset {
     // have change entries also?
     public List<FolderWithPath> getChangedFolders() {
         return changedFolders;
+    }
+
+    public String getProposedCommitId() {
+        return proposedCommitId;
+    }
+
+    public String getProposedRootFolderId() {
+        return proposedRootFolderId;
     }
 }

@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.server.data.hbase;
+package com.haberdashervcs.server.datastore.hbase;
 
 import java.util.Arrays;
 

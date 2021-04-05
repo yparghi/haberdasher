@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.datastore;
+package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,9 +10,10 @@ import java.util.UUID;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
-import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
+import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.server.operations.CheckoutResult;
 import com.haberdashervcs.server.operations.CheckoutStream;
+import com.haberdashervcs.server.operations.CommitEntry;
 import com.haberdashervcs.server.operations.FolderListing;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
@@ -20,7 +21,6 @@ import com.haberdashervcs.server.operations.change.Changeset;
 import com.haberdashervcs.server.protobuf.CommitsProto;
 import com.haberdashervcs.server.protobuf.FilesProto;
 import com.haberdashervcs.server.protobuf.FoldersProto;
-import com.haberdashervcs.server.server.data.hbase.HBaseTestClusterManager;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Put;
@@ -171,14 +171,16 @@ public class HBaseDatastoreTest {
 
     @Test
     public void basicApplyChangeset() throws Exception {
-        Changeset.Builder changeset = Changeset.builder();
+        HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
+
+        Changeset.Builder changesetBuilder = Changeset.builder();
 
         AddChange fileA = AddChange.forContents(
                 "fileA_id", fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
         AddChange fileB = AddChange.forContents(
                 "fileB_id", fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
-        changeset.withAddChange(fileA);
-        changeset.withAddChange(fileB);
+        changesetBuilder = changesetBuilder.withAddChange(fileA);
+        changesetBuilder = changesetBuilder.withAddChange(fileB);
 
         FoldersProto.FolderListing.Builder folderProto = FoldersProto.FolderListing.newBuilder()
                 .addEntries(FoldersProto.FolderListingEntry.newBuilder()
@@ -190,13 +192,20 @@ public class HBaseDatastoreTest {
                         .setName("banana.txt")
                         .setFileId(fileB.getId()));
         FolderListing folder = FolderListing.fromBytes(folderProto.build().toByteArray());
-        changeset = changeset.withFolderAndPath("/", folder);
+        changesetBuilder = changesetBuilder.withFolderAndPath("/", folder);
+
 
         final HdDatastore datastore = HBaseDatastore.forConnection(conn);
-        ApplyChangesetResult result = datastore.applyChangeset(changeset.build());
+        final Changeset changeset = changesetBuilder.build();
 
+        ApplyChangesetResult result = datastore.applyChangeset(changeset);
         assertEquals(ApplyChangesetResult.Status.OK, result.getStatus());
 
-        // TODO! Check the state of the data here -- do that "raw helper" TODO for puts/gets
+        String commitId = result.getCommitId();
+        CommitEntry commitEntry = helper.getCommit(changesetBuilder.build().getProposedCommitId());
+        assertEquals(changeset.getProposedRootFolderId(), commitEntry.getRootFolderId());
+
+        FolderListing rootFolder = helper.getFolder(commitEntry.getRootFolderId());
+        assertEquals(2, rootFolder.getEntries().size());
     }
 }
