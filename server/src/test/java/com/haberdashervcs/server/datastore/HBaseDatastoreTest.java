@@ -182,10 +182,10 @@ public class HBaseDatastoreTest {
                         .setName("banana.txt")
                         .setFileId(fileB.getId()));
         FolderListing folder = FolderListing.fromBytes(folderProto.build().toByteArray());
-        changeset.withFolderAndPath("/", folder);
+        changeset = changeset.withFolderAndPath("/", folder);
 
         final HdDatastore datastore = HBaseDatastore.forConnection(conn);
-        ApplyChangesetResult result = datastore.applyChangeset(changeset.build());
+        ApplyChangesetResult result = datastore.applyChangeset(changeset.build());  // TEMP! fail proto decode
 
         assertEquals(ApplyChangesetResult.Status.OK, result.getStatus());
 

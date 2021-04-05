@@ -112,8 +112,7 @@ public final class HBaseDatastore implements HdDatastore {
                             thisCrawlEntry.path + "/" + entryInFolder.getName(), thisEntryFolderListing));
 
                 } else {
-                    String fileRowKey = entryInFolder.getFileId();
-                    FileEntry fileEntry = getFile(fileRowKey);
+                    FileEntry fileEntry = getFile(entryInFolder.getFileId());
                     out.addFile(thisCrawlEntry.path + entryInFolder.getName(), fileEntry.getContents());
                 }
             }
@@ -134,16 +133,16 @@ public final class HBaseDatastore implements HdDatastore {
         return CommitEntry.fromBytes(commitEntryBytes);
     }
 
-    private FileEntry getFile(String rowKey) throws IOException {
+    private FileEntry getFile(String fileId) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
         final String columnFamilyName = "cfMain";
 
-        Get get = new Get(Bytes.toBytes(rowKey));
+        Get get = new Get(Bytes.toBytes(fileId));
         Result result = filesTable.get(get);
         byte[] fileValue = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("contents"));
 
-        return FileEntry.fromBytes(HdBytes.of(fileValue));
+        return FileEntry.fromBytes(fileId, HdBytes.of(fileValue));
     }
 
 
@@ -162,9 +161,7 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
-    private String putFileAdd(FileEntry fileEntry) throws IOException {
-        final String fileId = UUID.randomUUID().toString();
-
+    private String putFileAdd(final String fileId, FileEntry fileEntry) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
         final String columnFamilyName = "cfMain";
         final String columnName = "contents";
@@ -204,7 +201,7 @@ public final class HBaseDatastore implements HdDatastore {
         return out.build();
     }
 
-    private String putFolder(FolderListing folderListing, final String folderId) throws IOException {
+    private String putFolder(final String folderId, FolderListing folderListing) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
         final String columnName = "listing";
@@ -261,12 +258,9 @@ public final class HBaseDatastore implements HdDatastore {
         // - Update the branch to point to the new commit (TODO).
 
         // TODO: Should file ids be based on (hashed from?) the file contents? Or is that the client's problem to solve,
-        // in tracking/storing/sending which files are changed?
-        //
-        // TODO!!! what ID do I use for the file? how do I cross-reference that with the folder listing for this file??
-        // Is that the client's job?
+        // in tracking/storing/sending which files are changed? In other words, where do id's come from?
         for (FileEntry addedFile : parsed.getAddedFiles()) {
-            putFileAdd(addedFile);
+            putFileAdd(addedFile.getId(), addedFile);
         }
 
         for (FolderWithPath changedFolder : parsed.getChangedFolders()) {
@@ -276,7 +270,7 @@ public final class HBaseDatastore implements HdDatastore {
             } else {
                 folderId = UUID.randomUUID().toString();
             }
-            putFolder(changedFolder.getListing(), folderId);
+            putFolder(folderId, changedFolder.getListing());
         }
 
         putCommit(thisCommitId, rootFolderId);

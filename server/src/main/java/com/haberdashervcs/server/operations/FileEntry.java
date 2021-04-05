@@ -8,19 +8,25 @@ import com.haberdashervcs.server.protobuf.FilesProto;
 
 public class FileEntry {
 
-    public static FileEntry fromBytes(HdBytes bytes) throws IOException {
+    public static FileEntry fromBytes(String id, HdBytes bytes) throws IOException {
         FilesProto.FileEntry proto = FilesProto.FileEntry.parseFrom(bytes.getRawBytes());
-        return new FileEntry(proto.getContents().toByteArray());
+        return new FileEntry(id, proto.getContents().toByteArray());
     }
 
 
+    private final String id;
     private HdBytes contents;
 
-    private FileEntry(byte[] contents) {
+    private FileEntry(String id, byte[] contents) {
+        this.id = id;
         this.contents = HdBytes.of(contents);
     }
 
     public HdBytes getContents() {
         return contents;
+    }
+
+    public String getId() {
+        return id;
     }
 }
