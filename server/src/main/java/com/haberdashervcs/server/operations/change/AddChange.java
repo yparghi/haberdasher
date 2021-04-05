@@ -10,6 +10,7 @@ import com.haberdashervcs.server.core.HdBytes;
 // - Then a changeset has (and/or computes) the hash for a file/folder.
 public final class AddChange {
 
+    // TODO Should this take a FileEntry instead of a byte[] ?
     public static AddChange forContents(String id, byte[] contents) {
         return new AddChange(id, contents);
     }

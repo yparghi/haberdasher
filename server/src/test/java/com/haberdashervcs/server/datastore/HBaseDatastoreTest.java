@@ -162,13 +162,21 @@ public class HBaseDatastoreTest {
         assertTrue(true);
     }
 
+    private FilesProto.FileEntry fileEntryForText(String text, FilesProto.ChangeType changeType) {
+        return FilesProto.FileEntry.newBuilder()
+                .setChangeType(changeType)
+                .setContents(ByteString.copyFrom(text, StandardCharsets.UTF_8))
+                .build();
+    }
 
     @Test
     public void basicApplyChangeset() throws Exception {
         Changeset.Builder changeset = Changeset.builder();
 
-        AddChange fileA = AddChange.forContents("fileA_id", "apple".getBytes(StandardCharsets.UTF_8));
-        AddChange fileB = AddChange.forContents("fileB_id", "banana".getBytes(StandardCharsets.UTF_8));
+        AddChange fileA = AddChange.forContents(
+                "fileA_id", fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
+        AddChange fileB = AddChange.forContents(
+                "fileB_id", fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
         changeset.withAddChange(fileA);
         changeset.withAddChange(fileB);
 
@@ -185,7 +193,7 @@ public class HBaseDatastoreTest {
         changeset = changeset.withFolderAndPath("/", folder);
 
         final HdDatastore datastore = HBaseDatastore.forConnection(conn);
-        ApplyChangesetResult result = datastore.applyChangeset(changeset.build());  // TEMP! fail proto decode
+        ApplyChangesetResult result = datastore.applyChangeset(changeset.build());
 
         assertEquals(ApplyChangesetResult.Status.OK, result.getStatus());
 

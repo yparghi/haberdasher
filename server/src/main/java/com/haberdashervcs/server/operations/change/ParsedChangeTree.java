@@ -35,7 +35,7 @@ public final class ParsedChangeTree {
         for (AddChange addChange : changeset.getAddChanges()) {
             try {
                 out.add(FileEntry.fromBytes(addChange.getId(), addChange.getContents()));
-            } catch(IOException ioEx) {
+            } catch (IOException ioEx) {
                 throw new RuntimeException(ioEx);
             }
         }
