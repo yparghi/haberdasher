@@ -14,6 +14,7 @@
     - Should the file row key include the folder id, to group files in a folder together?
         - What about revisions to that folder that DON'T touch most of the files? Would that screw up the locality?
     - And how do renames affect this?
+    - Would a monotonically increasing commit ID make this easier, by keeping related data (close together in history) close together lexicographically?
 
 - Upgrade the JVM to whatever works with HBase.
 
