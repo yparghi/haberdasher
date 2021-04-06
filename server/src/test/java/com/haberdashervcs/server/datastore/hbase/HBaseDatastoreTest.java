@@ -207,5 +207,7 @@ public class HBaseDatastoreTest {
 
         FolderListing rootFolder = helper.getFolder(commitEntry.getRootFolderId());
         assertEquals(2, rootFolder.getEntries().size());
+        assertEquals("apple.txt", rootFolder.getEntries().get(0).getName());
+        assertEquals("banana.txt", rootFolder.getEntries().get(1).getName());
     }
 }
