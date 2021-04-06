@@ -200,9 +200,9 @@ public class HBaseDatastoreTest {
 
         ApplyChangesetResult result = datastore.applyChangeset(changeset);
         assertEquals(ApplyChangesetResult.Status.OK, result.getStatus());
+        assertEquals(changeset.getProposedCommitId(), result.getCommitId());
 
-        String commitId = result.getCommitId();
-        CommitEntry commitEntry = helper.getCommit(changesetBuilder.build().getProposedCommitId());
+        CommitEntry commitEntry = helper.getCommit(result.getCommitId());
         assertEquals(changeset.getProposedRootFolderId(), commitEntry.getRootFolderId());
 
         FolderListing rootFolder = helper.getFolder(commitEntry.getRootFolderId());

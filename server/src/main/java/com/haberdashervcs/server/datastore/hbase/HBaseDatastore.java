@@ -135,7 +135,7 @@ public final class HBaseDatastore implements HdDatastore {
 
         for (FolderWithPath changedFolder : parsed.getChangedFolders()) {
             String folderId;
-            if (changedFolder.getPath().equals("")) {
+            if (changedFolder.getPath().equals("/")) {
                 folderId = changeset.getProposedRootFolderId();
             } else {
                 folderId = UUID.randomUUID().toString();
