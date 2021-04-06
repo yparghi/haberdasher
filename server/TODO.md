@@ -35,3 +35,5 @@
 
 - Garbage collection / failed pushes: In the mark phase, save the data/results out to some giant file or a kind of temp table, to use in the sweep phase?
 
+- Client extensions, by loading from the classpath?
+
