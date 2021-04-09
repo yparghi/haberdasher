@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-import com.haberdashervcs.server.core.logging.HdLogger;
-import com.haberdashervcs.server.core.logging.HdLoggers;
-import com.haberdashervcs.server.operations.FileEntry;
-import com.haberdashervcs.server.operations.FolderWithPath;
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
+import com.haberdashervcs.common.objects.FileEntry;
+import com.haberdashervcs.common.objects.FolderWithPath;
 
 
 // TODO Do I need this class, or can Changeset do/hold everything?

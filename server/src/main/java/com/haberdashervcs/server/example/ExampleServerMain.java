@@ -1,8 +1,8 @@
 package com.haberdashervcs.server.example;
 
 import com.haberdashervcs.server.config.HaberdasherServer;
-import com.haberdashervcs.server.core.logging.HdLogger;
-import com.haberdashervcs.server.core.logging.HdLoggers;
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
 import com.haberdashervcs.server.frontend.JettyHttpFrontend;
 

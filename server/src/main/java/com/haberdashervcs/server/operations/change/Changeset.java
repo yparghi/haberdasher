@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.google.common.collect.ImmutableList;
-import com.haberdashervcs.server.operations.FolderListing;
-import com.haberdashervcs.server.operations.FolderWithPath;
+import com.haberdashervcs.common.objects.FolderListing;
+import com.haberdashervcs.common.objects.FolderWithPath;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

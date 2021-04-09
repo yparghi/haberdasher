@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.core;
+package com.haberdashervcs.common.io;
 
 import java.util.Arrays;
 

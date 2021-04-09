@@ -1,6 +1,6 @@
 package com.haberdashervcs.server.operations;
 
-import com.haberdashervcs.server.core.HdBytes;
+import com.haberdashervcs.common.io.HdBytes;
 
 
 public interface CheckoutStream extends Iterable<CheckoutStream.CheckoutFile> {

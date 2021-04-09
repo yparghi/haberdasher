@@ -1,4 +1,5 @@
-package com.haberdashervcs.server.operations;
+package com.haberdashervcs.common.objects;
+
 
 public final class FolderWithPath {
 

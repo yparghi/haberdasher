@@ -2,7 +2,7 @@ package com.haberdashervcs.server.operations.change;
 
 import java.util.Arrays;
 
-import com.haberdashervcs.server.core.HdBytes;
+import com.haberdashervcs.common.io.HdBytes;
 
 
 // TEMP NOTES on where ids come from:

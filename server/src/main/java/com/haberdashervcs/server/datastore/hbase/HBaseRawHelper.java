@@ -3,10 +3,10 @@ package com.haberdashervcs.server.datastore.hbase;
 import java.io.IOException;
 
 import com.google.protobuf.ByteString;
-import com.haberdashervcs.server.core.HdBytes;
-import com.haberdashervcs.server.operations.CommitEntry;
-import com.haberdashervcs.server.operations.FileEntry;
-import com.haberdashervcs.server.operations.FolderListing;
+import com.haberdashervcs.common.io.HdBytes;
+import com.haberdashervcs.common.objects.CommitEntry;
+import com.haberdashervcs.common.objects.FileEntry;
+import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.protobuf.CommitsProto;
 import com.haberdashervcs.common.protobuf.FilesProto;
 import com.haberdashervcs.common.protobuf.FoldersProto;

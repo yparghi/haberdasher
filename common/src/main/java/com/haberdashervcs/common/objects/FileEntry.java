@@ -1,8 +1,8 @@
-package com.haberdashervcs.server.operations;
+package com.haberdashervcs.common.objects;
 
 import java.io.IOException;
 
-import com.haberdashervcs.server.core.HdBytes;
+import com.haberdashervcs.common.io.HdBytes;
 import com.haberdashervcs.common.protobuf.FilesProto;
 
 

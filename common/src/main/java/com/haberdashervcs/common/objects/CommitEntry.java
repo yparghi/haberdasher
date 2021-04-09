@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.operations;
+package com.haberdashervcs.common.objects;
 
 import java.io.IOException;
 

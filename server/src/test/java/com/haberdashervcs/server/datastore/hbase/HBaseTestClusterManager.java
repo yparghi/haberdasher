@@ -2,8 +2,8 @@ package com.haberdashervcs.server.datastore.hbase;
 
 import java.util.Arrays;
 
-import com.haberdashervcs.server.core.logging.HdLogger;
-import com.haberdashervcs.server.core.logging.HdLoggers;
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;

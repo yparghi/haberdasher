@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.exceptions;
+package com.haberdashervcs.common.exceptions;
 
 
 public class HdRuntimeException extends RuntimeException{
