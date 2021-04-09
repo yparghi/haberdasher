@@ -12,7 +12,7 @@ import com.google.common.io.Files;
 
 class InitCommand implements Command {
 
-    private static final String INIT_FILENAME = "hdconfig";
+    private static final String INIT_FILENAME = "hdlocal";
     private static final String INIT_FILE_TEMPLATE = Joiner.on('\n').join(
             "---",
             "url: %s",
@@ -30,7 +30,8 @@ class InitCommand implements Command {
         String serverAddress = otherArgs.get(0);
         final File initFile = new File(INIT_FILENAME);
         if (initFile.exists()) {
-            throw new IllegalStateException("The file `hdconfig` already exists!");
+            throw new IllegalStateException(
+                    String.format("The file `%s` already exists!", INIT_FILENAME));
         }
 
         try {
