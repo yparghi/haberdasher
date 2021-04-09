@@ -1,13 +1,14 @@
 package com.haberdashervcs.server.example;
 
 import java.io.IOException;
-import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.haberdashervcs.server.core.logging.HdLogger;
 import com.haberdashervcs.server.core.logging.HdLoggers;
+import com.haberdashervcs.server.protobuf.CommitsProto;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -48,17 +49,24 @@ public class ExampleServerMain {
         server.start();
         // END: TEMP JETTY TESTING
 
-        System.out.println("Done!");
+        System.out.println("Serving...");
     }
 
-    private static class ExampleServlet extends HttpServlet {
+    // $ curl -v 'localhost:15367/example/'
+    public static class ExampleServlet extends HttpServlet {
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+                throws IOException {
+
+            CommitsProto.CommitEntry out = CommitsProto.CommitEntry.newBuilder()
+                    .setRootFolderId("someRootFolder")
+                    .build();
 
             resp.setStatus(HttpStatus.OK_200);
-            resp.getWriter().println("EmbeddedJetty");
+            resp.setContentType("application/octet-stream");
+            ServletOutputStream outStream = resp.getOutputStream();
+            outStream.write(out.toByteArray());
         }
     }
 }
