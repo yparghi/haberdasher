@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.haberdashervcs.server.protobuf.FoldersProto;
+import com.haberdashervcs.common.protobuf.FoldersProto;
 
 
 public final class FolderListing {

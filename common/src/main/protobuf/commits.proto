@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option java_package = "com.haberdashervcs.server.protobuf";
+option java_package = "com.haberdashervcs.common.protobuf.protobuf";
 option java_outer_classname = "CommitsProto";
 option java_multiple_files = false;
 

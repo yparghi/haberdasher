@@ -2,7 +2,7 @@ package com.haberdashervcs.server.operations;
 
 import java.io.IOException;
 
-import com.haberdashervcs.server.protobuf.CommitsProto;
+import com.haberdashervcs.common.protobuf.CommitsProto;
 
 
 public class CommitEntry {

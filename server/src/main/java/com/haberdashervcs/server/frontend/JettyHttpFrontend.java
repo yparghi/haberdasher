@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.haberdashervcs.server.protobuf.CommitsProto;
+import com.haberdashervcs.common.protobuf.CommitsProto;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -41,6 +41,8 @@ public class JettyHttpFrontend implements Frontend {
     // $ curl -v 'localhost:15367/example/'
     public static class ExampleServlet extends HttpServlet {
 
+        // TODO! Something to encapsulate the sending of proto messages in a stream?
+        // Maybe lines like "<type of object>:<byte size>\n"?
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws IOException {

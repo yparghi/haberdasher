@@ -3,7 +3,7 @@ package com.haberdashervcs.server.operations;
 import java.io.IOException;
 
 import com.haberdashervcs.server.core.HdBytes;
-import com.haberdashervcs.server.protobuf.FilesProto;
+import com.haberdashervcs.common.protobuf.FilesProto;
 
 
 public class FileEntry {
