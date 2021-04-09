@@ -46,6 +46,12 @@
             <version>30.1.1-jre</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.28</version>
+        </dependency>
+
     </dependencies>
 
 

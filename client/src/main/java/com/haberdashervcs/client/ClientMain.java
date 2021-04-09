@@ -2,6 +2,9 @@ package com.haberdashervcs.client;
 
 import java.util.Arrays;
 
+import com.haberdashervcs.client.commands.Command;
+import com.haberdashervcs.client.commands.Commands;
+
 
 public class ClientMain {
 
@@ -10,7 +13,7 @@ public class ClientMain {
 
         System.out.println("Haberdasher client: " + Arrays.toString(args));
 
-        MainArgs mainArgs = MainArgs.parseFromArgs(args);
-        mainArgs.perform();
+        Command command = Commands.parseFromArgs(args);
+        command.perform();
     }
 }
