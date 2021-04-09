@@ -13,6 +13,9 @@ public class Commands {
 
         if (commandWord.equals("init")) {
             return new InitCommand(otherArgs);
+
+        } else if (commandWord.equals("checkout")) {
+            return new CheckoutCommand(otherArgs);
         }
 
         throw new IllegalArgumentException("Unknown command: " + commandWord);
