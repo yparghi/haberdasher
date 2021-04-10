@@ -13,7 +13,10 @@ import com.haberdashervcs.server.frontend.JettyHttpFrontend;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 
 
 /**
@@ -26,10 +29,12 @@ public class ExampleServerMain {
     public static void main(String[] args) throws Exception {
         System.out.println( "Hello Haberdasher!" );
 
-        HBaseTestClusterManager testCluster = HBaseTestClusterManager.getInstance();
-        testCluster.setUp();
-        Connection hBaseConn = testCluster.getConn();
-        HBaseDatastore datastore = HBaseDatastore.forConnection(hBaseConn);
+        Configuration conf = HBaseConfiguration.create();
+        conf.clear();
+        conf.set("hbase.master", "localhost:60000");
+        Connection conn = ConnectionFactory.createConnection(conf);
+
+        HBaseDatastore datastore = HBaseDatastore.forConnection(conn);
 
         HaberdasherServer server = HaberdasherServer.builder()
                 .withDatastore(datastore)
@@ -41,7 +46,7 @@ public class ExampleServerMain {
         System.out.println("Serving...");
 
         // TEMP!
-        loadTestData(hBaseConn, datastore);
+        loadTestData(conn, datastore);
     }
 
     // TEMP!
