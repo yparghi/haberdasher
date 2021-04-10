@@ -58,7 +58,39 @@ public class HBaseDatastoreTest {
     public void setUp() throws Exception {
         Configuration conf = HBaseConfiguration.create();
         conf.clear();
-        conf.set("hbase.master", "localhost:60000");
+        conf.set("dfs.datanode.ipc.address", "0.0.0.0:50020");
+        conf.set("hadoop.registry.zk.quorum", "localhost:2181");
+        conf.set("hbase.zookeeper.peerport", "2888");
+        conf.set("dfs.namenode.http-address", "localhost:52460");
+        conf.set("dfs.datanode.https.address", "0.0.0.0:50475");
+        conf.set("hbase.status.multicast.address.ip", "226.1.1.3");
+        conf.set("yarn.router.webapp.https.address", "0.0.0.0:8091");
+        conf.set("dfs.balancer.address", "0.0.0.0:0");
+        conf.set("hbase.master.info.bindAddress", "0.0.0.0");
+        conf.set("hbase.regionserver.dns.interface", "default");
+        conf.set("dfs.journalnode.https-address", "0.0.0.0:8481");
+        conf.set("dfs.journalnode.rpc-address", "0.0.0.0:8485");
+        conf.set( "dfs.namenode.secondary.https-address", "0.0.0.0:50091");
+        conf.set( "hbase.zookeeper.property.clientPort", "62826");
+        conf.set( "hbase.localcluster.assign.random.ports", "false");
+        conf.set( "hbase.zookeeper.leaderport", "3888");
+        conf.set( "hbase.zookeeper.dns.interface", "default");
+        conf.set( "dfs.namenode.rpc-address", "localhost:52464");
+        conf.set( "dfs.namenode.backup.address", "0.0.0.0:50100");
+        conf.set( "fs.defaultFS", "hdfs://localhost:52464");
+        conf.set( "dfs.namenode.secondary.http-address", "0.0.0.0:50090");
+        conf.set( "hbase.zookeeper.property.dataDir", "${hbase.tmp.dir}/zookeeper");
+        conf.set( "hbase.regionserver.info.bindAddress", "0.0.0.0");
+        conf.set( "dfs.datanode.http.address", "0.0.0.0:50075");
+        conf.set( "dfs.namenode.backup.http-address", "0.0.0.0:50105");
+        conf.set( "dfs.journalnode.http-address", "0.0.0.0:8480");
+        conf.set( "hbase.zookeeper.quorum", "127.0.0.1");
+        conf.set( "dfs.namenode.https-address", "0.0.0.0:50470");
+        conf.set("dfs.datanode.address", "0.0.0.0:50010");
+        conf.set( "hbase.cluster.distributed", "false");
+
+        conf.set("hbase.masters", "192.168.1.2:16000");
+
         conn = ConnectionFactory.createConnection(conf);
 
         createTables();
