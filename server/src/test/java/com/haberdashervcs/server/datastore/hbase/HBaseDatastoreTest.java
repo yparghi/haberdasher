@@ -1,7 +1,6 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,17 +9,17 @@ import java.util.UUID;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
-import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.operations.CheckoutResult;
-import com.haberdashervcs.server.operations.CheckoutStream;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FolderListing;
-import com.haberdashervcs.server.operations.change.AddChange;
-import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
-import com.haberdashervcs.server.operations.change.Changeset;
 import com.haberdashervcs.common.protobuf.CommitsProto;
 import com.haberdashervcs.common.protobuf.FilesProto;
 import com.haberdashervcs.common.protobuf.FoldersProto;
+import com.haberdashervcs.server.datastore.HdDatastore;
+import com.haberdashervcs.server.operations.CheckoutResult;
+import com.haberdashervcs.server.operations.CheckoutStream;
+import com.haberdashervcs.server.operations.change.AddChange;
+import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
+import com.haberdashervcs.server.operations.change.Changeset;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Put;
@@ -75,7 +74,7 @@ public class HBaseDatastoreTest {
         return fileId;
     }
 
-    // TODO! Raw interface/helper to HBase, that does these puts and gets?
+    // TODO! Move to raw helper, here and in putFile()
     private String putFolderRaw(List<String> fileIds, List<String> fileNames) throws IOException {
         Preconditions.checkArgument(fileIds.size() == fileNames.size());
 
@@ -162,12 +161,6 @@ public class HBaseDatastoreTest {
         assertTrue(true);
     }
 
-    private FilesProto.FileEntry fileEntryForText(String text, FilesProto.ChangeType changeType) {
-        return FilesProto.FileEntry.newBuilder()
-                .setChangeType(changeType)
-                .setContents(ByteString.copyFrom(text, StandardCharsets.UTF_8))
-                .build();
-    }
 
     @Test
     public void basicApplyChangeset() throws Exception {
@@ -176,9 +169,9 @@ public class HBaseDatastoreTest {
         Changeset.Builder changesetBuilder = Changeset.builder();
 
         AddChange fileA = AddChange.forContents(
-                "fileA_id", fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
+                "fileA_id", helper.fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
         AddChange fileB = AddChange.forContents(
-                "fileB_id", fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
+                "fileB_id", helper.fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
         changesetBuilder = changesetBuilder.withAddChange(fileA);
         changesetBuilder = changesetBuilder.withAddChange(fileB);
 

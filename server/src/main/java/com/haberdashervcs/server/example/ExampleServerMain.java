@@ -1,10 +1,19 @@
 package com.haberdashervcs.server.example;
 
-import com.haberdashervcs.server.config.HaberdasherServer;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
+import com.haberdashervcs.common.objects.FolderListing;
+import com.haberdashervcs.common.protobuf.FilesProto;
+import com.haberdashervcs.common.protobuf.FoldersProto;
+import com.haberdashervcs.server.config.HaberdasherServer;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
+import com.haberdashervcs.server.datastore.hbase.HBaseRawHelper;
+import com.haberdashervcs.server.datastore.hbase.HBaseTestClusterManager;
 import com.haberdashervcs.server.frontend.JettyHttpFrontend;
+import com.haberdashervcs.server.operations.change.AddChange;
+import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
+import com.haberdashervcs.server.operations.change.Changeset;
+import org.apache.hadoop.hbase.client.Connection;
 
 
 /**
@@ -17,14 +26,51 @@ public class ExampleServerMain {
     public static void main(String[] args) throws Exception {
         System.out.println( "Hello Haberdasher!" );
 
-        // TODO: Figure out the right way to set up an example cluster -- with some fake URL?
+        HBaseTestClusterManager testCluster = HBaseTestClusterManager.getInstance();
+        testCluster.setUp();
+        Connection hBaseConn = testCluster.getConn();
+        HBaseDatastore datastore = HBaseDatastore.forConnection(hBaseConn);
+
         HaberdasherServer server = HaberdasherServer.builder()
-                .withDatastore(HBaseDatastore.forConnection(null /*TODO!*/))
+                .withDatastore(datastore)
                 .withFrontend(new JettyHttpFrontend())
                 .build();
 
         server.start();
 
         System.out.println("Serving...");
+
+        // TEMP!
+        loadTestData(hBaseConn, datastore);
+    }
+
+    // TEMP!
+    private static void loadTestData(Connection conn, HBaseDatastore datastore) throws Exception {
+        HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
+        Changeset.Builder changesetBuilder = Changeset.builder();
+
+        AddChange fileA = AddChange.forContents(
+                "fileA_id", helper.fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
+        AddChange fileB = AddChange.forContents(
+                "fileB_id", helper.fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
+        changesetBuilder = changesetBuilder.withAddChange(fileA);
+        changesetBuilder = changesetBuilder.withAddChange(fileB);
+
+        FoldersProto.FolderListing.Builder folderProto = FoldersProto.FolderListing.newBuilder()
+                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
+                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
+                        .setName("apple.txt")
+                        .setFileId(fileA.getId()))
+                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
+                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
+                        .setName("banana.txt")
+                        .setFileId(fileB.getId()));
+        FolderListing folder = FolderListing.fromBytes(folderProto.build().toByteArray());
+        changesetBuilder = changesetBuilder.withFolderAndPath("/", folder);
+
+        final Changeset changeset = changesetBuilder.build();
+
+        ApplyChangesetResult result = datastore.applyChangeset(changeset);
+
     }
 }

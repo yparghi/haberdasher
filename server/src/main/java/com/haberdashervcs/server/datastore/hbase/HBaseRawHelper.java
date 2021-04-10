@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import com.google.protobuf.ByteString;
 import com.haberdashervcs.common.io.HdBytes;
@@ -22,9 +23,9 @@ import org.apache.hadoop.hbase.util.Bytes;
 /**
  * Easy methods for HBase gets and puts.
  */
-final class HBaseRawHelper {
+public final class HBaseRawHelper {
 
-    static HBaseRawHelper forConnection(Connection conn) {
+    public static HBaseRawHelper forConnection(Connection conn) {
         return new HBaseRawHelper(conn);
     }
 
@@ -153,4 +154,12 @@ final class HBaseRawHelper {
                 commitProto.toByteArray());
         commitsTable.put(put);
     }
+
+    public FilesProto.FileEntry fileEntryForText(String text, FilesProto.ChangeType changeType) {
+        return FilesProto.FileEntry.newBuilder()
+                .setChangeType(changeType)
+                .setContents(ByteString.copyFrom(text, StandardCharsets.UTF_8))
+                .build();
+    }
+
 }
