@@ -7,12 +7,13 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
-import org.apache.hadoop.hbase.LocalHBaseCluster;
 import org.apache.hadoop.hbase.MiniHBaseCluster;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
 import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.TableDescriptor;
+import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
 import org.apache.log4j.Logger;
 
@@ -56,5 +57,35 @@ public class HBaseTestServerMain {
         // 2021-04-10 15:41:49,942 ERROR [master/192.168.1.2:16000:becomeActiveMaster] wal.AsyncFSWALProvider (AsyncFSWALProvider.java:createAsyncWriter(117)) - The RegionServer async write ahead log provider relies on the ability to call hflush for proper operation during component failures, but the current FileSystem does not support doing so. Please check the config value of 'hbase.wal.dir' and ensure it points to a FileSystem mount that has suitable capabilities for output streams.
         // See: https://hbase.apache.org/2.0/book.html
         MiniHBaseCluster hBase = new MiniHBaseCluster(conf, 1);
+
+        System.out.println("Done with cluster setup...");
+
+        Connection conn = testUtil.getConnection();
+        createTables(conn);
+        System.out.println("Done with test data.");
+    }
+
+    private static void createTables(Connection conn) throws Exception {
+        LOG.info("Creating test tables.");
+
+        Admin admin = conn.getAdmin();
+
+        TableDescriptor filesTableDesc = TableDescriptorBuilder
+                .newBuilder(TableName.valueOf("Files"))
+                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
+                .build();
+        admin.createTable(filesTableDesc);
+
+        TableDescriptor foldersTableDesc = TableDescriptorBuilder
+                .newBuilder(TableName.valueOf("Folders"))
+                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
+                .build();
+        admin.createTable(foldersTableDesc);
+
+        TableDescriptor commitsTableDesc = TableDescriptorBuilder
+                .newBuilder(TableName.valueOf("Commits"))
+                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("cfMain"))
+                .build();
+        admin.createTable(commitsTableDesc);
     }
 }
