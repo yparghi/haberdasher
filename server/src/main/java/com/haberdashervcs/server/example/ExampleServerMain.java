@@ -8,7 +8,6 @@ import com.haberdashervcs.common.protobuf.FoldersProto;
 import com.haberdashervcs.server.config.HaberdasherServer;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
 import com.haberdashervcs.server.datastore.hbase.HBaseRawHelper;
-import com.haberdashervcs.server.datastore.hbase.HBaseTestClusterManager;
 import com.haberdashervcs.server.frontend.JettyHttpFrontend;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;

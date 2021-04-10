@@ -1,9 +1,7 @@
-package com.haberdashervcs.server.datastore.hbase;
+package com.haberdashervcs.hbasetestserver;
 
 import java.util.Arrays;
 
-import com.haberdashervcs.common.logging.HdLogger;
-import com.haberdashervcs.common.logging.HdLoggers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
@@ -13,6 +11,7 @@ import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
+import org.apache.log4j.Logger;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -22,7 +21,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public final class HBaseTestClusterManager {
 
-    private static HdLogger LOG = HdLoggers.create(HBaseTestClusterManager.class);
+    private static final Logger LOG =Logger.getLogger(HBaseTestClusterManager.class);
 
     private static final HBaseTestClusterManager INSTANCE = new HBaseTestClusterManager();
 
