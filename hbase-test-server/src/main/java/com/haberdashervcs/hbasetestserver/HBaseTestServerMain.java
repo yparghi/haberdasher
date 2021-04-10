@@ -61,7 +61,7 @@ public class HBaseTestServerMain {
         System.out.println("Done with cluster setup...");
 
         Connection conn = testUtil.getConnection();
-        createTables(conn);
+        //createTables(conn);
         System.out.println("Done with test data.");
     }
 
