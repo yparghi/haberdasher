@@ -1,6 +1,5 @@
 package com.haberdashervcs.common.io;
 
-
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
