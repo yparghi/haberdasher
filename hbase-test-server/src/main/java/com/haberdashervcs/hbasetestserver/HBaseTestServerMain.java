@@ -36,12 +36,16 @@ public class HBaseTestServerMain {
     public static void main(String[] args) throws Exception {
         LOG.info("Starting the HBase test server...");
 
+        Path zkPath = Files.createTempDirectory("hdtest-zk");
+        Path hBaseRootPath = Files.createTempDirectory("hdtest-hbase");
+        Path hBaseTmpPath = Files.createTempDirectory("hdtest-hbasetmp");
+
         Configuration conf = HBaseConfiguration.create();
         conf.clear();
         conf.set(HConstants.ZOOKEEPER_CLIENT_PORT, "2181");
-        conf.set("hbase.wal.dir", "/tmp/yashhbase/wal");
-        conf.set("hbase.rootdir", "/tmp/yashhbase/hbase");
-        conf.set("hbase.tmp.dir", "/tmp/yashhbase/hbasetmp");
+        //conf.set("hbase.wal.dir", "/tmp/yashhbase/wal");
+        conf.set("hbase.rootdir", hBaseRootPath.toAbsolutePath().toString());
+        conf.set("hbase.tmp.dir", hBaseTmpPath.toAbsolutePath().toString());
         conf.set("hbase.cluster.distributed", "false");
         // This prevents error messages with the WAL -- by disabling it, I think.
         conf.set("hbase.unsafe.stream.capability.enforce", "false");
@@ -50,7 +54,6 @@ public class HBaseTestServerMain {
 
         MiniZooKeeperCluster zk = new MiniZooKeeperCluster(conf);
         zk.setDefaultClientPort(2181);
-        Path zkPath = Files.createTempDirectory("yashzk");
         zk.startup(zkPath.toFile());
 
         // Current bug:
@@ -60,7 +63,7 @@ public class HBaseTestServerMain {
 
         System.out.println("Done with cluster setup...");
 
-        Connection conn = testUtil.getConnection();
+        //Connection conn = testUtil.getConnection();
         //createTables(conn);
         System.out.println("Done with test data.");
     }
