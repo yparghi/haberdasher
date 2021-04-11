@@ -41,8 +41,10 @@ public class HBaseTestServerMain {
         zk.setDefaultClientPort(2181);
         zk.startup(zkPath.toFile());
 
+        // This constructor call apparently starts the cluster??
         MiniHBaseCluster hBase = new MiniHBaseCluster(conf, 1);
 
         System.out.println("Done with cluster setup.");
+        hBase.join();
     }
 }
