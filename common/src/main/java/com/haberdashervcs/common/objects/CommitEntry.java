@@ -1,15 +1,10 @@
 package com.haberdashervcs.common.objects;
 
-import java.io.IOException;
-
-import com.haberdashervcs.common.protobuf.CommitsProto;
-
 
 public class CommitEntry {
 
-    public static CommitEntry fromBytes(byte[] bytes) throws IOException {
-        CommitsProto.CommitEntry proto = CommitsProto.CommitEntry.parseFrom(bytes);
-        return new CommitEntry(proto.getRootFolderId());
+    public static CommitEntry forRootFolderId(String rootFolderId) {
+        return new CommitEntry(rootFolderId);
     }
 
 

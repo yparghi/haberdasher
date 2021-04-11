@@ -1,31 +1,15 @@
 package com.haberdashervcs.common.objects;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.haberdashervcs.common.protobuf.FoldersProto;
 
 
 public final class FolderListing {
 
-    // TODO Factory method from POJOs, for testing?
-
-    // TODO: Some iface for the bytes-from-datastore -> object converter? (so that protobuf isn't hardcoded here)
-    public static FolderListing fromBytes(byte[] listingBytes) throws IOException {
-        FoldersProto.FolderListing listingProto = FoldersProto.FolderListing.parseFrom(listingBytes);
-        ImmutableList.Builder<FolderEntry> entries = ImmutableList.builder();
-
-        for (FoldersProto.FolderListingEntry protoEntry : listingProto.getEntriesList()) {
-            FolderEntry entry = new FolderEntry(
-                    (protoEntry.getType() == FoldersProto.FolderListingEntry.Type.FILE)
-                            ? FolderEntry.Type.FILE : FolderEntry.Type.FOLDER,
-                    protoEntry.getName(),
-                    protoEntry.getFileId());
-            entries.add(entry);
-        }
-        return new FolderListing(entries.build());
+    public static FolderListing forEntries(List<FolderEntry> entries) {
+        return new FolderListing(entries);
     }
 
     public static class FolderEntry {
@@ -33,6 +17,15 @@ public final class FolderListing {
             FILE,
             FOLDER
         }
+
+        public static FolderEntry forFile(String name, String fileId) {
+            return new FolderEntry(Type.FILE, name, fileId);
+        }
+
+        public static FolderEntry forSubFolder(String name, String folderId) {
+            return new FolderEntry(Type.FOLDER, name, folderId);
+        }
+
 
         private final Type type;
         private final String name;
