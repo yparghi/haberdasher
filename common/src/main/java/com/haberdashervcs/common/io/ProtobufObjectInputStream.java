@@ -22,7 +22,7 @@ public class ProtobufObjectInputStream implements HdObjectInputStream {
     }
 
     @Override
-    public Optional<Type> next() {
+    public Optional<HdObjectId> next() {
         return Optional.empty();
     }
 

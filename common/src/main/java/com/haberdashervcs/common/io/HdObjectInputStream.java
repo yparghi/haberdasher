@@ -9,13 +9,7 @@ import com.haberdashervcs.common.objects.FolderListing;
 
 public interface HdObjectInputStream {
 
-    enum Type {
-        FILE,
-        FOLDER,
-        COMMIT
-    }
-
-    Optional<Type> next();
+    Optional<HdObjectId> next();
 
     FolderListing getFolder();
 

@@ -1,5 +1,7 @@
 package com.haberdashervcs.common.io;
 
+import java.io.IOException;
+
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
@@ -7,9 +9,9 @@ import com.haberdashervcs.common.objects.FolderListing;
 
 public interface HdObjectOutputStream {
 
-    void writeFolder(FolderListing folder);
+    void writeFolder(String folderId, FolderListing folder) throws IOException;
 
-    void writeFile(FileEntry file);
+    void writeFile(String fileId, FileEntry file) throws IOException;
 
-    void writeCommit(CommitEntry commit);
+    void writeCommit(String commitId, CommitEntry commit) throws IOException;
 }
