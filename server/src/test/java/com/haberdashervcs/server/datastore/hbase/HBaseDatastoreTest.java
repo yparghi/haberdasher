@@ -52,6 +52,7 @@ public class HBaseDatastoreTest {
     private static final HdLogger LOG = HdLoggers.create(HBaseDatastoreTest.class);
 
     private Connection conn;
+    private Admin admin;
 
 
     @Before
@@ -61,6 +62,7 @@ public class HBaseDatastoreTest {
 
         // TODO!! Add specialty settings here pertaining only to the test cluster -- like custom port(s) for example.
         conn = ConnectionFactory.createConnection(conf);
+        admin = conn.getAdmin();
 
         createTables();
     }
@@ -68,7 +70,7 @@ public class HBaseDatastoreTest {
     private void createTables() throws Exception {
         LOG.info("Creating test tables.");
 
-        Admin admin = conn.getAdmin();
+        clearTables();
 
         TableDescriptor filesTableDesc = TableDescriptorBuilder
                 .newBuilder(TableName.valueOf("Files"))
@@ -89,13 +91,18 @@ public class HBaseDatastoreTest {
         admin.createTable(commitsTableDesc);
     }
 
+    private void clearTables() throws Exception {
+        for (String tableName : Arrays.asList("Files", "Folders", "Commits")) {
+            if (admin.tableExists(TableName.valueOf(tableName))) {
+                admin.disableTable(TableName.valueOf(tableName));
+                admin.deleteTable(TableName.valueOf(tableName));
+            }
+        }
+    }
+
     @After
     public void tearDown() throws Exception {
-        /*Admin admin = conn.getAdmin();
-        for (String tableName : Arrays.asList("Files", "Folders", "Commits")) {
-            admin.disableTable(TableName.valueOf(tableName));
-            admin.deleteTable(TableName.valueOf(tableName));
-        }*/
+        clearTables();
     }
 
 
