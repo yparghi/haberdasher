@@ -27,23 +27,27 @@ public final class ProtobufObjectOutputStream implements HdObjectOutputStream {
 
     @Override
     public void writeFolder(String folderId, FolderListing folder) throws IOException {
-        out.write(idToString(new HdObjectId(HdObjectId.ObjectType.FOLDER, folderId)));
-        out.write(toBytes.folderToBytes(folder));
+        byte[] converted = toBytes.folderToBytes(folder);
+        out.write(idToString(new HdObjectId(HdObjectId.ObjectType.FOLDER, folderId), converted.length));
+        out.write(converted);
     }
 
     @Override
     public void writeFile(String fileId, FileEntry file) throws IOException {
-        out.write(idToString(new HdObjectId(HdObjectId.ObjectType.FILE, fileId)));
-        out.write(toBytes.fileToBytes(file));
+        byte[] converted = toBytes.fileToBytes(file);
+        out.write(idToString(new HdObjectId(HdObjectId.ObjectType.FILE, fileId), converted.length));
+        out.write(converted);
     }
 
     @Override
     public void writeCommit(String commitId, CommitEntry commit) throws IOException {
-        out.write(idToString(new HdObjectId(HdObjectId.ObjectType.COMMIT, commitId)));
-        out.write(toBytes.commitToBytes(commit));
+        byte[] converted = toBytes.commitToBytes(commit);
+        out.write(idToString(new HdObjectId(HdObjectId.ObjectType.COMMIT, commitId), converted.length));
+        out.write(converted);
     }
 
-    private byte[] idToString(HdObjectId id) {
-        return String.format("%s:%s\n", id.getType(), id.getId()).getBytes(StandardCharsets.UTF_8);
+    private byte[] idToString(HdObjectId id, int numBytes) {
+        return String.format("%s:%s:%d\n", id.getType(), id.getId(), numBytes)
+                .getBytes(StandardCharsets.UTF_8);
     }
 }
