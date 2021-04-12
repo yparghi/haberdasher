@@ -1,0 +1,12 @@
+package com.haberdashervcs.client.db;
+
+import com.haberdashervcs.client.checkout.CheckoutInputStream;
+
+// Notes on the DB:
+// - Always synced to one commit, no matter how many folders are checked out.
+public interface LocalDb {
+
+    void create();
+
+    void addCheckout(CheckoutInputStream checkout);
+}
