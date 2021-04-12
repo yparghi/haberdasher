@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
@@ -37,14 +38,22 @@ public class ProtobufObjectInputStream implements HdObjectInputStream {
 
     @Override
     public Optional<HdObjectId> next() throws IOException {
-        bytesInIdBuf = 0;
+        Preconditions.checkState(bytesNextObj == -1);
+        Preconditions.checkState(bytesInIdBuf == 0);
 
         while (true) {
             int thisByte = in.read();
+
             if (thisByte == -1) {
-                return Optional.empty();
+                if (bytesInIdBuf != 0) {
+                    throw new IOException("Unexpected EOF in object stream");
+                } else {
+                    return Optional.empty();
+                }
+
             } else if (thisByte == '\n') {
                 return Optional.of(idFromBytes());
+
             } else {
                 idBuf[bytesInIdBuf] = (byte)thisByte;
                 ++bytesInIdBuf;
