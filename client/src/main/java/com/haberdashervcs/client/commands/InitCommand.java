@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.haberdashervcs.client.db.LocalDb;
-import com.haberdashervcs.client.db.SqliteLocalDb;
+import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
 
 
 class InitCommand implements Command {

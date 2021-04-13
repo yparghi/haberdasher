@@ -9,4 +9,8 @@ public interface LocalDb {
     void create();
 
     void addCheckout(CheckoutInputStream checkout);
+
+    String getCurrentCommit();
+
+    void setNewCommit(String newCommitId);
 }

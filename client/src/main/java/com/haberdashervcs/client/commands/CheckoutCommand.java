@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.haberdashervcs.client.db.LocalDb;
+import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
 import com.haberdashervcs.common.io.HdObjectId;
 import com.haberdashervcs.common.io.ProtobufObjectInputStream;
 import com.haberdashervcs.common.logging.HdLogger;
@@ -17,6 +19,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.util.UrlEncoded;
 
 
 public class CheckoutCommand implements Command {
@@ -25,16 +28,25 @@ public class CheckoutCommand implements Command {
 
 
     private final List<String> otherArgs;
+    private final LocalDb db;
 
     CheckoutCommand(List<String> otherArgs) {
         this.otherArgs = otherArgs;
+        this.db = SqliteLocalDb.getInstance();
     }
 
     @Override
+    // TODO rollback on failure?
     public void perform() throws Exception {
+        final String currentCommit = db.getCurrentCommit();
+        final String path = otherArgs.get(0);
+
         // TODO: Get this from a config
         // TODO: Close the client -- on shutdown?
-        final String serverUrl = "localhost:15367";
+        final String serverUrl = String.format(
+                "localhost:15367/basic-test-repo/checkout/%s?commit=",
+                UrlEncoded.encodeString(path), UrlEncoded.encodeString(currentCommit));
+
         HttpClient httpClient = new HttpClient();
         httpClient.start();
 
