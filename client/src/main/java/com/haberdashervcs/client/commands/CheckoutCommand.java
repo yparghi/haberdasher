@@ -1,10 +1,18 @@
 package com.haberdashervcs.client.commands;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.haberdashervcs.common.io.HdObjectId;
 import com.haberdashervcs.common.io.ProtobufObjectInputStream;
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
+import com.haberdashervcs.common.objects.CommitEntry;
+import com.haberdashervcs.common.objects.FileEntry;
+import com.haberdashervcs.common.objects.FolderListing;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
@@ -12,6 +20,9 @@ import org.eclipse.jetty.http.HttpStatus;
 
 
 public class CheckoutCommand implements Command {
+
+    private static final HdLogger LOG = HdLoggers.create(CheckoutCommand.class);
+
 
     private final List<String> otherArgs;
 
@@ -39,7 +50,25 @@ public class CheckoutCommand implements Command {
         }
     }
 
-    private void processResponseBody(InputStream in) {
+    private void processResponseBody(InputStream in) throws IOException {
         ProtobufObjectInputStream protoIn = ProtobufObjectInputStream.forInputStream(in);
+        Optional<HdObjectId> next;
+        while ((next = protoIn.next()).isPresent()) {
+            LOG.info("Got next obj: " + next.get().getType());
+            switch (next.get().getType()) {
+                case FILE:
+                    FileEntry file = protoIn.getFile();
+                    break;
+                case FOLDER:
+                    FolderListing folder = protoIn.getFolder();
+                    break;
+                case COMMIT:
+                    CommitEntry commit = protoIn.getCommit();
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown type!");
+            }
+        }
+        LOG.info("Done with checkout stream.");
     }
 }
