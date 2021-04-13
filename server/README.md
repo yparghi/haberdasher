@@ -1,4 +1,4 @@
 ## Current Java version
 
-8
+11
 

@@ -1,60 +1,54 @@
 package com.haberdashervcs.server.frontend;
 
 import java.io.IOException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.haberdashervcs.common.protobuf.CommitsProto;
+import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
+import com.haberdashervcs.common.objects.CommitEntry;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 
 public class JettyHttpFrontend implements Frontend {
 
     @Override
     public void startInBackground() throws Exception {
-        // BEGIN: TEMP JETTY TESTING
-
-        Server server = new Server();
-        ServerConnector connector = new ServerConnector(server);
-
         // $ echo -n "haberdasher" | md5
         // 6b07689d9997423c2abd564445ac3c07
         // 3c07 as decimal: 15367
-        connector.setPort(15367);
-
-        server.setConnectors(new Connector[] {connector});
-
-        ServletContextHandler handler = new ServletContextHandler(server, "/example");
-        handler.addServlet(ExampleServlet.class, "/");
+        Server server = new Server(15367);
+        server.setHandler(new RootHandler());
 
         server.start();
-        // END: TEMP JETTY TESTING
     }
 
 
-    // $ curl -v 'localhost:15367/example/'
-    public static class ExampleServlet extends HttpServlet {
+    // localhost:15367/basic-test-repo/checkout/%s?commit=xxx
+    private static class RootHandler extends AbstractHandler {
 
-        // TODO! Something to encapsulate the sending of proto messages in a stream?
-        // Maybe lines like "<type of object>:<byte size>\n"?
+        private static final HdLogger LOG = HdLoggers.create(RootHandler.class);
+
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        public void handle(
+                String target,
+                Request jettyRequest,
+                HttpServletRequest request,
+                HttpServletResponse response)
                 throws IOException {
+            LOG.info("Request target: {}", target);
 
-            CommitsProto.CommitEntry out = CommitsProto.CommitEntry.newBuilder()
-                    .setRootFolderId("someRootFolder")
-                    .build();
+            response.setStatus(HttpStatus.OK_200);
+            response.setContentType("application/octet-stream");
 
-            resp.setStatus(HttpStatus.OK_200);
-            resp.setContentType("application/octet-stream");
-            ServletOutputStream outStream = resp.getOutputStream();
-            outStream.write(out.toByteArray());
+            ProtobufObjectOutputStream protoOut = ProtobufObjectOutputStream.forOutputStream(response.getOutputStream());
+
+            protoOut.writeCommit(
+                    "some-test-commit", CommitEntry.forRootFolderId("some-root-folder"));
         }
     }
 }

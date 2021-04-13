@@ -42,11 +42,11 @@ public class CheckoutCommand implements Command {
         final String path = otherArgs.get(0);
 
         // TODO: Get this from a config
-        // TODO: Close the client -- on shutdown?
         final String serverUrl = String.format(
                 "localhost:15367/basic-test-repo/checkout/%s?commit=",
                 UrlEncoded.encodeString(path), UrlEncoded.encodeString(currentCommit));
 
+        // TODO: Close the client -- on shutdown?
         HttpClient httpClient = new HttpClient();
         httpClient.start();
 

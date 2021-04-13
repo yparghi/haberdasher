@@ -1,5 +1,8 @@
 package com.haberdashervcs.server.example;
 
+import java.util.Arrays;
+
+import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.FolderListing;
@@ -23,17 +26,19 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
  */
 public class ExampleServerMain {
 
-    private static HdLogger LOG = HdLoggers.create(ExampleServerMain.class);
+    private static final HdLogger LOG = HdLoggers.create(ExampleServerMain.class);
 
     public static void main(String[] args) throws Exception {
         System.out.println( "Hello Haberdasher!" );
 
         Configuration conf = HBaseConfiguration.create();
         conf.clear();
-        conf.set("hbase.master", "localhost:60000");
         Connection conn = ConnectionFactory.createConnection(conf);
 
         HBaseDatastore datastore = HBaseDatastore.forConnection(conn);
+
+        // TEMP!
+        loadTestData(conn, datastore);
 
         HaberdasherServer server = HaberdasherServer.builder()
                 .withDatastore(datastore)
@@ -43,9 +48,6 @@ public class ExampleServerMain {
         server.start();
 
         System.out.println("Serving...");
-
-        // TEMP!
-        loadTestData(conn, datastore);
     }
 
     // TEMP!
@@ -60,21 +62,13 @@ public class ExampleServerMain {
         changesetBuilder = changesetBuilder.withAddChange(fileA);
         changesetBuilder = changesetBuilder.withAddChange(fileB);
 
-        FoldersProto.FolderListing.Builder folderProto = FoldersProto.FolderListing.newBuilder()
-                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
-                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
-                        .setName("apple.txt")
-                        .setFileId(fileA.getId()))
-                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
-                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
-                        .setName("banana.txt")
-                        .setFileId(fileB.getId()));
-        FolderListing folder = FolderListing.fromBytes(folderProto.build().toByteArray());
+        FolderListing folder = FolderListing.forEntries(Arrays.asList(
+            FolderListing.FolderEntry.forFile("apple.txt", fileA.getId()),
+                FolderListing.FolderEntry.forFile("banana.txt", fileB.getId())));
+
         changesetBuilder = changesetBuilder.withFolderAndPath("/", folder);
 
         final Changeset changeset = changesetBuilder.build();
-
         ApplyChangesetResult result = datastore.applyChangeset(changeset);
-
     }
 }

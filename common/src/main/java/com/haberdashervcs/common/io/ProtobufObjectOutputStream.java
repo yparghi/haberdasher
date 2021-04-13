@@ -12,7 +12,7 @@ import com.haberdashervcs.common.objects.FolderListing;
 // TODO write this javadoc: basic idea is to write e.g. "commit:47\n" then a commit proto of 47 bytes.
 public final class ProtobufObjectOutputStream implements HdObjectOutputStream {
 
-    public ProtobufObjectOutputStream forOutputStream(OutputStream out) {
+    public static ProtobufObjectOutputStream forOutputStream(OutputStream out) {
         return new ProtobufObjectOutputStream(out);
     }
 
