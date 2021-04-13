@@ -13,7 +13,13 @@ public class ClientMain {
 
         System.out.println("Haberdasher client: " + Arrays.toString(args));
 
-        Command command = Commands.parseFromArgs(args);
-        command.perform();
+        try {
+            Command command = Commands.parseFromArgs(args);
+            command.perform();
+        } catch (Exception ex) {
+            // TODO
+            System.out.println("Command exception!: " + ex);
+            ex.printStackTrace();
+        }
     }
 }

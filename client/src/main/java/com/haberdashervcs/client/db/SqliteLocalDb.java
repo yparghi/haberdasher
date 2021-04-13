@@ -22,7 +22,7 @@ public final class SqliteLocalDb implements LocalDb {
     private Supplier<Connection> conn = Suppliers.memoize(new Supplier<Connection>() {
         @Override public Connection get() {
             try {
-                return DriverManager.getConnection("jdbc:sqlite:sample.db");
+                return DriverManager.getConnection("jdbc:sqlite:" + DB_FILENAME);
             } catch (SQLException sqlEx) {
                 throw new RuntimeException(sqlEx);
             }
