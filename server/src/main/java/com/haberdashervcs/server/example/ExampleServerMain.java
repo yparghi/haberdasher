@@ -3,13 +3,10 @@ package com.haberdashervcs.server.example;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
-import com.haberdashervcs.common.protobuf.FilesProto;
-import com.haberdashervcs.common.protobuf.FoldersProto;
 import com.haberdashervcs.server.config.HaberdasherServer;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
 import com.haberdashervcs.server.datastore.hbase.HBaseRawHelper;
@@ -31,7 +28,7 @@ public class ExampleServerMain {
     private static final HdLogger LOG = HdLoggers.create(ExampleServerMain.class);
 
     public static void main(String[] args) throws Exception {
-        System.out.println( "Hello Haberdasher!" );
+        LOG.info("Hello Haberdasher!");
 
         Configuration conf = HBaseConfiguration.create();
         conf.clear();
@@ -49,7 +46,7 @@ public class ExampleServerMain {
 
         server.start();
 
-        System.out.println("Serving...");
+        LOG.info("Serving...");
     }
 
     // TEMP!

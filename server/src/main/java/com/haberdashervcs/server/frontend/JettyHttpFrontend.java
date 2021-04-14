@@ -36,7 +36,7 @@ public class JettyHttpFrontend implements Frontend {
         @Override
         public void handle(
                 String target,
-                Request jettyRequest,
+                Request baseRequest,
                 HttpServletRequest request,
                 HttpServletResponse response)
                 throws IOException {
@@ -49,6 +49,8 @@ public class JettyHttpFrontend implements Frontend {
 
             protoOut.writeCommit(
                     "some-test-commit", CommitEntry.forRootFolderId("some-root-folder"));
+
+            baseRequest.setHandled(true);
         }
     }
 }
