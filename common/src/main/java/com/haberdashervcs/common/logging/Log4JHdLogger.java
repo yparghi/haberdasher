@@ -7,10 +7,17 @@ import org.apache.logging.log4j.message.Message;
 
 public class Log4JHdLogger implements HdLogger {
 
+    static {
+        //LogManager.getContext().
+    }
+
     private final Logger log;
 
     Log4JHdLogger(Class myClass) {
         log = LogManager.getLogger(myClass);
+        log.info("test info");
+        log.warn("test warn");
+        log.error("test error");
     }
 
     @Override
