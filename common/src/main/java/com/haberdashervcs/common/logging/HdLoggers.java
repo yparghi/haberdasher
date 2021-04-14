@@ -6,12 +6,9 @@ package com.haberdashervcs.common.logging;
 public final class HdLoggers {
 
     public static HdLogger create(Class myClass) {
-        return fromLog4j(myClass);
+        return new SimpleConsoleLogger(myClass);
     }
 
-    private static HdLogger fromLog4j(Class myClass) {
-        return new Log4JHdLogger(myClass);
-    }
 
     private HdLoggers() {}
 }

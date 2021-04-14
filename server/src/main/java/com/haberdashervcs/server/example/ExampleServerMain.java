@@ -28,7 +28,7 @@ public class ExampleServerMain {
     private static final HdLogger LOG = HdLoggers.create(ExampleServerMain.class);
 
     public static void main(String[] args) throws Exception {
-        LOG.error("Hello Haberdasher!");
+        LOG.info("Hello Haberdasher!");
 
         Configuration conf = HBaseConfiguration.create();
         conf.clear();
