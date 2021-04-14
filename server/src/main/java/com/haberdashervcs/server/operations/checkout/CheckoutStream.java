@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.operations;
+package com.haberdashervcs.server.operations.checkout;
 
 import com.haberdashervcs.common.io.HdBytes;
 

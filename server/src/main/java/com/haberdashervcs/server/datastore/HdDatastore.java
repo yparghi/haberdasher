@@ -1,6 +1,6 @@
 package com.haberdashervcs.server.datastore;
 
-import com.haberdashervcs.server.operations.CheckoutResult;
+import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
 

@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.operations.CheckoutResult;
+import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;

@@ -7,7 +7,7 @@ import java.util.Map;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.haberdashervcs.common.io.HdBytes;
-import com.haberdashervcs.server.operations.CheckoutStream;
+import com.haberdashervcs.server.operations.checkout.CheckoutStream;
 import com.haberdashervcs.common.objects.FolderListing;
 
 
