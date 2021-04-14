@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 
 import com.google.protobuf.ByteString;
 import com.haberdashervcs.common.io.HdBytes;
+import com.haberdashervcs.common.io.HdObjectByteConverter;
+import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
@@ -31,6 +33,8 @@ public final class HBaseRawHelper {
 
 
     private final Connection conn;
+    // TODO pass/configure this
+    private final HdObjectByteConverter toBytes = ProtobufObjectByteConverter.getInstance();
 
     private HBaseRawHelper(Connection conn) {
         this.conn = conn;
@@ -45,7 +49,7 @@ public final class HBaseRawHelper {
         byte[] commitEntryBytes = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("entry"));
 
-        return CommitEntry.fromBytes(commitEntryBytes);
+        return toBytes.commitFromBytes(commitEntryBytes);
     }
 
     FileEntry getFile(String fileId) throws IOException {
@@ -57,7 +61,7 @@ public final class HBaseRawHelper {
         byte[] fileValue = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("contents"));
 
-        return FileEntry.fromBytes(fileId, HdBytes.of(fileValue));
+        return toBytes.fileFromBytes(fileValue);
     }
 
 
@@ -72,7 +76,7 @@ public final class HBaseRawHelper {
         byte[] folderValue = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("listing"));
 
-        return FolderListing.fromBytes(folderValue);
+        return toBytes.folderFromBytes(folderValue);
     }
 
 

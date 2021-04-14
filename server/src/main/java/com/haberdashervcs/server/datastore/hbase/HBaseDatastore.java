@@ -14,9 +14,9 @@ import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.FolderWithPath;
+import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
-import com.haberdashervcs.server.operations.change.ParsedChangeTree;
 import org.apache.hadoop.hbase.client.Connection;
 
 
@@ -119,8 +119,6 @@ public final class HBaseDatastore implements HdDatastore {
         //
         // TODO Set up branches (just mapping to a head commit id? proto BranchEntry?)
 
-        ParsedChangeTree parsed = ParsedChangeTree.fromChangeset(changeset);
-
         // For atomicity, apply the change from the bottom up:
         // - Create/modify files.
         // - Create new folder listings.
@@ -129,11 +127,11 @@ public final class HBaseDatastore implements HdDatastore {
 
         // TODO: Should file ids be based on (hashed from?) the file contents? Or is that the client's problem to solve,
         // in tracking/storing/sending which files are changed? In other words, where do id's come from?
-        for (FileEntry addedFile : parsed.getAddedFiles()) {
-            helper.putFileAdd(addedFile.getId(), addedFile);
+        for (AddChange addChange : changeset.getAddChanges()) {
+            helper.putFileAdd(addChange.getId(), addChange.getFile());
         }
 
-        for (FolderWithPath changedFolder : parsed.getChangedFolders()) {
+        for (FolderWithPath changedFolder : changeset.getChangedFolders()) {
             String folderId;
             if (changedFolder.getPath().equals("/")) {
                 folderId = changeset.getProposedRootFolderId();

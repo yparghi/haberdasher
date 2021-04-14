@@ -3,6 +3,7 @@ package com.haberdashervcs.server.operations.change;
 import java.util.Arrays;
 
 import com.haberdashervcs.common.io.HdBytes;
+import com.haberdashervcs.common.objects.FileEntry;
 
 
 // TEMP NOTES on where ids come from:
@@ -10,25 +11,24 @@ import com.haberdashervcs.common.io.HdBytes;
 // - Then a changeset has (and/or computes) the hash for a file/folder.
 public final class AddChange {
 
-    // TODO Should this take a FileEntry instead of a byte[] ?
-    public static AddChange forContents(String id, byte[] contents) {
-        return new AddChange(id, contents);
+    public static AddChange forContents(String id, FileEntry file) {
+        return new AddChange(id, file);
     }
 
 
     private final String id;
-    private final HdBytes contents;
+    private final FileEntry file;
 
-    private AddChange(String id, byte[] contents) {
+    private AddChange(String id, FileEntry file) {
         this.id = id;
-        this.contents = HdBytes.of(Arrays.copyOf(contents, contents.length));
-    }
-
-    public HdBytes getContents() {
-        return contents;
+        this.file = file;
     }
 
     public String getId() {
         return id;
+    }
+
+    public FileEntry getFile() {
+        return file;
     }
 }

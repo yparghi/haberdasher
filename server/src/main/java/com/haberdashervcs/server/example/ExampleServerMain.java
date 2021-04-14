@@ -1,10 +1,12 @@
 package com.haberdashervcs.server.example;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
+import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.protobuf.FilesProto;
 import com.haberdashervcs.common.protobuf.FoldersProto;
@@ -56,16 +58,15 @@ public class ExampleServerMain {
         Changeset.Builder changesetBuilder = Changeset.builder();
 
         AddChange fileA = AddChange.forContents(
-                "fileA_id", helper.fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
+                "fileA_id", FileEntry.forContents("apple".getBytes(StandardCharsets.UTF_8)));
         AddChange fileB = AddChange.forContents(
-                "fileB_id", helper.fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
+                "fileB_id", FileEntry.forContents("banana".getBytes(StandardCharsets.UTF_8)));
         changesetBuilder = changesetBuilder.withAddChange(fileA);
         changesetBuilder = changesetBuilder.withAddChange(fileB);
 
         FolderListing folder = FolderListing.forEntries(Arrays.asList(
             FolderListing.FolderEntry.forFile("apple.txt", fileA.getId()),
                 FolderListing.FolderEntry.forFile("banana.txt", fileB.getId())));
-
         changesetBuilder = changesetBuilder.withFolderAndPath("/", folder);
 
         final Changeset changeset = changesetBuilder.build();

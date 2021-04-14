@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.google.protobuf.ByteString;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.CommitEntry;
+import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.protobuf.CommitsProto;
 import com.haberdashervcs.common.protobuf.FilesProto;
@@ -223,24 +225,16 @@ public class HBaseDatastoreTest {
         Changeset.Builder changesetBuilder = Changeset.builder();
 
         AddChange fileA = AddChange.forContents(
-                "fileA_id", helper.fileEntryForText("apple", FilesProto.ChangeType.ADD).toByteArray());
+                "fileA_id", FileEntry.forContents("apple".getBytes(StandardCharsets.UTF_8)));
         AddChange fileB = AddChange.forContents(
-                "fileB_id", helper.fileEntryForText("banana", FilesProto.ChangeType.ADD).toByteArray());
+                "fileB_id", FileEntry.forContents("banana".getBytes(StandardCharsets.UTF_8)));
         changesetBuilder = changesetBuilder.withAddChange(fileA);
         changesetBuilder = changesetBuilder.withAddChange(fileB);
 
-        FoldersProto.FolderListing.Builder folderProto = FoldersProto.FolderListing.newBuilder()
-                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
-                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
-                        .setName("apple.txt")
-                        .setFileId(fileA.getId()))
-                .addEntries(FoldersProto.FolderListingEntry.newBuilder()
-                        .setType(FoldersProto.FolderListingEntry.Type.FILE)
-                        .setName("banana.txt")
-                        .setFileId(fileB.getId()));
-        FolderListing folder = FolderListing.fromBytes(folderProto.build().toByteArray());
+        FolderListing folder = FolderListing.forEntries(Arrays.asList(
+                FolderListing.FolderEntry.forFile("apple.txt", fileA.getId()),
+                FolderListing.FolderEntry.forFile("banana.txt", fileB.getId())));
         changesetBuilder = changesetBuilder.withFolderAndPath("/", folder);
-
 
         final HdDatastore datastore = HBaseDatastore.forConnection(conn);
         final Changeset changeset = changesetBuilder.build();
