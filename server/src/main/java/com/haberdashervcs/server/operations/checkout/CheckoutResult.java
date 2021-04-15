@@ -13,21 +13,19 @@ public final class CheckoutResult {
     }
 
     public static CheckoutResult failed(String errorMessage) {
-        return new CheckoutResult(Status.FAILED, null, errorMessage);
+        return new CheckoutResult(Status.FAILED, errorMessage);
     }
 
-    public static CheckoutResult forStream(CheckoutStream stream) {
-        return new CheckoutResult(Status.OK, stream, null);
+    public static CheckoutResult ok() {
+        return new CheckoutResult(Status.OK, null);
     }
 
 
     private final Status status;
-    private final Optional<CheckoutStream> stream;
     private final Optional<String> errorMessage;
 
-    private CheckoutResult(Status status, CheckoutStream stream, String errorMessage) {
+    private CheckoutResult(Status status, String errorMessage) {
         this.status = Preconditions.checkNotNull(status);
-        this.stream = Optional.ofNullable(stream);
         this.errorMessage = Optional.ofNullable(errorMessage);
     }
 
@@ -35,8 +33,8 @@ public final class CheckoutResult {
         return status;
     }
 
-    public CheckoutStream getStream() {
-        Preconditions.checkState(status == Status.OK && stream.isPresent());
-        return stream.get();
+    public String getErrorMessage() {
+        Preconditions.checkState(status == Status.FAILED);
+        return errorMessage.get();
     }
 }

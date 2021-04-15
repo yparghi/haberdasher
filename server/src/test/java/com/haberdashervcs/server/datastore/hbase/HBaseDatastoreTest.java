@@ -195,7 +195,7 @@ public class HBaseDatastoreTest {
         String commitId = putCommitRaw(folderId);
 
         HBaseDatastore datastore = HBaseDatastore.forConnection(conn);
-        CheckoutResult result = datastore.checkout(commitId, "/");
+        CheckoutResult result = datastore.checkout("test-org", "test-repo", commitId, "/");
 
         assertEquals(CheckoutResult.Status.OK, result.getStatus());
 

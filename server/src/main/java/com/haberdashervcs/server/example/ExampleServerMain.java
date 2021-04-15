@@ -41,7 +41,7 @@ public class ExampleServerMain {
 
         HaberdasherServer server = HaberdasherServer.builder()
                 .withDatastore(datastore)
-                .withFrontend(new JettyHttpFrontend())
+                .withFrontend(JettyHttpFrontend.forDatastore(datastore))
                 .build();
 
         server.start();

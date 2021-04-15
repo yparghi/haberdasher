@@ -6,17 +6,18 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
+import com.haberdashervcs.common.io.HdObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
-import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.FolderWithPath;
+import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
+import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import org.apache.hadoop.hbase.client.Connection;
 
 
@@ -50,18 +51,22 @@ public final class HBaseDatastore implements HdDatastore {
 
 
     @Override
-    public CheckoutResult checkout(String commitId, String folderToCheckout) {
+    public CheckoutResult checkout(String org, String repo, String commitId, String folderToCheckout, HdObjectOutputStream out) {
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(org, repo);
         try {
-            return checkoutInternal(commitId, folderToCheckout);
+            return checkoutInternal(rowKeyer, commitId, folderToCheckout, out);
         } catch (IOException ioEx) {
             LOG.exception(ioEx, "Error checking out path: " + folderToCheckout);
             return CheckoutResult.failed(ioEx.getMessage());
         }
     }
 
-    private CheckoutResult checkoutInternal(String commitId, String folderPath) throws IOException {
+    private CheckoutResult checkoutInternal(
+            HBaseRowKeyMaker rowKeyer, String commitId, String folderPath, HdObjectOutputStream out)
+            throws IOException {
         // TODO How do I generalize this check?
         Preconditions.checkArgument(folderPath.startsWith("/"));
+
         final CommitEntry commitEntry = helper.getCommit(commitId);
         FolderListing parentFolder = helper.getFolder(commitEntry.getRootFolderId());
 

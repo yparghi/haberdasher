@@ -8,8 +8,8 @@ import com.google.common.base.Splitter;
 import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
-import com.haberdashervcs.common.objects.CommitEntry;
-import com.haberdashervcs.server.operations.checkout.CheckoutOperation;
+import com.haberdashervcs.server.datastore.HdDatastore;
+import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
@@ -20,13 +20,24 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class JettyHttpFrontend implements Frontend {
 
+    public static JettyHttpFrontend forDatastore(HdDatastore datastore) {
+        return new JettyHttpFrontend(datastore);
+    }
+
+
+    private final HdDatastore datastore;
+
+    private JettyHttpFrontend(HdDatastore datastore) {
+        this.datastore = datastore;
+    }
+
     @Override
     public void startInBackground() throws Exception {
         // $ echo -n "haberdasher" | md5
         // 6b07689d9997423c2abd564445ac3c07
         // 3c07 as decimal: 15367
         Server server = new Server(15367);
-        server.setHandler(new RootHandler());
+        server.setHandler(new RootHandler(datastore));
         server.start();
     }
 
@@ -37,6 +48,13 @@ public class JettyHttpFrontend implements Frontend {
         private static final HdLogger LOG = HdLoggers.create(RootHandler.class);
 
         private static final Splitter PATH_PART_SPLITTER = Splitter.on('/');
+
+
+        private final HdDatastore datastore;
+
+        private RootHandler(HdDatastore datastore) {
+            this.datastore = datastore;
+        }
 
         @Override
         public void handle(
@@ -72,10 +90,6 @@ public class JettyHttpFrontend implements Frontend {
         private void handleCheckout(
                 HttpServletResponse response, String org, String repo, Map<String, String[]> params)
                 throws IOException {
-            ProtobufObjectOutputStream protoOut = ProtobufObjectOutputStream.forOutputStream(response.getOutputStream());
-            protoOut.writeCommit(
-                    "some-test-commit", CommitEntry.forRootFolderId("some-root-folder"));
-
             String path = getOneParam("path", params);
             String commit = getOneParam("commit", params);
             if (path == null || commit == null) {
@@ -83,11 +97,16 @@ public class JettyHttpFrontend implements Frontend {
                 return;
             }
 
-            CheckoutOperation op = new CheckoutOperation(org, repo, path, commit);
-            // TODO run it...
+            ProtobufObjectOutputStream protoOut = ProtobufObjectOutputStream.forOutputStream(response.getOutputStream());
+            CheckoutResult result = datastore.checkout(org, repo, commit, path, protoOut);
 
-            response.setStatus(HttpStatus.OK_200);
             response.setContentType("application/octet-stream");
+            if (result.getStatus() == CheckoutResult.Status.OK) {
+                response.setStatus(HttpStatus.OK_200);
+            } else {
+                LOG.error("Failed checkout: %s", result.getErrorMessage());
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            }
         }
 
         private String getOneParam(String key, Map<String, String[]> map) {

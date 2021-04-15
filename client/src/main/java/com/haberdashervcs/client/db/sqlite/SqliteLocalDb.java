@@ -14,6 +14,7 @@ import com.haberdashervcs.client.checkout.CheckoutInputStream;
 import com.haberdashervcs.client.db.LocalDb;
 
 
+// TODO! sqlite upsert to add objects?: https://www.sqlite.org/draft/lang_UPSERT.html
 public final class SqliteLocalDb implements LocalDb {
 
     private static final SqliteLocalDb INSTANCE = new SqliteLocalDb();
