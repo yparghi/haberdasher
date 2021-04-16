@@ -63,6 +63,8 @@ public class JettyHttpFrontend implements Frontend {
                 HttpServletRequest request,
                 HttpServletResponse response)
                 throws IOException {
+            baseRequest.setHandled(true);
+
             final String path = request.getPathInfo().substring(1);
             final List<String> parts = PATH_PART_SPLITTER.splitToList(path);
             final Map<String, String[]> params = request.getParameterMap();
@@ -81,10 +83,8 @@ public class JettyHttpFrontend implements Frontend {
                     break;
                 default:
                     response.setStatus(HttpStatus.NOT_FOUND_404);
-                    return;
+                    break;
             }
-
-            baseRequest.setHandled(true);
         }
 
         private void handleCheckout(
