@@ -1,10 +1,12 @@
 package com.haberdashervcs.server.frontend;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
@@ -42,7 +44,10 @@ public class JettyHttpFrontend implements Frontend {
     }
 
 
-    // $ curl 'localhost:15367/yashorg/basic-test-repo/checkout?path=somepath&commit=xxx'
+    // TODO:
+    // - General exception handler -- output some json envelope?
+    //
+    // $ curl -v 'localhost:15367/some_org/some_repo/checkout?path=%2Fsomepath&commit=xxx'
     private static class RootHandler extends AbstractHandler {
 
         private static final HdLogger LOG = HdLoggers.create(RootHandler.class);
@@ -69,6 +74,7 @@ public class JettyHttpFrontend implements Frontend {
             final List<String> parts = PATH_PART_SPLITTER.splitToList(path);
             final Map<String, String[]> params = request.getParameterMap();
             if (parts.size() != 3) {
+                LOG.info("Got parts: %s", String.join(", ", parts));
                 response.setStatus(HttpStatus.NOT_FOUND_404);
                 return;
             }
@@ -76,6 +82,7 @@ public class JettyHttpFrontend implements Frontend {
             final String org = parts.get(0);
             final String repo = parts.get(1);
             final String op = parts.get(2);
+            LOG.info("Org %s, Repo %s, op %s", org, repo, op);
 
             switch (op) {
                 case "checkout":

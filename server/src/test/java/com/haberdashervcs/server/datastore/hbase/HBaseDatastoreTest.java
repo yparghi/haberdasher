@@ -20,7 +20,6 @@ import com.haberdashervcs.common.protobuf.FilesProto;
 import com.haberdashervcs.common.protobuf.FoldersProto;
 import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
-import com.haberdashervcs.server.operations.checkout.CheckoutStream;
 import com.haberdashervcs.server.operations.change.AddChange;
 import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
 import com.haberdashervcs.server.operations.change.Changeset;
@@ -161,6 +160,7 @@ public class HBaseDatastoreTest {
         return folderId;
     }
 
+    /*
     private String putCommitRaw(String rootFolderId) throws IOException {
         final String commitId = UUID.randomUUID().toString();
 
@@ -251,4 +251,5 @@ public class HBaseDatastoreTest {
         assertEquals("apple.txt", rootFolder.getEntries().get(0).getName());
         assertEquals("banana.txt", rootFolder.getEntries().get(1).getName());
     }
+     */
 }
