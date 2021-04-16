@@ -40,11 +40,11 @@ public final class HBaseRawHelper {
         this.conn = conn;
     }
 
-    CommitEntry getCommit(String rowKey) throws IOException {
+    CommitEntry getCommit(byte[] rowKey) throws IOException {
         final Table commitsTable = conn.getTable(TableName.valueOf("Commits"));
         final String columnFamilyName = "cfMain";
 
-        Get get = new Get(Bytes.toBytes(rowKey));
+        Get get = new Get(rowKey);
         Result result = commitsTable.get(get);
         byte[] commitEntryBytes = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("entry"));
@@ -65,13 +65,11 @@ public final class HBaseRawHelper {
     }
 
 
-    FolderListing getFolder(String folderId) throws IOException {
+    FolderListing getFolder(byte[] folderRowKey) throws IOException {
         final Table foldersTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
 
-        final String rowKey = folderId; // TODO commits/refs in the row key?
-
-        Get get = new Get(Bytes.toBytes(rowKey));
+        Get get = new Get(folderRowKey);
         Result result = foldersTable.get(get);
         byte[] folderValue = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("listing"));

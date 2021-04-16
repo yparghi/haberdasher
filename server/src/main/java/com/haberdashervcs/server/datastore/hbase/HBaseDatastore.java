@@ -67,17 +67,19 @@ public final class HBaseDatastore implements HdDatastore {
         // TODO How do I generalize this check?
         Preconditions.checkArgument(folderPath.startsWith("/"));
 
-        final CommitEntry commitEntry = helper.getCommit(commitId);
-        FolderListing parentFolder = helper.getFolder(commitEntry.getRootFolderId());
+        final CommitEntry commitEntry = helper.getCommit(rowKeyer.forCommit(commitId));
+        FolderListing parentFolder = helper.getFolder(
+                rowKeyer.forFolder(commitEntry.getRootFolderId()));
 
         String[] pathParts = folderPath.split(Pattern.quote("/"));
         for (String nextFolderName : pathParts) {
-            parentFolder = helper.getFolder(parentFolder.getSubfolderId(nextFolderName));
+            parentFolder = helper.getFolder(
+                    rowKeyer.forFolder(parentFolder.getSubfolderId(nextFolderName)));
         }
 
         final FolderListing checkoutRoot = parentFolder;
-        HBaseCheckoutStream result = crawlFiles(folderPath, checkoutRoot);
-        return CheckoutResult.forStream(result);
+        crawlFiles(folderPath, checkoutRoot, out);
+        return CheckoutResult.ok();
     }
 
 
@@ -94,8 +96,8 @@ public final class HBaseDatastore implements HdDatastore {
         }
     }
 
-    private HBaseCheckoutStream crawlFiles(String rootPath, FolderListing rootListing) throws IOException {
-        HBaseCheckoutStream.Builder out = HBaseCheckoutStream.Builder.atRoot(rootPath, rootListing);
+    private void crawlFiles(String rootPath, FolderListing rootListing, HdObjectOutputStream out) throws IOException {
+        // TODO DFS or BFS?
         LinkedList<CrawlEntry> foldersToBrowse = new LinkedList<>();
         foldersToBrowse.add(new CrawlEntry(rootPath, rootListing));
 
@@ -109,12 +111,10 @@ public final class HBaseDatastore implements HdDatastore {
 
                 } else {
                     FileEntry fileEntry = helper.getFile(entryInFolder.getFileId());
-                    out.addFile(thisCrawlEntry.path + entryInFolder.getName(), fileEntry.getContents());
+                    out.writeFile(entryInFolder.getFileId(), fileEntry);
                 }
             }
         }
-
-        return out.build();
     }
 
 
