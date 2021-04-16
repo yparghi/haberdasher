@@ -78,7 +78,7 @@ public final class HBaseDatastore implements HdDatastore {
         }
 
         final FolderListing checkoutRoot = parentFolder;
-        crawlFiles(folderPath, checkoutRoot, out);
+        crawlFiles(rowKeyer, folderPath, checkoutRoot, out);
         return CheckoutResult.ok();
     }
 
@@ -96,7 +96,9 @@ public final class HBaseDatastore implements HdDatastore {
         }
     }
 
-    private void crawlFiles(String rootPath, FolderListing rootListing, HdObjectOutputStream out) throws IOException {
+    private void crawlFiles(
+            HBaseRowKeyMaker rowKeyer, String rootPath, FolderListing rootListing, HdObjectOutputStream out)
+            throws IOException {
         // TODO DFS or BFS?
         LinkedList<CrawlEntry> foldersToBrowse = new LinkedList<>();
         foldersToBrowse.add(new CrawlEntry(rootPath, rootListing));
@@ -110,7 +112,7 @@ public final class HBaseDatastore implements HdDatastore {
                             thisCrawlEntry.path + "/" + entryInFolder.getName(), thisEntryFolderListing));
 
                 } else {
-                    FileEntry fileEntry = helper.getFile(entryInFolder.getFileId());
+                    FileEntry fileEntry = helper.getFile(rowKeyer.forFile(entryInFolder.getFileId()));
                     out.writeFile(entryInFolder.getFileId(), fileEntry);
                 }
             }

@@ -71,5 +71,6 @@ public class ExampleServerMain {
 
         final Changeset changeset = changesetBuilder.build();
         ApplyChangesetResult result = datastore.applyChangeset(testOrg, testRepo, changeset);
+        LOG.info("Loaded test data at commit: %s", result.getCommitId());
     }
 }
