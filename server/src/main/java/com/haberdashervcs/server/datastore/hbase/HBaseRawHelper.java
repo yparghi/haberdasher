@@ -78,12 +78,10 @@ public final class HBaseRawHelper {
     }
 
 
-    String putFileAdd(final String fileId, FileEntry fileEntry) throws IOException {
+    void putFileAdd(final byte[] rowKey, FileEntry fileEntry) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
         final String columnFamilyName = "cfMain";
         final String columnName = "contents";
-
-        final String rowKey = fileId;
 
         // TODO compress the commit id and other string fields to bytes? Is that necessary?
         FilesProto.FileEntry fileProto = FilesProto.FileEntry.newBuilder()
@@ -91,14 +89,12 @@ public final class HBaseRawHelper {
                 .setChangeType(FilesProto.ChangeType.ADD)
                 .build();
 
-        Put put = new Put(Bytes.toBytes(rowKey));
+        Put put = new Put(rowKey);
         put.addColumn(
                 Bytes.toBytes(columnFamilyName),
                 Bytes.toBytes(columnName),
                 fileProto.toByteArray());
         filesTable.put(put);
-
-        return fileId;
     }
 
     FoldersProto.FolderListing convertFolderToProto(FolderListing folderListing) {
@@ -118,38 +114,32 @@ public final class HBaseRawHelper {
         return out.build();
     }
 
-    String putFolder(final String folderId, FolderListing folderListing) throws IOException {
+    void putFolder(final byte[] rowKey, FolderListing folderListing) throws IOException {
         final Table filesTable = conn.getTable(TableName.valueOf("Folders"));
         final String columnFamilyName = "cfMain";
         final String columnName = "listing";
 
-        final String rowKey = folderId;
-
         // TODO compress the commit id and other string fields to bytes? Is that necessary?
         FoldersProto.FolderListing folderProto = convertFolderToProto(folderListing);
 
-        Put put = new Put(Bytes.toBytes(rowKey));
+        Put put = new Put(rowKey);
         put.addColumn(
                 Bytes.toBytes(columnFamilyName),
                 Bytes.toBytes(columnName),
                 folderProto.toByteArray());
         filesTable.put(put);
-
-        return folderId;
     }
 
-    void putCommit(String commitId, String rootFolderId) throws IOException {
+    void putCommit(final byte[] rowKey, String rootFolderId) throws IOException {
         final Table commitsTable = conn.getTable(TableName.valueOf("Commits"));
         final String columnFamilyName = "cfMain";
         final String columnName = "entry";
-
-        final String rowKey = commitId;
 
         CommitsProto.CommitEntry commitProto = CommitsProto.CommitEntry.newBuilder()
                 .setRootFolderId(rootFolderId)
                 .build();
 
-        Put put = new Put(Bytes.toBytes(rowKey));
+        Put put = new Put(rowKey);
         put.addColumn(
                 Bytes.toBytes(columnFamilyName),
                 Bytes.toBytes(columnName),

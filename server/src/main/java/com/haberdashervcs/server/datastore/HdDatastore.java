@@ -8,7 +8,8 @@ import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 
 public interface HdDatastore {
 
-    ApplyChangesetResult applyChangeset(Changeset changeset);
+    ApplyChangesetResult applyChangeset(
+            String org, String repo, Changeset changeset);
 
     CheckoutResult checkout(
             String org, String repo, String commitId, String folderToCheckout, HdObjectOutputStream out);

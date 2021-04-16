@@ -40,9 +40,9 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
     @Override
-    public ApplyChangesetResult applyChangeset(Changeset changeset) {
+    public ApplyChangesetResult applyChangeset(String org, String repo, Changeset changeset) {
         try {
-            return applyChangesetInternal(changeset);
+            return applyChangesetInternal(org, repo, changeset);
         } catch (IOException ioEx) {
             LOG.exception(ioEx, "Error applying Changeset");
             return ApplyChangesetResult.failed();
@@ -118,22 +118,23 @@ public final class HBaseDatastore implements HdDatastore {
     }
 
 
-    private ApplyChangesetResult applyChangesetInternal(Changeset changeset) throws IOException {
-        // TODO: Some Transaction (or TransactionManager from the config) should do this, maybe by using the datastore
-        // instance.
-        //
-        // TODO Set up branches (just mapping to a head commit id? proto BranchEntry?)
-
+    // TODO: Some Transaction (or TransactionManager from the config) should do this, maybe by using the datastore
+    // instance.
+    //
+    // TODO Set up branches (just mapping to a head commit id? proto BranchEntry?)
+    private ApplyChangesetResult applyChangesetInternal(String org, String repo, Changeset changeset) throws IOException {
         // For atomicity, apply the change from the bottom up:
         // - Create/modify files.
         // - Create new folder listings.
         // - Create the new commit with the new root folder listing.
         // - Update the branch to point to the new commit (TODO).
 
+        HBaseRowKeyMaker keyer = HBaseRowKeyMaker.of(org, repo);
+
         // TODO: Should file ids be based on (hashed from?) the file contents? Or is that the client's problem to solve,
         // in tracking/storing/sending which files are changed? In other words, where do id's come from?
         for (AddChange addChange : changeset.getAddChanges()) {
-            helper.putFileAdd(addChange.getId(), addChange.getFile());
+            helper.putFileAdd(keyer.forFile(addChange.getId()), addChange.getFile());
         }
 
         for (FolderWithPath changedFolder : changeset.getChangedFolders()) {
@@ -143,10 +144,10 @@ public final class HBaseDatastore implements HdDatastore {
             } else {
                 folderId = UUID.randomUUID().toString();
             }
-            helper.putFolder(folderId, changedFolder.getListing());
+            helper.putFolder(keyer.forFolder(folderId), changedFolder.getListing());
         }
 
-        helper.putCommit(changeset.getProposedCommitId(), changeset.getProposedRootFolderId());
+        helper.putCommit(keyer.forCommit(changeset.getProposedCommitId()), changeset.getProposedRootFolderId());
 
         return ApplyChangesetResult.successful(changeset.getProposedCommitId());
     }

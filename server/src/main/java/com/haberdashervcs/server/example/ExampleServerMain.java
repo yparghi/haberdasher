@@ -51,6 +51,9 @@ public class ExampleServerMain {
 
     // TEMP!
     private static void loadTestData(Connection conn, HBaseDatastore datastore) throws Exception {
+        final String testOrg = "some_org";
+        final String testRepo = "some_repo";
+
         HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
         Changeset.Builder changesetBuilder = Changeset.builder();
 
@@ -67,6 +70,6 @@ public class ExampleServerMain {
         changesetBuilder = changesetBuilder.withFolderAndPath("/", folder);
 
         final Changeset changeset = changesetBuilder.build();
-        ApplyChangesetResult result = datastore.applyChangeset(changeset);
+        ApplyChangesetResult result = datastore.applyChangeset(testOrg, testRepo, changeset);
     }
 }
