@@ -1,4 +1,4 @@
-package com.haberdashervcs.client.commands;
+package com.haberdashervcs.client.checkout;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.haberdashervcs.client.commands.Command;
 import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
 import com.haberdashervcs.common.io.HdObjectId;

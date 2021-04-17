@@ -17,6 +17,8 @@ import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.objects.CommitEntry;
+import com.haberdashervcs.common.objects.FileEntry;
+import com.haberdashervcs.common.objects.FolderListing;
 
 
 // TODO! sqlite upsert to add objects?: https://www.sqlite.org/draft/lang_UPSERT.html
@@ -56,6 +58,8 @@ public final class SqliteLocalDb implements LocalDb {
 
         createTable(Schemas.META_SCHEMA);
         createTable(Schemas.COMMITS_SCHEMA);
+        createTable(Schemas.FOLDERS_SCHEMA);
+        createTable(Schemas.FILES_SCHEMA);
     }
 
     private void createTable(String sql) {
@@ -112,6 +116,41 @@ public final class SqliteLocalDb implements LocalDb {
             Blob contents = rs.getBlob("contents");
             byte[] contentsBytes = new byte[(int) contents.length()];
             return byteConv.commitFromBytes(contentsBytes);
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
+
+    @Override
+    public FolderListing getFolder(String folderId) {
+        try {
+            PreparedStatement getStmt = conn.get().prepareStatement(
+                    "SELECT contents FROM Folders WHERE id = ?");
+            getStmt.setString(1, folderId);
+            ResultSet rs = getStmt.executeQuery();
+            rs.next();
+            Blob contents = rs.getBlob("contents");
+            byte[] contentsBytes = new byte[(int) contents.length()];
+            return byteConv.folderFromBytes(contentsBytes);
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
+
+    public FileEntry getFile(String fileId) {
+        try {
+            PreparedStatement getStmt = conn.get().prepareStatement(
+                    "SELECT contents FROM Files WHERE id = ?");
+            getStmt.setString(1, fileId);
+            ResultSet rs = getStmt.executeQuery();
+            rs.next();
+            Blob contents = rs.getBlob("contents");
+            byte[] contentsBytes = new byte[(int) contents.length()];
+            return byteConv.fileFromBytes(contentsBytes);
         } catch (SQLException sqlEx) {
             throw new RuntimeException(sqlEx);
         } catch (IOException ioEx) {

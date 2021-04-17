@@ -1,6 +1,9 @@
 package com.haberdashervcs.common.objects;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -59,6 +62,15 @@ public final class FolderListing {
 
     public List<FolderEntry> getEntries() {
         return entries;
+    }
+
+    public Optional<FolderEntry> getEntryForName(String name) {
+        for(FolderEntry entry : entries) {
+            if (entry.getName().equals(name)) {
+                return Optional.of(entry);
+            }
+        }
+        return Optional.empty();
     }
 
     public String getSubfolderId(String subfolderName) {

@@ -3,6 +3,9 @@ package com.haberdashervcs.client.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.haberdashervcs.client.checkout.CheckoutCommand;
+import com.haberdashervcs.client.push.PushCommand;
+
 
 public class Commands {
 
