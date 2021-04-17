@@ -70,7 +70,7 @@ public final class SqliteLocalDb implements LocalDb {
     private String getMetaValue(String key) {
         try {
             PreparedStatement getStmt = conn.get().prepareStatement(
-                    "SELECT value FROM Meta WHERE key = ?");
+                    "SELECT value FROM Meta WHERE metaKey = ?");
             getStmt.setString(1, key);
             ResultSet rs = getStmt.executeQuery();
             rs.next();
