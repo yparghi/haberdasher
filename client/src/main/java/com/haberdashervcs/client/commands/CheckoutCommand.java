@@ -2,7 +2,10 @@ package com.haberdashervcs.client.commands;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -20,11 +23,15 @@ import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.util.UrlEncoded;
+import org.yaml.snakeyaml.Yaml;
 
 
 public class CheckoutCommand implements Command {
 
     private static final HdLogger LOG = HdLoggers.create(CheckoutCommand.class);
+
+    // TODO move these constants somewhere common?
+    private static final String INIT_FILENAME = "hdlocal";
 
 
     private final List<String> otherArgs;
@@ -40,6 +47,15 @@ public class CheckoutCommand implements Command {
     public void perform() throws Exception {
         final String currentCommit = db.getCurrentCommit();
         final String path = otherArgs.get(0);
+        final String commit = otherArgs.get(1);
+
+        final String initContents = Files.readString(Paths.get(INIT_FILENAME));
+        Yaml yamlParser = new Yaml();
+        Map<String, String> parsedYaml = yamlParser.load(initContents);
+        if (true) {
+            LOG.info("Parsed yaml: %s", parsedYaml);
+            return;
+        }
 
         // TODO: Get this from a config
         final String serverUrl = String.format(

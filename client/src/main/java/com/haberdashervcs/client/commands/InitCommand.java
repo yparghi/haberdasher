@@ -20,7 +20,9 @@ class InitCommand implements Command {
 
     private static final String INIT_FILE_TEMPLATE = Joiner.on('\n').join(
             "---",
-            "url: %s",
+            "host: %s",
+            "org: %s",
+            "repo: %s",
             "");
 
 
@@ -35,7 +37,10 @@ class InitCommand implements Command {
 
     @Override
     public void perform() {
-        String serverAddress = otherArgs.get(0);
+        final String host = otherArgs.get(0);
+        final String org = otherArgs.get(1);
+        final String repo = otherArgs.get(2);
+
         final File initFile = new File(INIT_FILENAME);
         if (initFile.exists()) {
             throw new IllegalStateException(
@@ -43,7 +48,7 @@ class InitCommand implements Command {
         }
 
         try {
-            String initFileContents = initFileContents(serverAddress);
+            String initFileContents = initFileContents(host, org, repo);
             Files.write(initFileContents.getBytes(StandardCharsets.UTF_8), initFile);
             initDb();
         } catch (IOException ioEx) {
@@ -51,8 +56,10 @@ class InitCommand implements Command {
         }
     }
 
-    private String initFileContents(String serverAddress) {
-        return String.format(INIT_FILE_TEMPLATE, serverAddress);
+    private String initFileContents(String host, String org, String repo) {
+        return String.format(
+                INIT_FILE_TEMPLATE,
+                host, org, repo);
     }
 
     private void initDb() {
