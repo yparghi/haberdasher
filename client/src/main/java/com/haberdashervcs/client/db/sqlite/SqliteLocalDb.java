@@ -1,6 +1,8 @@
 package com.haberdashervcs.client.db.sqlite;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,6 +14,9 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.haberdashervcs.client.checkout.CheckoutInputStream;
 import com.haberdashervcs.client.db.LocalDb;
+import com.haberdashervcs.common.io.HdObjectByteConverter;
+import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
+import com.haberdashervcs.common.objects.CommitEntry;
 
 
 // TODO! sqlite upsert to add objects?: https://www.sqlite.org/draft/lang_UPSERT.html
@@ -24,6 +29,7 @@ public final class SqliteLocalDb implements LocalDb {
         return INSTANCE;
     }
 
+
     private Supplier<Connection> conn = Suppliers.memoize(new Supplier<Connection>() {
         @Override public Connection get() {
             try {
@@ -34,7 +40,11 @@ public final class SqliteLocalDb implements LocalDb {
         }
     });
 
-    private SqliteLocalDb() {}
+    private final HdObjectByteConverter byteConv;
+
+    private SqliteLocalDb() {
+        this.byteConv = ProtobufObjectByteConverter.getInstance();
+    }
 
     @Override
     public void create() {
@@ -45,6 +55,7 @@ public final class SqliteLocalDb implements LocalDb {
         }
 
         createTable(Schemas.META_SCHEMA);
+        createTable(Schemas.COMMITS_SCHEMA);
     }
 
     private void createTable(String sql) {
@@ -83,5 +94,28 @@ public final class SqliteLocalDb implements LocalDb {
     @Override
     public void setNewCommit(String newCommitId) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getBaseRemoteCommit() {
+        return getMetaValue("baseRemoteCommit");
+    }
+
+    @Override
+    public CommitEntry getCommit(String commitId) {
+        try {
+            PreparedStatement getStmt = conn.get().prepareStatement(
+                    "SELECT contents FROM Commits WHERE id = ?");
+            getStmt.setString(1, commitId);
+            ResultSet rs = getStmt.executeQuery();
+            rs.next();
+            Blob contents = rs.getBlob("contents");
+            byte[] contentsBytes = new byte[(int) contents.length()];
+            return byteConv.commitFromBytes(contentsBytes);
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
     }
 }

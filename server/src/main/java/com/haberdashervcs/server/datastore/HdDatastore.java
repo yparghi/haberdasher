@@ -1,8 +1,8 @@
 package com.haberdashervcs.server.datastore;
 
 import com.haberdashervcs.common.io.HdObjectOutputStream;
-import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
-import com.haberdashervcs.server.operations.change.Changeset;
+import com.haberdashervcs.common.change.ApplyChangesetResult;
+import com.haberdashervcs.common.change.Changeset;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 
 

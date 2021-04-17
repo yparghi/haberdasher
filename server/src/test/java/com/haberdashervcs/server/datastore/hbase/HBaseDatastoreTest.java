@@ -1,8 +1,6 @@
 package com.haberdashervcs.server.datastore.hbase;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -12,17 +10,8 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
-import com.haberdashervcs.common.objects.CommitEntry;
-import com.haberdashervcs.common.objects.FileEntry;
-import com.haberdashervcs.common.objects.FolderListing;
-import com.haberdashervcs.common.protobuf.CommitsProto;
 import com.haberdashervcs.common.protobuf.FilesProto;
 import com.haberdashervcs.common.protobuf.FoldersProto;
-import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.operations.checkout.CheckoutResult;
-import com.haberdashervcs.server.operations.change.AddChange;
-import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
-import com.haberdashervcs.server.operations.change.Changeset;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
@@ -37,7 +26,6 @@ import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

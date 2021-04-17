@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.operations.change;
+package com.haberdashervcs.common.change;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,4 +11,10 @@ final class Schemas {
         "metaKey VARCHAR(255) PRIMARY KEY, " +
         "metaValue VARCHAR(255) NOT NULL " +
         ");";
+
+    static final String COMMITS_SCHEMA =
+            "CREATE TABLE Commits (" +
+                    "id VARCHAR(255) PRIMARY KEY, " +
+                    "contents BLOB NOT NULL " +
+                    ");";
 }

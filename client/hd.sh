@@ -10,5 +10,7 @@ BASE=$(dirname $0)
 (cd "$BASE/../client" && mvn install)
 
 ARGS=$(echo "$@")
-mvn -f "$BASE/pom.xml" exec:java -Dexec.mainClass="com.haberdashervcs.client.ClientMain" -Dexec.args="$ARGS"
+mvn -f "$BASE/pom.xml" exec:java \
+    -Dexec.mainClass="com.haberdashervcs.client.ClientMain" \
+    -Dexec.args="$ARGS"
 

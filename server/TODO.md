@@ -27,6 +27,7 @@
     - Does a changeset always set a base commit for a file? (Like, only push this changeset if this file is still at commit xyz.)
     - If so, then _how do you know a file's commit history?_ From the change history stored on the folder, like I proposed in my notes?
     - Use HBase **checkAndPut** for safe merging?
+    - Does your change need to hold its "place in line" in a way?
 
 - SSL/TLS for socket communications from client to server?
     - The server socket/communication config should be configurable from main?

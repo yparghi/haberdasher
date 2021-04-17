@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.operations.change;
+package com.haberdashervcs.common.change;
 
 import com.google.common.base.Preconditions;
 

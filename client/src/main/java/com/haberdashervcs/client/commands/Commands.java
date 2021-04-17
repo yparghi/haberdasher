@@ -16,6 +16,9 @@ public class Commands {
 
         } else if (commandWord.equals("checkout")) {
             return new CheckoutCommand(otherArgs);
+
+        } else if (commandWord.equals("push")) {
+            return new PushCommand(otherArgs);
         }
 
         throw new IllegalArgumentException("Unknown command: " + commandWord);

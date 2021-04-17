@@ -14,9 +14,9 @@ import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.FolderWithPath;
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.operations.change.AddChange;
-import com.haberdashervcs.server.operations.change.ApplyChangesetResult;
-import com.haberdashervcs.server.operations.change.Changeset;
+import com.haberdashervcs.common.change.AddChange;
+import com.haberdashervcs.common.change.ApplyChangesetResult;
+import com.haberdashervcs.common.change.Changeset;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import org.apache.hadoop.hbase.client.Connection;
 

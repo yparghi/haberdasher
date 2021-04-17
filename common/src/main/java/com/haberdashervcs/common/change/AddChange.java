@@ -1,8 +1,5 @@
-package com.haberdashervcs.server.operations.change;
+package com.haberdashervcs.common.change;
 
-import java.util.Arrays;
-
-import com.haberdashervcs.common.io.HdBytes;
 import com.haberdashervcs.common.objects.FileEntry;
 
 
