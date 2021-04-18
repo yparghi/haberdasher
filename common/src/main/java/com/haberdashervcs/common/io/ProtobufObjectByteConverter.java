@@ -36,7 +36,7 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
         for (FolderListing.FolderEntry entry : folder.getEntries()) {
             FoldersProto.FolderListingEntry.Builder entryProto = FoldersProto.FolderListingEntry.newBuilder();
             entryProto.setName(entry.getName());
-            entryProto.setFileId(entry.getFileId());
+            entryProto.setFileId(entry.getId());
             entryProto.setType(
                     (entry.getType() == FolderListing.FolderEntry.Type.FILE)
                     ? FoldersProto.FolderListingEntry.Type.FILE : FoldersProto.FolderListingEntry.Type.FOLDER);

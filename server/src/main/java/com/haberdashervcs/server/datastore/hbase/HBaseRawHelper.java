@@ -101,7 +101,7 @@ public final class HBaseRawHelper {
 
         for (FolderListing.FolderEntry entry : folderListing.getEntries()) {
             FoldersProto.FolderListingEntry protoEntry = FoldersProto.FolderListingEntry.newBuilder()
-                    .setFileId(entry.getFileId())
+                    .setFileId(entry.getId())
                     .setName(entry.getName())
                     .setType(entry.getType() == FolderListing.FolderEntry.Type.FILE
                             ? FoldersProto.FolderListingEntry.Type.FILE

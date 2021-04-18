@@ -3,8 +3,6 @@ package com.haberdashervcs.common.objects;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -48,7 +46,7 @@ public final class FolderListing {
             return name;
         }
 
-        public String getFileId() {
+        public String getId() {
             Preconditions.checkState(type == Type.FILE);
             return fileId;
         }
@@ -76,7 +74,7 @@ public final class FolderListing {
     public String getSubfolderId(String subfolderName) {
         for (FolderEntry entry : entries) {
             if (entry.getType() == FolderEntry.Type.FOLDER && entry.getName().equals(subfolderName)) {
-                return entry.getFileId();
+                return entry.getId();
             }
         }
         throw new IllegalArgumentException("Subfolder not found: " + subfolderName);

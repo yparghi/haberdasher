@@ -112,8 +112,8 @@ public final class HBaseDatastore implements HdDatastore {
                             thisCrawlEntry.path + "/" + entryInFolder.getName(), thisEntryFolderListing));
 
                 } else {
-                    FileEntry fileEntry = helper.getFile(rowKeyer.forFile(entryInFolder.getFileId()));
-                    out.writeFile(entryInFolder.getFileId(), fileEntry);
+                    FileEntry fileEntry = helper.getFile(rowKeyer.forFile(entryInFolder.getId()));
+                    out.writeFile(entryInFolder.getId(), fileEntry);
                 }
             }
         }

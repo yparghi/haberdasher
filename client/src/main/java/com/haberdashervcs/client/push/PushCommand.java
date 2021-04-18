@@ -2,11 +2,15 @@ package com.haberdashervcs.client.push;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import com.haberdashervcs.client.commands.Command;
 import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
+import com.haberdashervcs.common.change.AddChange;
 import com.haberdashervcs.common.change.Changeset;
+import com.haberdashervcs.common.change.DeleteChange;
+import com.haberdashervcs.common.change.ModifyChange;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 
@@ -41,6 +45,8 @@ public class PushCommand implements Command {
         // Crawl the checkout adding each new tree and file as you go...
         // For any file in a changed tree, determine if it's an add/delete/modify(/rename?).
 
+        Changeset.Builder out = Changeset.builder();
+
         final CommitEntry baseCommit = db.getCommit(baseRemoteCommit);
         final CommitEntry localHeadCommit = db.getCommit(db.getCurrentCommit());
         LinkedList<CrawlDiffEntry> changedTrees = new LinkedList<>();
@@ -49,21 +55,50 @@ public class PushCommand implements Command {
         FolderListing rootNew = db.getFolder(localHeadCommit.getRootFolderId());
         changedTrees.add(new CrawlDiffEntry(rootOld, rootNew));
 
+        // TODO: Do I need a class/abstraction for this walking code? It feels partly redundant with similar server
+        // code.
         while (!changedTrees.isEmpty()) {
             CrawlDiffEntry thisDiff = changedTrees.pop();
 
             if (thisDiff.getOld() != null && thisDiff.getNew() == null) {
-                // delete...
+                for (FolderListing.FolderEntry entry : thisDiff.getOld().getEntries()) {
+                    if (entry.getType() == FolderListing.FolderEntry.Type.FILE) {
+                        out.withDeleteChange(DeleteChange.forFile(entry.getId()));
+                    } else {
+                        FolderListing deletedSubFolder = db.getFolder(entry.getId());
+                        changedTrees.add(new CrawlDiffEntry(deletedSubFolder, null));
+                    }
+                }
+
             } else if (thisDiff.getOld() == null && thisDiff.getNew() != null) {
-                // add...
+                for (FolderListing.FolderEntry entry : thisDiff.getNew().getEntries()) {
+                    if (entry.getType() == FolderListing.FolderEntry.Type.FILE) {
+                        out.withAddChange(AddChange.forContents(entry.getId(), db.getFile(entry.getId())));
+                    } else {
+                        FolderListing addedSubFolder = db.getFolder(entry.getId());
+                        changedTrees.add(new CrawlDiffEntry(null, addedSubFolder));
+                    }
+                }
+
+
             } else {
                 for (FolderListing.FolderEntry entry : thisDiff.getNew().getEntries()) {
+                    Optional<FolderListing.FolderEntry> oldEntry = thisDiff.getOld().getEntryForName(entry.getName());
+                    if (!oldEntry.isPresent()) {
+                        out.withAddChange(AddChange.forContents(entry.getId(), db.getFile(entry.getId())));
+                    } else {
+                        out.withModifyChange(ModifyChange.forContents(entry.getId(), db.getFile(entry.getId())));
+                    }
+
                     // TODO files -> check getEntryByName() in old...
                     // folders -> check getEntry and maybe add a new CrawlDiffEntry?
+
                 }
+
+                // TODO also check the other side, entries in old that don't correspond to new...
             }
         }
 
-        return null;
+        return out.build();
     }
 }
