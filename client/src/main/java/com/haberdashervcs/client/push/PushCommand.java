@@ -20,7 +20,7 @@ public class PushCommand implements Command {
     private final List<String> otherArgs;
     private final LocalDb db;
 
-    PushCommand(List<String> otherArgs) {
+    public PushCommand(List<String> otherArgs) {
         this.otherArgs = otherArgs;
         this.db = SqliteLocalDb.getInstance();
     }

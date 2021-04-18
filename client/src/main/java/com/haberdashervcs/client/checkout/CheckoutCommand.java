@@ -38,7 +38,7 @@ public class CheckoutCommand implements Command {
     private final List<String> otherArgs;
     private final LocalDb db;
 
-    CheckoutCommand(List<String> otherArgs) {
+    public CheckoutCommand(List<String> otherArgs) {
         this.otherArgs = otherArgs;
         this.db = SqliteLocalDb.getInstance();
     }
