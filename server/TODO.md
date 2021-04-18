@@ -1,5 +1,6 @@
 # TODOs
 
+
 ## Small
 
 - Update ExampleMain to set up a test HBase cluster, for easily testing the client.
@@ -8,6 +9,9 @@
 
 - Org and repo id's: Use some small randomly generated ID instead of what's typed in (which can just be a display name)?
     - Then the small random ID would be used in the row keys.
+
+- Test data builder/helper that looks/works like a tree, one commit at a time?
+
 
 
 ## Big
@@ -37,6 +41,7 @@
 - Compression in storage?
 
 - Garbage collection / failed pushes: In the mark phase, save the data/results out to some giant file or a kind of temp table, to use in the sweep phase?
+    - Or, idea: every object gets marked with some kind of transaction tag, that gets removed when it's confirmed the transaction has committed/landed/finished -- or is this too much overhead?
 
 - Client extensions, by loading from the classpath?
 
