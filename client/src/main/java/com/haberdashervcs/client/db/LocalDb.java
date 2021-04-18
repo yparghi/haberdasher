@@ -25,4 +25,10 @@ public interface LocalDb {
     FolderListing getFolder(String folderId);
 
     FileEntry getFile(String fileId);
+
+    void putCommit(String commitId, CommitEntry commit);
+
+    void putFolder(String folderId, FolderListing folder);
+
+    void putFile(String fileId, FileEntry file);
 }

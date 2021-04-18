@@ -3,7 +3,9 @@ package com.haberdashervcs.client.commands;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -11,6 +13,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
+import com.haberdashervcs.common.objects.CommitEntry;
+import com.haberdashervcs.common.objects.FolderListing;
 
 
 class InitCommand implements Command {
@@ -64,5 +68,12 @@ class InitCommand implements Command {
 
     private void initDb() {
         db.create();
+
+        String folderId = UUID.randomUUID().toString();
+        FolderListing rootFolder = FolderListing.forEntries(Collections.emptyList());
+        db.putFolder(folderId, rootFolder);
+
+        CommitEntry rootCommit = CommitEntry.forRootFolderId(folderId);
+        db.putCommit("INITIAL_COMMIT", rootCommit);
     }
 }

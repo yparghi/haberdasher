@@ -157,4 +157,70 @@ public final class SqliteLocalDb implements LocalDb {
             throw new RuntimeException(ioEx);
         }
     }
+
+    @Override
+    public void putCommit(String commitId, CommitEntry commit) {
+        try {
+            Blob blob = conn.get().createBlob();
+            byte[] bytes = byteConv.commitToBytes(commit);
+            blob.setBytes(0, bytes);
+
+            PreparedStatement stmt = conn.get().prepareStatement(
+                    "INSERT INTO Commits (id, contents) VALUES (?, ?)");
+            stmt.setString(1, commitId);
+            stmt.setBlob(2, blob);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated != 1) {
+                throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);
+            }
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
+
+    @Override
+    public void putFolder(String folderId, FolderListing folder) {
+        try {
+            Blob blob = conn.get().createBlob();
+            byte[] folderBytes = byteConv.folderToBytes(folder);
+            blob.setBytes(0, folderBytes);
+
+            PreparedStatement stmt = conn.get().prepareStatement(
+                    "INSERT INTO Folders (id, contents) VALUES (?, ?)");
+            stmt.setString(1, folderId);
+            stmt.setBlob(2, blob);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated != 1) {
+                throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);
+            }
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
+
+    @Override
+    public void putFile(String fileId, FileEntry file) {
+        try {
+            Blob blob = conn.get().createBlob();
+            byte[] bytes = byteConv.fileToBytes(file);
+            blob.setBytes(0, bytes);
+
+            PreparedStatement stmt = conn.get().prepareStatement(
+                    "INSERT INTO Files (id, contents) VALUES (?, ?)");
+            stmt.setString(1, fileId);
+            stmt.setBlob(2, blob);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated != 1) {
+                throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);
+            }
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
 }
