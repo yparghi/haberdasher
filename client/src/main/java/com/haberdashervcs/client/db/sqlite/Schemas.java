@@ -11,8 +11,8 @@ final class Schemas {
 
     static final String META_SCHEMA =
         "CREATE TABLE Meta (" +
-        "metaKey VARCHAR(255) PRIMARY KEY, " +
-        "metaValue VARCHAR(255) NOT NULL " +
+        "key VARCHAR(255) PRIMARY KEY, " +
+        "value VARCHAR(255) NOT NULL " +
         ");";
 
     static final String COMMITS_SCHEMA =

@@ -120,4 +120,8 @@ public final class Changeset {
     public String getProposedRootFolderId() {
         return proposedRootFolderId;
     }
+
+    public String getDebugString() {
+        return "Changeset:";
+    }
 }

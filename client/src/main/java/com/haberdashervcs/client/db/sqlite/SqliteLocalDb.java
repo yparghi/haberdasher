@@ -60,6 +60,10 @@ public final class SqliteLocalDb implements LocalDb {
         createTable(Schemas.COMMITS_SCHEMA);
         createTable(Schemas.FOLDERS_SCHEMA);
         createTable(Schemas.FILES_SCHEMA);
+
+        // TODO constants somewhere common
+        putMetaValue("baseRemoteCommit", "INITIAL_COMMIT");
+        putMetaValue("currentCommit", "INITIAL_COMMIT");
     }
 
     private void createTable(String sql) {
@@ -85,7 +89,7 @@ public final class SqliteLocalDb implements LocalDb {
     private String getMetaValue(String key) {
         try {
             PreparedStatement getStmt = conn.get().prepareStatement(
-                    "SELECT value FROM Meta WHERE metaKey = ?");
+                    "SELECT value FROM Meta WHERE key = ?");
             getStmt.setString(1, key);
             ResultSet rs = getStmt.executeQuery();
             rs.next();
@@ -93,16 +97,36 @@ public final class SqliteLocalDb implements LocalDb {
         } catch (SQLException sqlEx) {
             throw new RuntimeException(sqlEx);
         }
-}
+    }
+
+    private void putMetaValue(String key, String value) {
+        try {
+            PreparedStatement stmt = conn.get().prepareStatement(
+                    "INSERT INTO Meta (key, value) VALUES (?, ?)");
+            stmt.setString(1, key);
+            stmt.setString(2, value);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated != 1) {
+                throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);
+            }
+        } catch (SQLException sqlEx) {
+            throw new RuntimeException(sqlEx);
+        }
+    }
 
     @Override
-    public void setNewCommit(String newCommitId) {
-        throw new UnsupportedOperationException();
+    public void setCurrentCommit(String newCommitId) {
+        putMetaValue("currentCommit", newCommitId);
     }
 
     @Override
     public String getBaseRemoteCommit() {
         return getMetaValue("baseRemoteCommit");
+    }
+
+    @Override
+    public void setBaseRemoteCommit(String newRemoteCommitId) {
+        putMetaValue("baseRemoteCommit", newRemoteCommitId);
     }
 
     @Override
@@ -161,14 +185,12 @@ public final class SqliteLocalDb implements LocalDb {
     @Override
     public void putCommit(String commitId, CommitEntry commit) {
         try {
-            Blob blob = conn.get().createBlob();
-            byte[] bytes = byteConv.commitToBytes(commit);
-            blob.setBytes(0, bytes);
+            byte[] commitBytes = byteConv.commitToBytes(commit);
 
             PreparedStatement stmt = conn.get().prepareStatement(
                     "INSERT INTO Commits (id, contents) VALUES (?, ?)");
             stmt.setString(1, commitId);
-            stmt.setBlob(2, blob);
+            stmt.setBytes(2, commitBytes);
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated != 1) {
                 throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);
@@ -183,14 +205,12 @@ public final class SqliteLocalDb implements LocalDb {
     @Override
     public void putFolder(String folderId, FolderListing folder) {
         try {
-            Blob blob = conn.get().createBlob();
             byte[] folderBytes = byteConv.folderToBytes(folder);
-            blob.setBytes(0, folderBytes);
 
             PreparedStatement stmt = conn.get().prepareStatement(
                     "INSERT INTO Folders (id, contents) VALUES (?, ?)");
             stmt.setString(1, folderId);
-            stmt.setBlob(2, blob);
+            stmt.setBytes(2, folderBytes);
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated != 1) {
                 throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);
@@ -205,14 +225,12 @@ public final class SqliteLocalDb implements LocalDb {
     @Override
     public void putFile(String fileId, FileEntry file) {
         try {
-            Blob blob = conn.get().createBlob();
-            byte[] bytes = byteConv.fileToBytes(file);
-            blob.setBytes(0, bytes);
+            byte[] fileBytes = byteConv.fileToBytes(file);
 
             PreparedStatement stmt = conn.get().prepareStatement(
                     "INSERT INTO Files (id, contents) VALUES (?, ?)");
             stmt.setString(1, fileId);
-            stmt.setBlob(2, blob);
+            stmt.setBytes(2, fileBytes);
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated != 1) {
                 throw new IllegalStateException("Expected 1 row inserted, got " + rowsUpdated);

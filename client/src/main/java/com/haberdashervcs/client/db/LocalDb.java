@@ -16,9 +16,11 @@ public interface LocalDb {
 
     String getCurrentCommit();
 
-    void setNewCommit(String newCommitId);
+    void setCurrentCommit(String newCommitId);
 
     String getBaseRemoteCommit();
+
+    void setBaseRemoteCommit(String newRemoteCommitId);
 
     CommitEntry getCommit(String commitId);
 

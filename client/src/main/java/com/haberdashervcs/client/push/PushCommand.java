@@ -11,11 +11,15 @@ import com.haberdashervcs.common.change.AddChange;
 import com.haberdashervcs.common.change.Changeset;
 import com.haberdashervcs.common.change.DeleteChange;
 import com.haberdashervcs.common.change.ModifyChange;
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 
 
 public class PushCommand implements Command {
+
+    private static final HdLogger LOG = HdLoggers.create(PushCommand.class);
 
     private final List<String> otherArgs;
     private final LocalDb db;
@@ -38,6 +42,7 @@ public class PushCommand implements Command {
         
         Changeset changeset = buildChangeset(baseRemoteCommit);
         // TODO! For now just log/toString the changeset here so I can inspect that it's working
+        LOG.info("Changeset result: %s", changeset.getDebugString());
     }
 
     private Changeset buildChangeset(String baseRemoteCommit) {
