@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.FolderWithPath;
@@ -122,6 +123,14 @@ public final class Changeset {
     }
 
     public String getDebugString() {
-        return "Changeset:";
+        return "Changeset: " + MoreObjects.toStringHelper(this)
+                .add("changedFolders", changedFolders)
+                .add("addChanges", addChanges)
+                .add("deleteChanges", deleteChanges)
+                .add("modifyChanges", modifyChanges)
+                .add("renameChanges", renameChanges)
+                .add("proposedCommitId", proposedCommitId)
+                .add("proposedRootFolderId", proposedRootFolderId)
+                .toString();
     }
 }
