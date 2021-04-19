@@ -46,6 +46,7 @@ public class PushCommand implements Command {
         LOG.info("Changeset result: %s", changeset.getDebugString());
     }
 
+    // TODO! I need to CREATE THE NEW COMMIT FIRST -- `hd scan/add` or whatnot
     private Changeset buildChangeset(String baseRemoteCommit) {
         // Given commit and commit + 1...
         // Crawl the checkout adding each new tree and file as you go...
@@ -67,6 +68,7 @@ public class PushCommand implements Command {
             CrawlDiffEntry thisDiff = changedTrees.pop();
 
             if (thisDiff.getOld() != null && thisDiff.getNew() == null) {
+                LOG.debug("TEMP push: old is nonnull, new is null");
                 for (FolderListing.FolderEntry entry : thisDiff.getOld().getEntries()) {
                     if (entry.getType() == FolderListing.FolderEntry.Type.FILE) {
                         out.withDeleteChange(DeleteChange.forFile(entry.getId()));
@@ -77,6 +79,7 @@ public class PushCommand implements Command {
                 }
 
             } else if (thisDiff.getOld() == null && thisDiff.getNew() != null) {
+                LOG.debug("TEMP push: old is null, new is nonnull");
                 for (FolderListing.FolderEntry entry : thisDiff.getNew().getEntries()) {
                     if (entry.getType() == FolderListing.FolderEntry.Type.FILE) {
                         out.withAddChange(AddChange.forContents(entry.getId(), db.getFile(entry.getId())));
@@ -88,6 +91,7 @@ public class PushCommand implements Command {
 
 
             } else {
+                LOG.debug("TEMP push: both are nonnull");
                 for (FolderListing.FolderEntry entry : thisDiff.getNew().getEntries()) {
                     Optional<FolderListing.FolderEntry> oldEntry = thisDiff.getOld().getEntryForName(entry.getName());
                     if (!oldEntry.isPresent()) {
