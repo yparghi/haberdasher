@@ -2,7 +2,6 @@ package com.haberdashervcs.client.db.sqlite;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -137,8 +136,7 @@ public final class SqliteLocalDb implements LocalDb {
             getStmt.setString(1, commitId);
             ResultSet rs = getStmt.executeQuery();
             rs.next();
-            Blob contents = rs.getBlob("contents");
-            byte[] contentsBytes = new byte[(int) contents.length()];
+            byte[] contentsBytes = rs.getBytes("contents");
             return byteConv.commitFromBytes(contentsBytes);
         } catch (SQLException sqlEx) {
             throw new RuntimeException(sqlEx);
@@ -155,8 +153,7 @@ public final class SqliteLocalDb implements LocalDb {
             getStmt.setString(1, folderId);
             ResultSet rs = getStmt.executeQuery();
             rs.next();
-            Blob contents = rs.getBlob("contents");
-            byte[] contentsBytes = new byte[(int) contents.length()];
+            byte[] contentsBytes = rs.getBytes("contents");
             return byteConv.folderFromBytes(contentsBytes);
         } catch (SQLException sqlEx) {
             throw new RuntimeException(sqlEx);
@@ -172,8 +169,7 @@ public final class SqliteLocalDb implements LocalDb {
             getStmt.setString(1, fileId);
             ResultSet rs = getStmt.executeQuery();
             rs.next();
-            Blob contents = rs.getBlob("contents");
-            byte[] contentsBytes = new byte[(int) contents.length()];
+            byte[] contentsBytes = rs.getBytes("contents");
             return byteConv.fileFromBytes(contentsBytes);
         } catch (SQLException sqlEx) {
             throw new RuntimeException(sqlEx);
