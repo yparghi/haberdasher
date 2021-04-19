@@ -1,5 +1,7 @@
-package com.haberdashervcs.client.push;
+package com.haberdashervcs.client.commit;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -7,8 +9,8 @@ import java.util.Optional;
 import com.haberdashervcs.client.commands.Command;
 import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
+import com.haberdashervcs.client.push.CrawlDiffEntry;
 import com.haberdashervcs.common.change.AddChange;
-import com.haberdashervcs.common.change.Changeset;
 import com.haberdashervcs.common.change.DeleteChange;
 import com.haberdashervcs.common.change.ModifyChange;
 import com.haberdashervcs.common.logging.HdLogger;
@@ -17,55 +19,48 @@ import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 
 
-public class PushCommand implements Command {
+public class CommitCommand implements Command {
 
-    private static final HdLogger LOG = HdLoggers.create(PushCommand.class);
+    private static final HdLogger LOG = HdLoggers.create(CommitCommand.class);
 
 
     private final List<String> otherArgs;
     private final LocalDb db;
 
-    public PushCommand(List<String> otherArgs) {
+    public CommitCommand(List<String> otherArgs) {
         this.otherArgs = otherArgs;
         this.db = SqliteLocalDb.getInstance();
     }
 
     @Override
-    // TODO: A flag to push all commits as one, i.e. automatically squash?
     public void perform() throws Exception {
-        final String baseRemoteCommit = db.getBaseRemoteCommit();
+        // TODO crawling code:
+        // - Start from the root.
+        // - Get the folder entries there and compare them. (How? By hash? Manual for now?)
+        // - Like the PushCommand crawling (which I should abstract/commonize), choose a left/right branch and add
+        //   objects to the DB as needed from there.
+        // - Finally set the current commit.
 
-        // The idea:
-        // - Starting from the baseRemoteCommit + 1, push commits one at a time.
-        // - For each one, serialize a Changeset and send it over the wire.
-        // - And on the wire? Like an object stream, send the meta info for the changeset, then each object in it, and
-        //   the server will reconstitute the changeset.
-        
-        Changeset changeset = buildChangeset(baseRemoteCommit);
-        // TODO! For now just log/toString the changeset here so I can inspect that it's working
-        LOG.info("Changeset result: %s", changeset.getDebugString());
-    }
-
-    // TODO! I need to CREATE THE NEW COMMIT FIRST -- `hd scan/add` or whatnot
-    private Changeset buildChangeset(String baseRemoteCommit) {
-        // Given commit and commit + 1...
-        // Crawl the checkout adding each new tree and file as you go...
-        // For any file in a changed tree, determine if it's an add/delete/modify(/rename?).
-
-        Changeset.Builder out = Changeset.builder();
-
-        final CommitEntry baseCommit = db.getCommit(baseRemoteCommit);
         final CommitEntry localHeadCommit = db.getCommit(db.getCurrentCommit());
-        LinkedList<CrawlDiffEntry> changedFolders = new LinkedList<>();
+        final FolderListing commitRoot = db.getFolder(localHeadCommit.getRootFolderId());
 
-        FolderListing rootOld = db.getFolder(baseCommit.getRootFolderId());
+        LinkedList<LocalCrawlEntry> changedFolders = new LinkedList<>();
+        Path currentDir = Paths.get("");
+        changedFolders.add(new LocalCrawlEntry(commitRoot, currentDir));
+
+        while (!changedFolders.isEmpty()) {
+
+        }
+
+
+
         FolderListing rootNew = db.getFolder(localHeadCommit.getRootFolderId());
-        changedFolders.add(new CrawlDiffEntry(rootOld, rootNew));
+        changedTrees.add(new CrawlDiffEntry(rootOld, rootNew));
 
         // TODO: Do I need a class/abstraction for this walking code? It feels partly redundant with similar server
         // code.
-        while (!changedFolders.isEmpty()) {
-            CrawlDiffEntry thisDiff = changedFolders.pop();
+        while (!changedTrees.isEmpty()) {
+            CrawlDiffEntry thisDiff = changedTrees.pop();
 
             if (thisDiff.getOld() != null && thisDiff.getNew() == null) {
                 LOG.debug("TEMP push: old is nonnull, new is null");
@@ -74,7 +69,7 @@ public class PushCommand implements Command {
                         out.withDeleteChange(DeleteChange.forFile(entry.getId()));
                     } else {
                         FolderListing deletedSubFolder = db.getFolder(entry.getId());
-                        changedFolders.add(new CrawlDiffEntry(deletedSubFolder, null));
+                        changedTrees.add(new CrawlDiffEntry(deletedSubFolder, null));
                     }
                 }
 
@@ -85,7 +80,7 @@ public class PushCommand implements Command {
                         out.withAddChange(AddChange.forContents(entry.getId(), db.getFile(entry.getId())));
                     } else {
                         FolderListing addedSubFolder = db.getFolder(entry.getId());
-                        changedFolders.add(new CrawlDiffEntry(null, addedSubFolder));
+                        changedTrees.add(new CrawlDiffEntry(null, addedSubFolder));
                     }
                 }
 
@@ -108,7 +103,5 @@ public class PushCommand implements Command {
                 // TODO also check the other side, entries in old that don't correspond to new...
             }
         }
-
-        return out.build();
     }
 }

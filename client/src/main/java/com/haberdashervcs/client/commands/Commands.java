@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.haberdashervcs.client.checkout.CheckoutCommand;
+import com.haberdashervcs.client.commit.CommitCommand;
 import com.haberdashervcs.client.push.PushCommand;
 
 
