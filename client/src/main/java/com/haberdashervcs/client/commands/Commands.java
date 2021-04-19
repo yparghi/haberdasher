@@ -22,6 +22,10 @@ public class Commands {
 
         } else if (commandWord.equals("push")) {
             return new PushCommand(otherArgs);
+
+        } else if (commandWord.equals("commit")) {
+            // TODO: This should really be broken up with an add/scan command first, for staging changes.
+            return new CommitCommand(otherArgs);
         }
 
         throw new IllegalArgumentException("Unknown command: " + commandWord);
