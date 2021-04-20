@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
+import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.FolderListing;
@@ -19,10 +20,12 @@ final class LocalChangeCrawler {
     private static final HdLogger LOG = HdLoggers.create(LocalChangeCrawler.class);
 
 
+    private final LocalDb db;
     private final FolderListing commitStartingDir;
     private final Path localStartingDir;
 
-    LocalChangeCrawler(FolderListing fromBaseCommit, Path localDir) {
+    LocalChangeCrawler(LocalDb db, FolderListing fromBaseCommit, Path localDir) {
+        this.db = db;
         this.commitStartingDir = fromBaseCommit;
         this.localStartingDir = localDir;
     }
@@ -68,18 +71,26 @@ final class LocalChangeCrawler {
             for (Path subpath : localEntriesThisFolder) {
                 String name = subpath.getFileName().toString();
 
+                Optional<FolderListing.FolderEntry> commitEntry;
+
                 if (current.currentInCommit == null) {
-                    LOG.info("Commit folder is null: " + name);
-
+                    commitEntry = Optional.empty();
                 } else {
-                    Optional<FolderListing.FolderEntry> commitEntry = current.currentInCommit.getEntryForName(name);
-                    if (!commitEntry.isPresent()) {
-                        LOG.info("New path: " + subpath.toAbsolutePath());
-                    }
+                    commitEntry = current.currentInCommit.getEntryForName(name);
+                }
 
-                    if (subpath.toFile().isDirectory()) {
-                        LOG.info("Local crawl: dir to crawl: " + subpath.toAbsolutePath());
-                        // TODO! add new entry...
+                if (!commitEntry.isPresent()) {
+                    LOG.info("New path: " + subpath.toAbsolutePath());
+                }
+
+                // TODO what if it's a folder in the commit, but now a file locally? Etc.
+                if (subpath.toFile().isDirectory()) {
+                    LOG.info("Local crawl: dir to crawl: " + subpath.toAbsolutePath());
+                    if (commitEntry.isPresent()) {
+                        FolderListing commitFolder = db.getFolder(commitEntry.get().getId());
+                        entries.add(new CrawlEntry(commitFolder, subpath));
+                    } else {
+                        entries.add(new CrawlEntry(null, subpath));
                     }
                 }
             }

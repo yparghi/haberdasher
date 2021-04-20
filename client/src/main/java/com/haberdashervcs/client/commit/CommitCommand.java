@@ -40,7 +40,7 @@ public class CommitCommand implements Command {
         final FolderListing commitRoot = db.getFolder(localHeadCommit.getRootFolderId());
         final Path localRoot = Paths.get("");
 
-        LocalChangeCrawler crawler = new LocalChangeCrawler(commitRoot, localRoot);
+        LocalChangeCrawler crawler = new LocalChangeCrawler(db, commitRoot, localRoot);
         crawler.compare();
     }
 }
