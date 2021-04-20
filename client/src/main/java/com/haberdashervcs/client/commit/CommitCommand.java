@@ -38,14 +38,9 @@ public class CommitCommand implements Command {
 
         final CommitEntry localHeadCommit = db.getCommit(db.getCurrentCommit());
         final FolderListing commitRoot = db.getFolder(localHeadCommit.getRootFolderId());
+        final Path localRoot = Paths.get("");
 
-        LinkedList<LocalCrawlEntry> changedFolders = new LinkedList<>();
-        Path currentDir = Paths.get("");
-        changedFolders.add(new LocalCrawlEntry(commitRoot, currentDir));
-
-        while (!changedFolders.isEmpty()) {
-            LocalCrawlEntry thisFolder = changedFolders.pop();
-            thisFolder.compare();
-        }
+        LocalChangeCrawler crawler = new LocalChangeCrawler(commitRoot, localRoot);
+        crawler.compare();
     }
 }
