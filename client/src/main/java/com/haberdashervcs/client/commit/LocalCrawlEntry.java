@@ -1,11 +1,21 @@
 package com.haberdashervcs.client.commit;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.haberdashervcs.common.logging.HdLogger;
+import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.FolderListing;
 
 
 final class LocalCrawlEntry {
+
+    private static final HdLogger LOG = HdLoggers.create(LocalCrawlEntry.class);
+
 
     private final FolderListing fromBaseCommit;
     private final Path localDir;
@@ -22,7 +32,26 @@ final class LocalCrawlEntry {
     // - How can this be correct RECURSIVELY????....????????....
     //   **?? Would it be weird to have separate folder LISTINGS vs. folder ENTRIES? does that even make sense?
     //     - TODO sketch this out...
-    Optional<FolderListing> compare() {
+    void compare() {
+        try {
+            compareInternal();
+        } catch (IOException ioEx) {
+            throw new RuntimeException(ioEx);
+        }
+    }
 
+    void compareInternal() throws IOException {
+        List<Path> subpaths = Files.list(localDir).collect(Collectors.toList());
+        // TODO diffing
+        for (Path subpath : subpaths) {
+            String name = subpath.getFileName().toString();
+            Optional<FolderListing.FolderEntry> commitEntry = fromBaseCommit.getEntryForName(name);
+            if (!commitEntry.isPresent()) {
+                LOG.info("Local crawl: new file: " + subpath.toAbsolutePath());
+            }
+            if (subpath.toFile().isDirectory()) {
+                LOG.info("Local crawl: dir to crawl: " + subpath.toAbsolutePath());
+            }
+        }
     }
 }
