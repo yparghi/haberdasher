@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "com.haberdashervcs.common.protobuf";
+option java_outer_classname = "FilesProto";
+option java_multiple_files = false;
+
+
+message DmpDiffContents {
+    repeated bytes patches = 1;
+}
+
+
+message FileEntry {
+
+    enum ContentsType {
+        FULL = 0;
+        // Diffs parsed by diff-match-patch
+        DIFF_DMP = 1;
+    }
+
+    string id = 1;
+    bytes contents = 2;
+    ContentsType contentsType = 3;
+    string diffBaseEntryId = 4;
+}

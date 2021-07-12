@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_package = "com.haberdashervcs.common.protobuf";
+option java_outer_classname = "FoldersProto";
+option java_multiple_files = false;
+
+
+message FolderListingEntry {
+    enum Type {
+        FILE = 0;
+        FOLDER = 1;
+    }
+
+    Type type = 1;
+    string name = 2;
+    string id = 3;
+}
+
+message FolderListing {
+    repeated FolderListingEntry entries = 1;
+    string path = 2;
+    int64 commitId = 3;
+    string mergeLockId = 4;
+}
+
+message FolderHistoryEntry {
+    string commitId = 1;
+    string folderId = 2;
+}
+
+message FolderHistory {
+    repeated FolderHistoryEntry historyEntries = 1;
+    string path = 2;
+    string commitLow = 3;
+    string commitHigh = 4;
+    string mergeLockId = 5;
+}

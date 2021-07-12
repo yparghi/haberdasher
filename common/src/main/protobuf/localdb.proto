@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "com.haberdashervcs.common.protobuf";
+option java_outer_classname = "LocalDbProto";
+option java_multiple_files = false;
+
+
+message LocalBranchState {
+    int64 baseCommitId = 1;
+    int64 headCommitId = 2;
+    int64 lastPushedCommit = 3;
+}
+
+message LocalFileState {
+    bool pushedToServer = 1;
+}
+
+message LocalRepoState {
+    enum RepoState {
+        NORMAL = 0;
+        REBASE_IN_PROGRESS = 1;
+    }
+
+    RepoState state = 1;
+}
