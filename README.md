@@ -30,5 +30,9 @@ Hosting on GitHub is temporary while we set up the Haberdasher website.
 
 ## Contact
 
-Questions? Interested in alpha testing? Contact us at **hello@haberdashervcs.com**
+- [Website](https://www.haberdashervcs.com)
+- [Twitter](https://twitter.com/haberdashervcs)
+- [haberdasher-discuss](https://groups.google.com/g/haberdasher-discuss) Google group for the latest news and discussion
+
+Questions? Interested in alpha testing? Email us at **hello@haberdashervcs.com**
 
