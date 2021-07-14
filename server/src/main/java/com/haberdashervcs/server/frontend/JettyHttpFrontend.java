@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 
@@ -45,7 +46,12 @@ public class JettyHttpFrontend implements Frontend {
         // $ echo -n "haberdasher" | md5
         // 6b07689d9997423c2abd564445ac3c07
         // 3c07 as decimal: 15367
-        Server server = new Server(15367);
+        Server server = new Server();
+        ServerConnector httpConnector = new ServerConnector(server);
+        httpConnector.setHost("0.0.0.0");
+        httpConnector.setPort(15367);
+        server.addConnector(httpConnector);
+
         server.setHandler(new RootHandler(datastore));
         server.start();
     }
@@ -95,6 +101,10 @@ public class JettyHttpFrontend implements Frontend {
             baseRequest.setHandled(true);
 
             final String path = request.getPathInfo().substring(1);
+            if (path.equals("health")) {
+                response.setStatus(HttpStatus.OK_200);
+                return;
+            }
             final List<String> parts = PATH_PART_SPLITTER.splitToList(path);
             final Map<String, String[]> params = request.getParameterMap();
             if (parts.size() != 3) {
