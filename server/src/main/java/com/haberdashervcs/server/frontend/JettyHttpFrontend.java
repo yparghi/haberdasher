@@ -130,6 +130,7 @@ public class JettyHttpFrontend implements Frontend {
                     break;
                 default:
                     response.setStatus(HttpStatus.NOT_FOUND_404);
+                    response.getWriter().print("<html><body><p>404 Not Found</p></body></html>");
                     break;
             }
         }
