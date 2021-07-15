@@ -16,5 +16,5 @@ public interface RepoBrowser {
 
     FolderListing getFolderAt(String branchName, String path, long commitId) throws IOException;
 
-    BranchDiff getDiff(String branchName);
+    BranchDiff getDiffToMain(String branchName) throws IOException;
 }

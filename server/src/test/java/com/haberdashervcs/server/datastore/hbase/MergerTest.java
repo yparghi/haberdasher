@@ -52,7 +52,7 @@ public class MergerTest {
         createTables();
 
         helper = HBaseRawHelper.forConnection(conn);
-        rowKeyer = HBaseRowKeyMaker.of(ORG, REPO);
+        rowKeyer = HBaseRowKeyMaker.forRepo(ORG, REPO);
     }
 
     // TODO: Commonize this stuff.

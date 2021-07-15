@@ -50,7 +50,7 @@ public class FolderHistoryLoaderTest {
         createTables();
 
         helper = HBaseRawHelper.forConnection(conn);
-        rowKeyer = HBaseRowKeyMaker.of(ORG, REPO);
+        rowKeyer = HBaseRowKeyMaker.forRepo(ORG, REPO);
     }
 
     private void createTables() throws Exception {
@@ -95,7 +95,7 @@ public class FolderHistoryLoaderTest {
     @Test
     public void loadFromMain() throws Exception {
         HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(ORG, REPO);
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(ORG, REPO);
 
         TreeMaker tree = TreeMaker.ofMerged(
                 ORG, REPO, BRANCH, 123, helper)
@@ -114,7 +114,7 @@ public class FolderHistoryLoaderTest {
     @Test
     public void loadFromBranch() throws Exception {
         HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(ORG, REPO);
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(ORG, REPO);
 
         TreeMaker tree = TreeMaker.ofMerged(
                 ORG, REPO, BRANCH, 123, helper)
@@ -135,7 +135,7 @@ public class FolderHistoryLoaderTest {
     // - Branch at 122 loads a listing from main
     public void loadFromBranchHistoryThatReachesIntoMain() throws Exception {
         HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(ORG, REPO);
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(ORG, REPO);
 
         TreeMaker oldTree = TreeMaker.ofMerged(
                 ORG, REPO, "main", 122, helper)

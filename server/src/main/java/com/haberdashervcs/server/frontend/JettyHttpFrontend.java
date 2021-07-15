@@ -305,7 +305,7 @@ public class JettyHttpFrontend implements Frontend {
                 return;
             }
 
-            BranchDiff diff = browser.getDiff(branch.get().getName());
+            BranchDiff diff = browser.getDiffToMain(branch.get().getName());
 
             // TODO: Templating engine
             StringBuilder out = new StringBuilder();

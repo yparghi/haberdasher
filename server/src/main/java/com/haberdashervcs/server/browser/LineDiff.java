@@ -12,15 +12,21 @@ public final class LineDiff {
 
 
     private final Type type;
+    private final int lineNumber;
     private final String lineContents;
 
-    LineDiff(Type type, String lineContents) {
+    LineDiff(Type type, int lineNumber, String lineContents) {
         this.type = type;
+        this.lineNumber = lineNumber;
         this.lineContents = lineContents;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
     }
 
     public String getLineContents() {

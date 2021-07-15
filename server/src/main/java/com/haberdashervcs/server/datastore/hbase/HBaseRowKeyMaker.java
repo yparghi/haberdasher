@@ -12,7 +12,7 @@ public final class HBaseRowKeyMaker {
     private static final HdLogger LOG = HdLoggers.create(HBaseRowKeyMaker.class);
 
 
-    public static HBaseRowKeyMaker of(String org, String repo) {
+    public static HBaseRowKeyMaker forRepo(String org, String repo) {
         return new HBaseRowKeyMaker(org, repo);
     }
 

@@ -74,7 +74,7 @@ public final class HBaseDatastore implements HdDatastore {
             long newHeadCommitId,
             HdObjectInputStream objectsIn)
             throws IOException {
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(org, repo);
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
         final boolean debug = false;  // This is temporary, for testing.
         long highestSeenCommitId = -1;
 
@@ -132,7 +132,7 @@ public final class HBaseDatastore implements HdDatastore {
 
     @Override
     public CheckoutResult checkout(String org, String repo, String branch, long commitId, String folderToCheckout, HdObjectOutputStream out) {
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(org, repo);
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
         try {
             return checkoutInternal(rowKeyer, branch, commitId, folderToCheckout, out);
         } catch (IOException ioEx) {
@@ -143,7 +143,7 @@ public final class HBaseDatastore implements HdDatastore {
 
     @Override
     public Optional<BranchAndCommit> getHeadCommitForBranch(String org, String repo, String branchName) {
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(org, repo);
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
         try {
             // TODO Rewrite this to use the returned optional.
             BranchEntry branchEntry = helper.getBranch(rowKeyer.forBranch(branchName)).get();
@@ -219,7 +219,7 @@ public final class HBaseDatastore implements HdDatastore {
     // TODO! This is incredibly temporary.
     public void loadTestData() throws IOException {
         HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of("some_org", "some_repo");
+        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo("some_org", "some_repo");
         Admin admin = conn.getAdmin();
 
         for (String nameStr : Arrays.asList("Branches", "Files", "Folders", "Merges")) {

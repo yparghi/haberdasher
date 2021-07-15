@@ -56,7 +56,7 @@ final class TreeMaker {
         this.branchName = branchName;
         this.commitId = commitId;
         this.helper = helper;
-        this.rowKeyer = HBaseRowKeyMaker.of(org, repo);
+        this.rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
         this.mergeLock = mergeLock;
     }
 
