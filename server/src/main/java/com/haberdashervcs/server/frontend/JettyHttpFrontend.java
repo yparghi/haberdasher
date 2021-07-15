@@ -8,7 +8,6 @@ import java.util.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.html.HtmlEscapers;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
-import com.haberdashervcs.common.io.HdObjectId;
 import com.haberdashervcs.common.io.HdObjectInputStream;
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.io.ProtobufObjectInputStream;
@@ -17,10 +16,11 @@ import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
 import com.haberdashervcs.common.objects.BranchEntry;
-import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
+import com.haberdashervcs.server.browser.BranchDiff;
+import com.haberdashervcs.server.browser.FileDiff;
+import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.datastore.RepoBrowser;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -133,6 +133,9 @@ public class JettyHttpFrontend implements Frontend {
                     break;
                 case "view":
                     handleView(baseRequest, request, response, org, repo, params);
+                    break;
+                case "diff":
+                    handleDiff(baseRequest, request, response, org, repo, params);
                     break;
                 default:
                     notFound(response);
@@ -273,5 +276,52 @@ public class JettyHttpFrontend implements Frontend {
         private String htmlEnc(String s) {
             return HtmlEscapers.htmlEscaper().escape(s);
         }
+
+
+        // TODO: Should web/browse stuff be broken out into a separate frontend component/iface? To
+        //     separate it from the VCS frontend.
+        private void handleDiff(
+                Request baseRequest,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                String org,
+                String repo,
+                Map<String, String[]> params)
+                throws IOException {
+
+            LOG.debug("TEMP: got diff: %s", params);
+
+            // TODO: Optionally, a specific commit?
+            String branchName = getOneParam("branchName", params);
+            if (branchName == null) {
+                response.setStatus(HttpStatus.BAD_REQUEST_400);
+                return;
+            }
+
+            RepoBrowser browser = datastore.getBrowser(org, repo);
+            Optional<BranchEntry> branch = browser.getBranch(branchName);
+            if (!branch.isPresent()) {
+                notFound(response);
+                return;
+            }
+
+            BranchDiff diff = browser.getDiff(branch.get().getName());
+
+            // TODO: Templating engine
+            StringBuilder out = new StringBuilder();
+            out.append("<html><head><title>Diff Branch</title></head><body>");
+            out.append("<h3>Diff for branch: " + htmlEnc(branchName) + "</h3>");
+            out.append("<ul>");
+
+            for (FileDiff fDiff : diff.getFileDiffs()) {
+                out.append("<li>Diff: " + htmlEnc(fDiff.getPath()));
+            }
+
+            out.append("</ul></body></html>");
+
+            response.setStatus(HttpStatus.OK_200);
+            response.getWriter().print(out.toString());
+        }
+
     }
 }

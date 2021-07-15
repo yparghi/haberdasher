@@ -19,7 +19,7 @@ import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.datastore.RepoBrowser;
+import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;

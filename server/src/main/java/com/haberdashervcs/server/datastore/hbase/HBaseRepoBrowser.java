@@ -5,7 +5,8 @@ import java.util.Optional;
 
 import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FolderListing;
-import com.haberdashervcs.server.datastore.RepoBrowser;
+import com.haberdashervcs.server.browser.BranchDiff;
+import com.haberdashervcs.server.browser.RepoBrowser;
 
 
 final class HBaseRepoBrowser implements RepoBrowser {
@@ -31,5 +32,10 @@ final class HBaseRepoBrowser implements RepoBrowser {
     @Override
     public FolderListing getFolderAt(String branchName, String path, long commitId) throws IOException {
         return helper.getFolder(rowKeyer.forFolderAt(branchName, path, commitId));
+    }
+
+    @Override
+    public BranchDiff getDiff(String branchName) {
+        return null;
     }
 }

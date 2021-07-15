@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.haberdashervcs.common.io.HdObjectInputStream;
 import com.haberdashervcs.common.io.HdObjectOutputStream;
 import com.haberdashervcs.common.objects.BranchAndCommit;
+import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 
 

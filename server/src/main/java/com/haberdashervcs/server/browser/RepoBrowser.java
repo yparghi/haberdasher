@@ -1,4 +1,4 @@
-package com.haberdashervcs.server.datastore;
+package com.haberdashervcs.server.browser;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -15,4 +15,6 @@ public interface RepoBrowser {
     Optional<BranchEntry> getBranch(String branchName) throws IOException;
 
     FolderListing getFolderAt(String branchName, String path, long commitId) throws IOException;
+
+    BranchDiff getDiff(String branchName);
 }
