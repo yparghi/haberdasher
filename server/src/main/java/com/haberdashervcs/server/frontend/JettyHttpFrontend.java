@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.base.Splitter;
+import com.google.common.html.HtmlEscapers;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
 import com.haberdashervcs.common.io.HdObjectId;
 import com.haberdashervcs.common.io.HdObjectInputStream;
@@ -15,9 +16,11 @@ import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
+import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.server.datastore.HdDatastore;
+import com.haberdashervcs.server.datastore.RepoBrowser;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -128,9 +131,11 @@ public class JettyHttpFrontend implements Frontend {
                 case "push":
                     handlePush(baseRequest, request, response, org, repo, params);
                     break;
+                case "view":
+                    handleView(baseRequest, request, response, org, repo, params);
+                    break;
                 default:
-                    response.setStatus(HttpStatus.NOT_FOUND_404);
-                    response.getWriter().print("<html><body><p>404 Not Found</p></body></html>");
+                    notFound(response);
                     break;
             }
         }
@@ -212,6 +217,61 @@ public class JettyHttpFrontend implements Frontend {
                 return null;
             }
             return value[0];
+        }
+
+        private void handleView(
+                Request baseRequest,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                String org,
+                String repo,
+                Map<String, String[]> params)
+                throws IOException {
+
+            LOG.debug("TEMP: got view: %s", params);
+
+            // TODO: Optionally, a specific commit?
+            String branchName = getOneParam("branchName", params);
+            String path = getOneParam("path", params);
+            if (branchName == null || path == null) {
+                response.setStatus(HttpStatus.BAD_REQUEST_400);
+                return;
+            }
+
+            RepoBrowser browser = datastore.getBrowser(org, repo);
+            Optional<BranchEntry> branch = browser.getBranch(branchName);
+            if (!branch.isPresent()) {
+                notFound(response);
+                return;
+            }
+
+            FolderListing rootListing = browser.getFolderAt(branchName, path, branch.get().getHeadCommitId());
+
+            // TODO: Templating engine
+            StringBuilder out = new StringBuilder();
+            out.append("<html><head><title>Browse Repo</title></head><body>");
+            out.append("<h3>Viewing path: " + htmlEnc(path) + "</h3>");
+            out.append("<ul>");
+            for (FolderListing.Entry entry : rootListing.getEntries()) {
+                if (entry.getType() == FolderListing.Entry.Type.FOLDER) {
+                    out.append("<li>Folder: " + htmlEnc(entry.getName()));
+                } else {
+                    out.append("<li>File: " + htmlEnc(entry.getName()));
+                }
+            }
+            out.append("</ul></body></html>");
+
+            response.setStatus(HttpStatus.OK_200);
+            response.getWriter().print(out.toString());
+        }
+
+        private void notFound(HttpServletResponse response) throws IOException {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            response.getWriter().print("<html><body><p>404 Not Found</p></body></html>");
+        }
+
+        private String htmlEnc(String s) {
+            return HtmlEscapers.htmlEscaper().escape(s);
         }
     }
 }

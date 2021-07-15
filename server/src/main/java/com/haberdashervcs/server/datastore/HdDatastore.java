@@ -30,4 +30,8 @@ public interface HdDatastore {
             String org,
             String repo,
             String branchName);
+
+    RepoBrowser getBrowser(
+            String org,
+            String repo);
 }

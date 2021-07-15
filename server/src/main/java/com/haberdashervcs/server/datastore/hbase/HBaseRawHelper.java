@@ -378,24 +378,35 @@ public final class HBaseRawHelper {
         byte[] originalBytes;
     }
 
-    BranchEntry getBranch(final byte[] rowKey) throws IOException {
-        return getBranchWithOriginalBytes(rowKey).branch;
+
+    Optional<BranchEntry> getBranch(final byte[] rowKey) throws IOException {
+        Optional<BranchWithOriginalBytes> bb = getBranchWithOriginalBytes(rowKey);
+        if (bb.isPresent()) {
+            return Optional.of(bb.get().branch);
+        } else {
+            return Optional.empty();
+        }
     }
 
-    BranchWithOriginalBytes getBranchWithOriginalBytes(final byte[] rowKey) throws IOException {
+
+    Optional<BranchWithOriginalBytes> getBranchWithOriginalBytes(final byte[] rowKey) throws IOException {
         final Table branchesTable = conn.getTable(TableName.valueOf("Branches"));
         final String columnFamilyName = "cfMain";
         final String columnName = "branch";
 
         Get get = new Get(rowKey);
         Result result = branchesTable.get(get);
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+
         byte[] rowValue = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes(columnName));
 
         BranchWithOriginalBytes out = new BranchWithOriginalBytes();
         out.branch = byteConv.branchFromBytes(rowValue);
         out.originalBytes = rowValue;
-        return out;
+        return Optional.of(out);
     }
 
 }

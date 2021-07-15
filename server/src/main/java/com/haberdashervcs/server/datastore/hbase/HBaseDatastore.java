@@ -19,6 +19,7 @@ import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.server.datastore.HdDatastore;
+import com.haberdashervcs.server.datastore.RepoBrowser;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
@@ -115,7 +116,7 @@ public final class HBaseDatastore implements HdDatastore {
                     "The new head commit (%d) didn't match the newest folder commit (%d)",
                     newHeadCommitId, highestSeenCommitId));
         }
-        BranchEntry currentBranchState = helper.getBranch(rowKeyer.forBranch(branchName));
+        BranchEntry currentBranchState = helper.getBranch(rowKeyer.forBranch(branchName)).get();
         LOG.debug("Push: Current branch state is %s", currentBranchState.getDebugString());
         if (currentBranchState.getBaseCommitId() != baseCommitId) {
             throw new AssertionError(String.format(
@@ -144,12 +145,19 @@ public final class HBaseDatastore implements HdDatastore {
     public Optional<BranchAndCommit> getHeadCommitForBranch(String org, String repo, String branchName) {
         HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(org, repo);
         try {
-            BranchEntry branchEntry = helper.getBranch(rowKeyer.forBranch(branchName));
+            // TODO Rewrite this to use the returned optional.
+            BranchEntry branchEntry = helper.getBranch(rowKeyer.forBranch(branchName)).get();
             return Optional.of(BranchAndCommit.of(branchName, branchEntry.getHeadCommitId()));
         } catch (IOException ioEx) {
             LOG.warn("No branch entry found for: %s", branchName);
             return Optional.empty();
         }
+    }
+
+
+    @Override
+    public RepoBrowser getBrowser(String org, String repo) {
+        return HBaseRepoBrowser.forRepo(org, repo, helper);
     }
 
 

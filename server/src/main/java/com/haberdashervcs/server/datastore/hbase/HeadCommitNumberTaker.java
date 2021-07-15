@@ -37,7 +37,8 @@ final class HeadCommitNumberTaker {
         int numTries = 5;
         while (numTries > 0) {
             --numTries;
-            HBaseRawHelper.BranchWithOriginalBytes main = helper.getBranchWithOriginalBytes(rowKeyer.forBranch("main"));
+            HBaseRawHelper.BranchWithOriginalBytes main =
+                    helper.getBranchWithOriginalBytes(rowKeyer.forBranch("main")).get();
             BranchEntry withIncrementedHeadCommit = BranchEntry.of(
                     main.branch.getName(),
                     main.branch.getBaseCommitId(),

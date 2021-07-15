@@ -57,7 +57,7 @@ public final class Merger {
     // - Clean-up: Go through the histories again (with their updated values). Use checkAndPut to remove the locks.
     public MergeResult merge(String org, String repo, String branchName, HBaseRawHelper helper) throws IOException {
         HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.of(org, repo);
-        BranchEntry branchEntry = helper.getBranch(rowKeyer.forBranch(branchName));
+        BranchEntry branchEntry = helper.getBranch(rowKeyer.forBranch(branchName)).get();
         MergeStates mergeStates = MergeStates.fromPastSeconds(TimeUnit.HOURS.toSeconds(1), helper, rowKeyer);
         final long nowTs = System.currentTimeMillis();
 
