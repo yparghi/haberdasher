@@ -106,8 +106,6 @@ public class PushCommand implements Command {
 
             // Because subfolders may have pushable changes while a parent folder doesn't, we have
             // to crawl even FolderListings that haven't changed since the last pushed commit.
-
-            // BUG! /subfolder/ isn't getting crawled...
             Optional<FolderListing> baseFolderAtCommit = db.findFolderAt(
                     currentBC.getBranchName(),
                     hdPath.forFolderListing(),

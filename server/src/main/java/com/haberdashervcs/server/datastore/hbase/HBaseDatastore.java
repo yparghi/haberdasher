@@ -116,7 +116,20 @@ public final class HBaseDatastore implements HdDatastore {
                     "The new head commit (%d) didn't match the newest folder commit (%d)",
                     newHeadCommitId, highestSeenCommitId));
         }
-        BranchEntry currentBranchState = helper.getBranch(rowKeyer.forBranch(branchName)).get();
+
+        // TODO: Consider branch overwriting, because of an accidental name collision. Should we
+        //     use randomized alphanumeric branch id's for the actual name on the server?
+        BranchEntry currentBranchState;
+        Optional<BranchEntry> oBranch = helper.getBranch(rowKeyer.forBranch(branchName));
+        if (oBranch.isPresent()) {
+            currentBranchState = oBranch.get();
+        } else {
+            BranchEntry newBranch = BranchEntry.of(branchName, baseCommitId, 0);
+            LOG.info("Creating new branch: %s", newBranch.getDebugString());
+            helper.putBranch(rowKeyer.forBranch(branchName), newBranch);
+            currentBranchState = newBranch;
+        }
+
         LOG.debug("Push: Current branch state is %s", currentBranchState.getDebugString());
         if (currentBranchState.getBaseCommitId() != baseCommitId) {
             throw new AssertionError(String.format(
