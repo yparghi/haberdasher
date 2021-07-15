@@ -92,6 +92,7 @@ public class JettyHttpFrontend implements Frontend {
                 handleInternal(target, baseRequest, request, response);
             } catch (Throwable ex) {
                 LOG.exception(ex, "Error handling request");
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
             }
         }
 

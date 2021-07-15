@@ -16,7 +16,7 @@ public class ClientMain {
         try {
             Command command = Commands.parseFromArgs(args);
             command.perform();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.exception(ex, "Command failed: %s", Arrays.toString(args));
         }
     }
