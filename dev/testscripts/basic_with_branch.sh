@@ -15,5 +15,9 @@ echo "new on branch" > subfolder/new.txt
 ~/src/haberdasher/client/hd_nobuild.sh commit
 ~/src/haberdasher/client/hd_nobuild.sh status
 
+echo "
+
+To push:
 ~/src/haberdasher/client/hd_nobuild.sh push
+"
 

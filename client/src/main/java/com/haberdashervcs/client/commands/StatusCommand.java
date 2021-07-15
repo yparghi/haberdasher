@@ -1,6 +1,7 @@
 package com.haberdashervcs.client.commands;
 
 import com.haberdashervcs.client.db.LocalDb;
+import com.haberdashervcs.client.db.objects.LocalBranchState;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
@@ -22,9 +23,11 @@ public final class StatusCommand implements Command {
     @Override
     public void perform() throws Exception {
         BranchAndCommit currentBranch = db.getCurrentBranch();
+        LocalBranchState branchState = db.getBranchState(currentBranch.getBranchName());
         LOG.info(
                 "On branch %s and commit %d",
                 currentBranch.getBranchName(),
                 currentBranch.getCommitId());
+        LOG.debug("Branch state: %s", branchState.getDebugString());
     }
 }

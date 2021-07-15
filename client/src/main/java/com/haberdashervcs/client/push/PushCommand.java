@@ -101,14 +101,23 @@ public class PushCommand implements Command {
                 throw new AssertionError("Path crawled twice: " + hdPath);
             }
             seenPaths.add(hdPath);
+            LOG.debug("Push: Looking for folders at path: %s", hdPath);
 
 
             // Because subfolders may have pushable changes while a parent folder doesn't, we have
             // to crawl even FolderListings that haven't changed since the last pushed commit.
+
+            // BUG! /subfolder/ isn't getting crawled...
             Optional<FolderListing> baseFolderAtCommit = db.findFolderAt(
                     currentBC.getBranchName(),
                     hdPath.forFolderListing(),
                     branchState.getLastPushedCommitId());
+            if (!baseFolderAtCommit.isPresent()) {
+                baseFolderAtCommit = db.findFolderAt(
+                        "main",
+                        hdPath.forFolderListing(),
+                        branchState.getBaseCommitId());
+            }
             if (baseFolderAtCommit.isPresent()) {
                 for (FolderListing.Entry entry : baseFolderAtCommit.get().getEntries()) {
                     if (entry.getType() == FolderListing.Entry.Type.FOLDER) {
@@ -121,13 +130,13 @@ public class PushCommand implements Command {
             }
 
 
-            List<FolderListing> listingsThisPath = db.getListingsSinceCommit(
+            List<FolderListing> listingsOnBranchThisPath = db.getListingsSinceCommit(
                     currentBC.getBranchName(),
                     hdPath.forFolderListing(),
                     branchState.getLastPushedCommitId());
-            LOG.debug("TEMP: Found %d listings since commit", listingsThisPath.size());
+            LOG.debug("TEMP: Found %d branch listings since commit", listingsOnBranchThisPath.size());
 
-            for (FolderListing listing : listingsThisPath) {
+            for (FolderListing listing : listingsOnBranchThisPath) {
                 LOG.debug("Writing folder: %s", listing.getDebugString());
                 outStream.writeFolder("TODO do folders still have ids?", listing);
 
