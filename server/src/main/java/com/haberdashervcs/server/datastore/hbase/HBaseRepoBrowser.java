@@ -109,7 +109,6 @@ final class HBaseRepoBrowser implements RepoBrowser {
 
         // Check for deletions
         for (Map.Entry<String, String> entry : pathToFileIdMain.entrySet()) {
-            // TODO!
             if (!pathToFileIdBranch.containsKey(entry.getKey())) {
                 out.add(FileDiff.of(entry.getKey(), FileDiff.Type.DELETED, ImmutableList.of()));
             }

@@ -36,7 +36,7 @@ class SimpleConsoleLogger implements HdLogger {
     }
 
     @Override
-    public void exception(Exception ex, String fmt, Object... args) {
+    public void exception(Throwable ex, String fmt, Object... args) {
         String msg = String.format(fmt, args);
         msg += "\n";
         msg += Throwables.getStackTraceAsString(ex);

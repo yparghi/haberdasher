@@ -10,5 +10,5 @@ public interface HdLogger {
 
     void error(String fmt, Object... args);
 
-    void exception(Exception ex, String fmt, Object... args);
+    void exception(Throwable ex, String fmt, Object... args);
 }

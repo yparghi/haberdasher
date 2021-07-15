@@ -90,7 +90,7 @@ public class JettyHttpFrontend implements Frontend {
                 throws IOException {
             try {
                 handleInternal(target, baseRequest, request, response);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 LOG.exception(ex, "Error handling request");
             }
         }
@@ -157,11 +157,14 @@ public class JettyHttpFrontend implements Frontend {
             String branchName = getOneParam("branchName", params);
             long baseCommitId = Long.parseLong(getOneParam("baseCommitId", params));
             long newHeadCommitId = Long.parseLong(getOneParam("newHeadCommitId", params));
+            LOG.debug("TEMP: A");
             HdObjectInputStream objectsIn = ProtobufObjectInputStream.forInputStream(
                     request.getInputStream());
 
+            LOG.debug("TEMP: B");
             datastore.writeObjectsFromPush(org, repo, branchName, baseCommitId, newHeadCommitId, objectsIn);
 
+            LOG.debug("TEMP: C");
             response.setStatus(HttpStatus.OK_200);
         }
 
