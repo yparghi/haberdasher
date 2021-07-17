@@ -1,8 +1,9 @@
 package com.haberdashervcs.server.browser;
 
+import java.util.Objects;
 import java.util.Optional;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.MoreObjects;
 
 
 public final class LineDiff {
@@ -12,8 +13,11 @@ public final class LineDiff {
         return new LineDiff(Type.SAME, oLine, oLine);
     }
 
-    public static LineDiff forDiff(String original, String modified) {
-        return new LineDiff(Type.DIFF, Optional.of(original), Optional.of(modified));
+    // A diff algorithm may work in hunks, where e.g. a diff hunk may replace 2 lines in the
+    // original with 4 lines in the new string. So a LineDiff in a diff hunk doesn't necessarily
+    // have a line in both original and modified.
+    public static LineDiff forDiff(Optional<String> original, Optional<String> modified) {
+        return new LineDiff(Type.DIFF, original, modified);
     }
 
     public static LineDiff forAdded(String added) {
@@ -47,13 +51,34 @@ public final class LineDiff {
         return type;
     }
 
-    public String getOriginalLine() {
-        Preconditions.checkState(type == Type.SAME || type == Type.DIFF || type == Type.DELETED);
-        return originalLine.get();
+    public Optional<String> getOriginalLine() {
+        return originalLine;
     }
 
-    public String getNewLine() {
-        Preconditions.checkState(type == Type.SAME || type == Type.DIFF || type == Type.ADDED);
-        return newLine.get();
+    public Optional<String> getNewLine() {
+        return newLine;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineDiff lineDiff = (LineDiff) o;
+        return type == lineDiff.type && originalLine.equals(lineDiff.originalLine) && newLine.equals(lineDiff.newLine);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, originalLine, newLine);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", type)
+                .add("originalLine", originalLine)
+                .add("newline", newLine)
+                .toString();
+    }
+
 }
