@@ -1,6 +1,5 @@
 package com.haberdashervcs.client.push;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,16 +13,11 @@ import com.haberdashervcs.client.db.objects.LocalFileState;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDb;
 import com.haberdashervcs.client.talker.JettyServerTalker;
 import com.haberdashervcs.client.talker.ServerTalker;
-import com.haberdashervcs.common.change.AddChange;
-import com.haberdashervcs.common.change.Changeset;
-import com.haberdashervcs.common.change.DeleteChange;
-import com.haberdashervcs.common.change.ModifyChange;
 import com.haberdashervcs.common.io.HdObjectOutputStream;
 import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
-import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.HdFolderPath;
