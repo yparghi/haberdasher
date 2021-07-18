@@ -17,7 +17,7 @@ import org.eclipse.jgit.diff.SequenceComparator;
 
 public final class HistogramDiffer {
 
-    public EditList diff(String original, String modified) {
+    private EditList diff(String original, String modified) {
         RawText originalRT = new RawText(original.getBytes(StandardCharsets.UTF_8));
         RawText modifiedRT = new RawText(modified.getBytes(StandardCharsets.UTF_8));
         SequenceComparator<RawText> comp = RawTextComparator.DEFAULT;
@@ -28,7 +28,9 @@ public final class HistogramDiffer {
     }
 
 
-    public List<LineDiff> toLineDiffs(String original, String modified, EditList edits) {
+    public List<LineDiff> toLineDiffs(String original, String modified) {
+        EditList edits = diff(original, modified);
+
         List<String> originalLines = original.lines().collect(Collectors.toUnmodifiableList());
         List<String> modifiedLines = modified.lines().collect(Collectors.toUnmodifiableList());
         List<LineDiff> out = new ArrayList<>();

@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.haberdashervcs.common.diff.DmpDiffer;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
 import com.haberdashervcs.common.logging.HdLogger;
@@ -407,6 +409,42 @@ public final class HBaseRawHelper {
         out.branch = byteConv.branchFromBytes(rowValue);
         out.originalBytes = rowValue;
         return Optional.of(out);
+    }
+
+
+    // TODO: Should I switch to unix style patches everywhere, instead of diff-match-patch?
+    // TODO: Put this in one common place? Instead of copy-pasting it from SqliteLocalDb.
+    private static final int MAX_DIFF_SEARCH = 20;
+    // TODO: Internalize rowKeyer?
+    String resolveDiffs(final FileEntry file, HBaseRowKeyMaker rowKeyer) throws IOException {
+        if (file.getContentsType() == FileEntry.ContentsType.FULL) {
+            return new String(file.getContents().getRawBytes(), StandardCharsets.UTF_8);
+        }
+
+        Preconditions.checkState(file.getContentsType() == FileEntry.ContentsType.DIFF_DMP);
+        ArrayList<byte[]> diffs = new ArrayList<>();
+        diffs.add(file.getContents().getRawBytes());
+        FileEntry current = file;
+        for (int i = 0; i < MAX_DIFF_SEARCH; ++i) {
+            FileEntry parent = getFile(
+                    rowKeyer.forFile(file.getBaseEntryId().get()));
+            if (parent.getContentsType() == FileEntry.ContentsType.DIFF_DMP) {
+                diffs.add(0, parent.getContents().getRawBytes());
+                current = parent;
+                continue;
+
+            } else if (parent.getContentsType() == FileEntry.ContentsType.FULL) {
+                try {
+                    return DmpDiffer.applyPatches(diffs, parent);
+                } catch (IOException ioEx) {
+                    throw new RuntimeException(ioEx);
+                }
+
+            } else {
+                throw new IllegalStateException("Unknown contents type: " + parent.getContentsType());
+            }
+        }
+        throw new IllegalStateException("Couldn't resolve a diff after " + MAX_DIFF_SEARCH + " entries");
     }
 
 }

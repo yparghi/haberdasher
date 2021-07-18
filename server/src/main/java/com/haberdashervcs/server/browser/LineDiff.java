@@ -81,4 +81,25 @@ public final class LineDiff {
                 .toString();
     }
 
+    // TODO: temp
+    public String getDisplayString() {
+        String start;
+        switch (type) {
+            case SAME:
+                start = "  ";
+                break;
+            case DIFF:
+                start = "· ";
+                break;
+            case ADDED:
+                start = "+ ";
+                break;
+            case DELETED:
+            default:
+                start = "- ";
+                break;
+        }
+
+        return String.format("%s%s / %s", start, originalLine, newLine);
+    }
 }

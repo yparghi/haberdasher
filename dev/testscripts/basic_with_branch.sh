@@ -12,6 +12,8 @@ bash ~/src/haberdasher/client/hd_nobuild.sh checkout /
 ~/src/haberdasher/client/hd_nobuild.sh status
 
 echo "new on branch" > subfolder/new.txt
+echo "
+changed in branch" >> subfolder/hello.txt
 ~/src/haberdasher/client/hd_nobuild.sh commit
 ~/src/haberdasher/client/hd_nobuild.sh status
 

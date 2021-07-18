@@ -19,6 +19,7 @@ import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.server.browser.BranchDiff;
 import com.haberdashervcs.server.browser.FileDiff;
+import com.haberdashervcs.server.browser.LineDiff;
 import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.server.operations.checkout.CheckoutResult;
@@ -311,11 +312,16 @@ public class JettyHttpFrontend implements Frontend {
             // TODO: Templating engine
             StringBuilder out = new StringBuilder();
             out.append("<html><head><title>Diff Branch</title></head><body>");
-            out.append("<h3>Diff for branch: " + htmlEnc(branchName) + "</h3>");
+            out.append("<h2>Diff for branch: " + htmlEnc(branchName) + "</h3>");
             out.append("<ul>");
 
             for (FileDiff fDiff : diff.getFileDiffs()) {
-                out.append("<li>Diff: " + htmlEnc(fDiff.getPath()));
+                out.append("<h3>Diff: " + htmlEnc(fDiff.getPath())+ "</h3>");
+                out.append("<ul>");
+                for (LineDiff lDiff : fDiff.getDiffs()) {
+                    out.append(String.format("<li>%s", htmlEnc(lDiff.getDisplayString())));
+                }
+                out.append("</ul>");
             }
 
             out.append("</ul></body></html>");

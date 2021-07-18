@@ -10,10 +10,13 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.haberdashervcs.common.objects.BranchEntry;
+import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.HdFolderPath;
 import com.haberdashervcs.server.browser.BranchDiff;
 import com.haberdashervcs.server.browser.FileDiff;
+import com.haberdashervcs.server.browser.HistogramDiffer;
+import com.haberdashervcs.server.browser.LineDiff;
 import com.haberdashervcs.server.browser.RepoBrowser;
 
 
@@ -94,6 +97,7 @@ final class HBaseRepoBrowser implements RepoBrowser {
             String path = entry.getKey();
             String branchFileId = entry.getValue();
             if (!pathToFileIdMain.containsKey(path)) {
+                // TODO! Addition diff -- or just send along the added file contents?
                 out.add(FileDiff.of(path, FileDiff.Type.ADDED, ImmutableList.of()));
                 continue;
             }
@@ -102,14 +106,19 @@ final class HBaseRepoBrowser implements RepoBrowser {
             if (mainFileId.equals(branchFileId)) {
                 continue;
             } else {
-                // TODO! Actual line diffs
-                out.add(FileDiff.of(path, FileDiff.Type.DIFF, ImmutableList.of()));
+                FileEntry mainFile = helper.getFile(rowKeyer.forFile(mainFileId));
+                FileEntry branchFile = helper.getFile(rowKeyer.forFile(branchFileId));
+                String mainFileContents = helper.resolveDiffs(mainFile, rowKeyer);
+                String branchFileContents = helper.resolveDiffs(branchFile, rowKeyer);
+                List<LineDiff> diffs = new HistogramDiffer().toLineDiffs(mainFileContents, branchFileContents);
+                out.add(FileDiff.of(path, FileDiff.Type.DIFF, diffs));
             }
         }
 
         // Check for deletions
         for (Map.Entry<String, String> entry : pathToFileIdMain.entrySet()) {
             if (!pathToFileIdBranch.containsKey(entry.getKey())) {
+                // TODO! Deletion diff -- or just send along the deleted file contents?
                 out.add(FileDiff.of(entry.getKey(), FileDiff.Type.DELETED, ImmutableList.of()));
             }
         }
