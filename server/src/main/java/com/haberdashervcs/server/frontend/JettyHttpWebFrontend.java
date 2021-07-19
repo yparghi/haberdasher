@@ -8,13 +8,9 @@ import java.util.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.html.HtmlEscapers;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
-import com.haberdashervcs.common.io.HdObjectInputStream;
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
-import com.haberdashervcs.common.io.ProtobufObjectInputStream;
-import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
-import com.haberdashervcs.common.objects.BranchAndCommit;
 import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.server.browser.BranchDiff;
@@ -22,7 +18,6 @@ import com.haberdashervcs.server.browser.FileDiff;
 import com.haberdashervcs.server.browser.LineDiff;
 import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.operations.checkout.CheckoutResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
@@ -32,28 +27,25 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 
-public class JettyHttpFrontend implements Frontend {
+public class JettyHttpWebFrontend implements WebFrontend {
 
-    public static JettyHttpFrontend forDatastore(HdDatastore datastore) {
-        return new JettyHttpFrontend(datastore);
+    public static JettyHttpWebFrontend forDatastore(HdDatastore datastore) {
+        return new JettyHttpWebFrontend(datastore);
     }
 
 
     private final HdDatastore datastore;
 
-    private JettyHttpFrontend(HdDatastore datastore) {
+    private JettyHttpWebFrontend(HdDatastore datastore) {
         this.datastore = datastore;
     }
 
     @Override
     public void startInBackground() throws Exception {
-        // $ echo -n "haberdasher" | md5
-        // 6b07689d9997423c2abd564445ac3c07
-        // 3c07 as decimal: 15367
         Server server = new Server();
         ServerConnector httpConnector = new ServerConnector(server);
         httpConnector.setHost("0.0.0.0");
-        httpConnector.setPort(15367);
+        httpConnector.setPort(15368);
         server.addConnector(httpConnector);
 
         server.setHandler(new RootHandler(datastore));
@@ -112,27 +104,24 @@ public class JettyHttpFrontend implements Frontend {
             }
             final List<String> parts = PATH_PART_SPLITTER.splitToList(path);
             final Map<String, String[]> params = request.getParameterMap();
-            if (parts.size() != 3) {
+            if (parts.size() != 4) {
                 LOG.info("Got parts: %s", String.join(", ", parts));
-                response.setStatus(HttpStatus.NOT_FOUND_404);
+                notFound(response);
                 return;
             }
 
-            final String org = parts.get(0);
-            final String repo = parts.get(1);
-            final String op = parts.get(2);
+            final String backendType = parts.get(0);
+            if (!backendType.equals("web")) {
+                notFound(response);
+                return;
+            }
+
+            final String org = parts.get(1);
+            final String repo = parts.get(2);
+            final String op = parts.get(3);
             LOG.info("Org %s, Repo %s, op %s", org, repo, op);
 
             switch (op) {
-                case "checkout":
-                    handleCheckout(response, org, repo, params);
-                    break;
-                case "headCommitOnBranch":
-                    handleHeadCommitOnBranch(response, org, repo, params);
-                    break;
-                case "push":
-                    handlePush(baseRequest, request, response, org, repo, params);
-                    break;
                 case "view":
                     handleView(baseRequest, request, response, org, repo, params);
                     break;
@@ -142,73 +131,6 @@ public class JettyHttpFrontend implements Frontend {
                 default:
                     notFound(response);
                     break;
-            }
-        }
-
-        private void handlePush(
-                Request baseRequest,
-                HttpServletRequest request,
-                HttpServletResponse response,
-                String org,
-                String repo,
-                Map<String, String[]> params)
-                throws IOException {
-
-            LOG.debug("TEMP: got push: %s", params);
-
-            String branchName = getOneParam("branchName", params);
-            long baseCommitId = Long.parseLong(getOneParam("baseCommitId", params));
-            long newHeadCommitId = Long.parseLong(getOneParam("newHeadCommitId", params));
-            HdObjectInputStream objectsIn = ProtobufObjectInputStream.forInputStream(
-                    request.getInputStream());
-
-            datastore.writeObjectsFromPush(org, repo, branchName, baseCommitId, newHeadCommitId, objectsIn);
-
-            response.setStatus(HttpStatus.OK_200);
-        }
-
-
-        private void handleHeadCommitOnBranch(
-                HttpServletResponse response, String org, String repo, Map<String, String[]> params)
-                throws IOException {
-            String branchName = getOneParam("branchName", params);
-            if (branchName == null) {
-                response.setStatus(HttpStatus.BAD_REQUEST_400);
-                return;
-            }
-
-            Optional<BranchAndCommit> branchAndCommit = datastore.getHeadCommitForBranch(org, repo, branchName);
-
-            response.setContentType("application/octet-stream");
-            if (branchAndCommit.isPresent()) {
-                response.setStatus(HttpStatus.OK_200);
-                response.getOutputStream().write(byteConv.branchAndCommitToBytes(branchAndCommit.get()));
-            } else {
-                response.setStatus(HttpStatus.NOT_FOUND_404);
-            }
-        }
-
-
-        private void handleCheckout(
-                HttpServletResponse response, String org, String repo, Map<String, String[]> params)
-                throws IOException {
-            String path = getOneParam("path", params);
-            long commit = Long.parseLong(getOneParam("commit", params));
-            String branchName = getOneParam("branchName", params);
-            if (path == null || commit <= 0 || branchName == null) {
-                response.setStatus(HttpStatus.BAD_REQUEST_400);
-                return;
-            }
-
-            ProtobufObjectOutputStream protoOut = ProtobufObjectOutputStream.forOutputStream(response.getOutputStream());
-            CheckoutResult result = datastore.checkout(org, repo, branchName, commit, path, protoOut);
-
-            response.setContentType("application/octet-stream");
-            if (result.getStatus() == CheckoutResult.Status.OK) {
-                response.setStatus(HttpStatus.OK_200);
-            } else {
-                LOG.error("Failed checkout: %s", result.getErrorMessage());
-                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
             }
         }
 
@@ -280,8 +202,6 @@ public class JettyHttpFrontend implements Frontend {
         }
 
 
-        // TODO: Should web/browse stuff be broken out into a separate frontend component/iface? To
-        //     separate it from the VCS frontend.
         private void handleDiff(
                 Request baseRequest,
                 HttpServletRequest request,

@@ -4,7 +4,7 @@ import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.server.config.HaberdasherServer;
 import com.haberdashervcs.server.datastore.hbase.HBaseDatastore;
-import com.haberdashervcs.server.frontend.JettyHttpFrontend;
+import com.haberdashervcs.server.frontend.JettyHttpVcsFrontend;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Connection;
@@ -32,7 +32,7 @@ public class ExampleServerMain {
 
         HaberdasherServer server = HaberdasherServer.builder()
                 .withDatastore(datastore)
-                .withFrontend(JettyHttpFrontend.forDatastore(datastore))
+                .withVcsFrontend(JettyHttpVcsFrontend.forDatastore(datastore))
                 .build();
 
         server.start();

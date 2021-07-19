@@ -1,7 +1,10 @@
 package com.haberdashervcs.server.config;
 
+import javax.annotation.Nullable;
+
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.server.frontend.Frontend;
+import com.haberdashervcs.server.frontend.VcsFrontend;
+import com.haberdashervcs.server.frontend.WebFrontend;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -11,7 +14,8 @@ public final class HaberdasherServer {
 
     public static final class Builder {
         private HdDatastore datastore = null;
-        private Frontend frontend = null;
+        private VcsFrontend vcsFrontend = null;
+        private WebFrontend webFrontend = null;
 
         private Builder() {}
 
@@ -21,14 +25,20 @@ public final class HaberdasherServer {
             return this;
         }
 
-        public Builder withFrontend(Frontend frontend) {
-            checkState(this.frontend == null);
-            this.frontend = checkNotNull(frontend);
+        public Builder withVcsFrontend(VcsFrontend vcsFrontend) {
+            checkState(this.vcsFrontend == null);
+            this.vcsFrontend = checkNotNull(vcsFrontend);
+            return this;
+        }
+
+        public Builder withWebFrontend(WebFrontend webFrontend) {
+            checkState(this.webFrontend == null);
+            this.webFrontend = checkNotNull(webFrontend);
             return this;
         }
 
         public HaberdasherServer build() {
-            return new HaberdasherServer(datastore, frontend);
+            return new HaberdasherServer(datastore, vcsFrontend, webFrontend);
         }
     }
 
@@ -38,15 +48,20 @@ public final class HaberdasherServer {
 
 
     private final HdDatastore datastore;
-    private final Frontend frontend;
+    private final VcsFrontend vcsFrontend;
+    private final @Nullable WebFrontend webFrontend;
 
-    private HaberdasherServer(HdDatastore datastore, Frontend frontend) {
+    private HaberdasherServer(HdDatastore datastore, VcsFrontend vcsFrontend, WebFrontend webFrontend) {
         this.datastore = checkNotNull(datastore);
-        this.frontend = checkNotNull(frontend);
+        this.vcsFrontend = checkNotNull(vcsFrontend);
+        this.webFrontend = webFrontend;
     }
 
     // TODO should this be synch or asynch?
     public void start() throws Exception {
-        frontend.startInBackground();
+        vcsFrontend.startInBackground();
+        if (webFrontend != null) {
+            webFrontend.startInBackground();
+        }
     }
 }
