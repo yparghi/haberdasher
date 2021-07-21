@@ -12,5 +12,9 @@ public interface HdAuthenticator {
 
     AuthToken login(String email, String password);
 
+    AuthToken webTokenForId(String tokenId);
+
+    AuthToken cliTokenForId(String tokenId);
+
     AuthResult canAccessRepo(AuthToken authToken, String org, String repo);
 }

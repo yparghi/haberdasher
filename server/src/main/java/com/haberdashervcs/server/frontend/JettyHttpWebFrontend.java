@@ -18,6 +18,10 @@ import com.haberdashervcs.server.browser.FileDiff;
 import com.haberdashervcs.server.browser.LineDiff;
 import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.datastore.HdDatastore;
+import com.haberdashervcs.server.user.AuthResult;
+import com.haberdashervcs.server.user.AuthToken;
+import com.haberdashervcs.server.user.HdAuthenticator;
+import com.haberdashervcs.server.user.HdUserStore;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
@@ -29,15 +33,20 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class JettyHttpWebFrontend implements WebFrontend {
 
-    public static JettyHttpWebFrontend forDatastore(HdDatastore datastore) {
-        return new JettyHttpWebFrontend(datastore);
+    public static JettyHttpWebFrontend forDatastore(
+            HdDatastore datastore, HdUserStore userStore, HdAuthenticator authenticator) {
+        return new JettyHttpWebFrontend(datastore, userStore, authenticator);
     }
 
 
     private final HdDatastore datastore;
+    private final HdUserStore userStore;
+    private final HdAuthenticator authenticator;
 
-    private JettyHttpWebFrontend(HdDatastore datastore) {
+    private JettyHttpWebFrontend(HdDatastore datastore, HdUserStore userStore, HdAuthenticator authenticator) {
         this.datastore = datastore;
+        this.userStore = userStore;
+        this.authenticator = authenticator;
     }
 
     @Override
@@ -48,7 +57,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
         httpConnector.setPort(15368);
         server.addConnector(httpConnector);
 
-        server.setHandler(new RootHandler(datastore));
+        server.setHandler(new RootHandler(datastore, userStore, authenticator));
         server.start();
     }
 
@@ -66,10 +75,14 @@ public class JettyHttpWebFrontend implements WebFrontend {
 
 
         private final HdDatastore datastore;
+        private final HdUserStore userStore;
+        private final HdAuthenticator authenticator;
         private final HdObjectByteConverter byteConv;
 
-        private RootHandler(HdDatastore datastore) {
+        private RootHandler(HdDatastore datastore, HdUserStore userStore, HdAuthenticator authenticator) {
             this.datastore = datastore;
+            this.userStore = userStore;
+            this.authenticator = authenticator;
             // TODO: Pass this in.
             this.byteConv = ProtobufObjectByteConverter.getInstance();
         }
@@ -97,6 +110,14 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 throws IOException {
             baseRequest.setHandled(true);
 
+            // TODO! special case for login
+            String webTokenId = request.getHeader("X-Haberdasher-Web-Auth-Token");
+            if (webTokenId == null) {
+                notAuthorized(response, "Please log in to perform this action.");
+                return;
+            }
+            AuthToken token = authenticator.webTokenForId(webTokenId);
+
             final String path = request.getPathInfo().substring(1);
             if (path.equals("health")) {
                 response.setStatus(HttpStatus.OK_200);
@@ -120,6 +141,17 @@ public class JettyHttpWebFrontend implements WebFrontend {
             final String repo = parts.get(2);
             final String op = parts.get(3);
             LOG.info("Org %s, Repo %s, op %s", org, repo, op);
+
+            AuthResult authResult = authenticator.canAccessRepo(token, org, repo);
+            if (authResult.getType() == AuthResult.Type.AUTH_EXPIRED) {
+                notAuthorized(response, "Your login session has expired. Please log in again.");
+                return;
+            } else if (authResult.getType() == AuthResult.Type.FORBIDDEN) {
+                notAuthorized(response, "You are not authorized to perform that action.");
+                return;
+            } else if (authResult.getType() != AuthResult.Type.PERMITTED) {
+                throw new IllegalStateException("Unexpected Auth type!");
+            }
 
             switch (op) {
                 case "view":
@@ -195,6 +227,12 @@ public class JettyHttpWebFrontend implements WebFrontend {
         private void notFound(HttpServletResponse response) throws IOException {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             response.getWriter().print("<html><body><p>404 Not Found</p></body></html>");
+        }
+
+        private void notAuthorized(HttpServletResponse response, String message) throws IOException {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            response.getWriter().print(
+                    String.format("<html><body><p>401 Not Authorized</p><p>%s</p></body></html>", message));
         }
 
         private String htmlEnc(String s) {
