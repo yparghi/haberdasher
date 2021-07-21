@@ -6,7 +6,7 @@ import com.haberdashervcs.server.user.HdAuthenticator;
 import org.apache.hadoop.hbase.client.Connection;
 
 
-public class HBaseAuthenticator implements HdAuthenticator {
+public final class HBaseAuthenticator implements HdAuthenticator {
 
     public static HdAuthenticator forConnection(Connection conn) {
         return new HBaseAuthenticator(conn);

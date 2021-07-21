@@ -66,8 +66,6 @@ public final class HBaseRawHelper {
     }
 
     FileEntry getFile(final byte[] rowKey) throws IOException {
-        LOG.debug("TEMP: Getting file: %s", new String(rowKey, StandardCharsets.UTF_8));
-
         final Table filesTable = conn.getTable(TableName.valueOf("Files"));
         final String columnFamilyName = "cfMain";
 
