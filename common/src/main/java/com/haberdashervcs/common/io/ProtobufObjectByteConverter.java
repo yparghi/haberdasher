@@ -14,12 +14,14 @@ import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderHistory;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.MergeLock;
+import com.haberdashervcs.common.objects.user.HdUser;
 import com.haberdashervcs.common.protobuf.BranchesProto;
 import com.haberdashervcs.common.protobuf.CommitsProto;
 import com.haberdashervcs.common.protobuf.FilesProto;
 import com.haberdashervcs.common.protobuf.FoldersProto;
 import com.haberdashervcs.common.protobuf.MergesProto;
 import com.haberdashervcs.common.protobuf.ServerProto;
+import com.haberdashervcs.common.protobuf.UsersProto;
 
 
 public final class ProtobufObjectByteConverter implements HdObjectByteConverter {
@@ -236,8 +238,25 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
     }
 
     @Override
+    public byte[] userToBytes(HdUser user) throws IOException {
+        return UsersProto.HdUser.newBuilder()
+                .setUserId(user.getUserId())
+                .setEmail(user.getEmail())
+                .setOrg(user.getOrg())
+                .setPassword(user.getPassword())
+                .build()
+                .toByteArray();
+    }
+
+    @Override
     public BranchAndCommit branchAndCommitFromBytes(byte[] bytes) throws IOException {
         ServerProto.BranchAndCommit proto = ServerProto.BranchAndCommit.parseFrom(bytes);
         return BranchAndCommit.of(proto.getBranchName(), proto.getCommitId());
+    }
+
+    @Override
+    public HdUser userFromBytes(byte[] bytes) throws IOException {
+        UsersProto.HdUser proto = UsersProto.HdUser.parseFrom(bytes);
+        return new HdUser(proto.getUserId(), proto.getEmail(), proto.getOrg(), proto.getPassword());
     }
 }

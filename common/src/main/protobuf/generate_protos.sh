@@ -14,5 +14,12 @@ PROTO_DIR="$(dirname $0)"
 "$PROTOC_PATH" \
     --proto_path="$PROTO_DIR" \
     --java_out="common/src/main/java" \
-    branches.proto commits.proto files.proto folders.proto localdb.proto merges.proto server.proto
+    branches.proto \
+    commits.proto \
+    files.proto \
+    folders.proto \
+    localdb.proto \
+    merges.proto \
+    server.proto \
+    users.proto
 

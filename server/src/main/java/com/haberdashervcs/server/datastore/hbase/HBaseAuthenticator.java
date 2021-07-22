@@ -1,8 +1,8 @@
 package com.haberdashervcs.server.datastore.hbase;
 
-import com.haberdashervcs.server.user.AuthResult;
-import com.haberdashervcs.server.user.AuthToken;
-import com.haberdashervcs.server.user.HdAuthenticator;
+import com.haberdashervcs.common.objects.user.AuthResult;
+import com.haberdashervcs.common.objects.user.AuthToken;
+import com.haberdashervcs.common.objects.user.HdAuthenticator;
 import org.apache.hadoop.hbase.client.Connection;
 
 

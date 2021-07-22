@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.haberdashervcs.common.protobuf";
+option java_outer_classname = "UsersProto";
+option java_multiple_files = false;
+
+
+message HdUser {
+    string userId = 1;
+    string email = 2;
+    string org = 3;
+    string password = 4;
+}
