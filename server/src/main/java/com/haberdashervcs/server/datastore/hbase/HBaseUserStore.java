@@ -14,6 +14,7 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.client.TableDescriptor;
@@ -80,7 +81,7 @@ public final class HBaseUserStore implements HdUserStore {
         Get get = new Get(rowKey);
         Result result = filesTable.get(get);
         byte[] value = result.getValue(
-                Bytes.toBytes(columnFamilyName), Bytes.toBytes("id"));
+                Bytes.toBytes(columnFamilyName), Bytes.toBytes("user"));
 
         return byteConv.userFromBytes(value);
     }
@@ -88,6 +89,20 @@ public final class HBaseUserStore implements HdUserStore {
 
     @Override
     public void putUser(HdUser user) throws IOException {
-        // TODO! Put in both cf's
+        final Table usersTable = conn.getTable(TableName.valueOf("Users"));
+
+        Put emailPut = new Put(user.getEmail().getBytes(StandardCharsets.UTF_8));
+        emailPut.addColumn(
+                Bytes.toBytes("cfEmailToId"),
+                Bytes.toBytes("id"),
+                user.getUserId().getBytes(StandardCharsets.UTF_8));
+        usersTable.put(emailPut);
+
+        Put userPut = new Put(user.getUserId().getBytes(StandardCharsets.UTF_8));
+        userPut.addColumn(
+                Bytes.toBytes("cfIdToUser"),
+                Bytes.toBytes("user"),
+                byteConv.userToBytes(user));
+        usersTable.put(userPut);
     }
 }
