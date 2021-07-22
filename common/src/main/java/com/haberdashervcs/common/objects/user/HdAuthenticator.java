@@ -1,5 +1,8 @@
 package com.haberdashervcs.common.objects.user;
 
+import java.io.IOException;
+import java.util.Optional;
+
 
 // TEMP!:
 //
@@ -10,7 +13,9 @@ package com.haberdashervcs.common.objects.user;
 // - Token generation?
 public interface HdAuthenticator {
 
-    AuthToken login(String email, String password);
+    void start() throws Exception;
+
+    Optional<AuthToken> loginToWeb(String email, String password) throws IOException;
 
     AuthToken webTokenForId(String tokenId);
 
