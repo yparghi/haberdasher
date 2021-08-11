@@ -15,6 +15,7 @@ import com.haberdashervcs.common.objects.FolderHistory;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.MergeLock;
 import com.haberdashervcs.common.objects.user.HdUser;
+import com.haberdashervcs.common.objects.user.UserAuthToken;
 import com.haberdashervcs.common.protobuf.BranchesProto;
 import com.haberdashervcs.common.protobuf.CommitsProto;
 import com.haberdashervcs.common.protobuf.FilesProto;
@@ -249,6 +250,22 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
     }
 
     @Override
+    public byte[] userAuthTokenToBytes(UserAuthToken token) throws IOException {
+        UsersProto.UserAuthToken.Type protoType = (
+                token.getType() == UserAuthToken.Type.WEB
+                        ? UsersProto.UserAuthToken.Type.WEB
+                        : UsersProto.UserAuthToken.Type.CLI);
+
+        return UsersProto.UserAuthToken.newBuilder()
+                .setUserId(token.getUser().getUserId())
+                .setType(protoType)
+                .setTokenId(token.getTokenId())
+                .setOrg(token.getUser().getOrg())
+                .build()
+                .toByteArray();
+    }
+
+    @Override
     public BranchAndCommit branchAndCommitFromBytes(byte[] bytes) throws IOException {
         ServerProto.BranchAndCommit proto = ServerProto.BranchAndCommit.parseFrom(bytes);
         return BranchAndCommit.of(proto.getBranchName(), proto.getCommitId());
@@ -258,5 +275,19 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
     public HdUser userFromBytes(byte[] bytes) throws IOException {
         UsersProto.HdUser proto = UsersProto.HdUser.parseFrom(bytes);
         return new HdUser(proto.getUserId(), proto.getEmail(), proto.getOrg(), proto.getPassword());
+    }
+
+    @Override
+    public UserAuthToken userAuthTokenFromBytes(byte[] bytes) throws IOException {
+        UsersProto.UserAuthToken proto = UsersProto.UserAuthToken.parseFrom(bytes);
+
+        if (proto.getType() == UsersProto.UserAuthToken.Type.WEB) {
+            return UserAuthToken.forWeb()
+
+        } else if (proto.getType() == UsersProto.UserAuthToken.Type.CLI) {
+
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 }

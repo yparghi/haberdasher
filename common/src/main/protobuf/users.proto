@@ -11,3 +11,15 @@ message HdUser {
     string org = 3;
     string password = 4;
 }
+
+message UserAuthToken {
+    enum Type {
+        WEB = 0;
+        CLI = 1;
+    }
+
+    Type type = 1;
+    string tokenId = 2;
+    string userId = 3;
+    string org = 4;
+}

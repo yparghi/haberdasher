@@ -1,7 +1,7 @@
 package com.haberdashervcs.common.objects.user;
 
 
-public final class AuthToken {
+public final class UserAuthToken {
 
     public enum Type {
         CLI,
@@ -9,16 +9,23 @@ public final class AuthToken {
     }
 
 
+    public static UserAuthToken forCli(String tokenId, HdUser user) {
+        return new UserAuthToken(Type.CLI, tokenId, user);
+    }
+
+    public static UserAuthToken forWeb(String tokenId, HdUser user) {
+        return new UserAuthToken(Type.WEB, tokenId, user);
+    }
+
+
     private final Type type;
     private final String tokenId;
     private final HdUser user;
-    private final String org;
 
-    public AuthToken(Type type, String tokenId, HdUser user, String org) {
+    private UserAuthToken(Type type, String tokenId, HdUser user) {
         this.type = type;
         this.tokenId = tokenId;
         this.user = user;
-        this.org = org;
     }
 
     public Type getType() {
@@ -31,9 +38,5 @@ public final class AuthToken {
 
     public HdUser getUser() {
         return user;
-    }
-
-    public String getOrg() {
-        return org;
     }
 }

@@ -19,7 +19,7 @@ import com.haberdashervcs.server.browser.LineDiff;
 import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.datastore.HdDatastore;
 import com.haberdashervcs.common.objects.user.AuthResult;
-import com.haberdashervcs.common.objects.user.AuthToken;
+import com.haberdashervcs.common.objects.user.UserAuthToken;
 import com.haberdashervcs.common.objects.user.HdAuthenticator;
 import com.haberdashervcs.common.objects.user.HdUserStore;
 import jakarta.servlet.http.HttpServletRequest;
@@ -116,7 +116,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 notAuthorized(response, "Please log in to perform this action.");
                 return;
             }
-            AuthToken token = authenticator.webTokenForId(webTokenId);
+            UserAuthToken token = authenticator.webTokenForId(webTokenId);
 
             final String path = request.getPathInfo().substring(1);
             if (path.equals("health")) {

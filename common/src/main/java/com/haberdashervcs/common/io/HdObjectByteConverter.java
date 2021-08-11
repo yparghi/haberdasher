@@ -10,7 +10,7 @@ import com.haberdashervcs.common.objects.FolderHistory;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.MergeLock;
 import com.haberdashervcs.common.objects.user.HdUser;
-import com.haberdashervcs.common.protobuf.ServerProto;
+import com.haberdashervcs.common.objects.user.UserAuthToken;
 
 
 public interface HdObjectByteConverter {
@@ -23,6 +23,7 @@ public interface HdObjectByteConverter {
     byte[] branchToBytes(BranchEntry branch) throws IOException;
     byte[] branchAndCommitToBytes(BranchAndCommit branchAndCommit) throws IOException;
     byte[] userToBytes(HdUser user) throws IOException;
+    byte[] userAuthTokenToBytes(UserAuthToken token) throws IOException;
 
     FileEntry fileFromBytes(byte[] fileBytes) throws IOException;
     FolderListing folderFromBytes(byte[] folderBytes) throws IOException;
@@ -32,4 +33,5 @@ public interface HdObjectByteConverter {
     BranchEntry branchFromBytes(byte[] branchBytes) throws IOException;
     BranchAndCommit branchAndCommitFromBytes(byte[] bytes) throws IOException;
     HdUser userFromBytes(byte[] bytes) throws IOException;
+    UserAuthToken userAuthTokenFromBytes(byte[] bytes) throws IOException;
 }

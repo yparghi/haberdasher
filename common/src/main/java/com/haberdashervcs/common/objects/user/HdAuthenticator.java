@@ -15,11 +15,11 @@ public interface HdAuthenticator {
 
     void start() throws Exception;
 
-    Optional<AuthToken> loginToWeb(String email, String password) throws IOException;
+    Optional<UserAuthToken> loginToWeb(String email, String password) throws IOException;
 
-    AuthToken webTokenForId(String tokenId);
+    UserAuthToken webTokenForId(String tokenId);
 
-    AuthToken cliTokenForId(String tokenId);
+    UserAuthToken cliTokenForId(String tokenId);
 
-    AuthResult canAccessRepo(AuthToken authToken, String org, String repo);
+    AuthResult canAccessRepo(UserAuthToken authToken, String org, String repo);
 }
