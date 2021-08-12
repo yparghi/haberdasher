@@ -257,10 +257,10 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
                         : UsersProto.UserAuthToken.Type.CLI);
 
         return UsersProto.UserAuthToken.newBuilder()
-                .setUserId(token.getUser().getUserId())
                 .setType(protoType)
                 .setTokenId(token.getTokenId())
-                .setOrg(token.getUser().getOrg())
+                .setUserId(token.getUserId())
+                .setOrg(token.getOrg())
                 .build()
                 .toByteArray();
     }
@@ -282,9 +282,10 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
         UsersProto.UserAuthToken proto = UsersProto.UserAuthToken.parseFrom(bytes);
 
         if (proto.getType() == UsersProto.UserAuthToken.Type.WEB) {
-            return UserAuthToken.forWeb()
+            return UserAuthToken.forWeb(proto.getTokenId(), proto.getUserId(), proto.getOrg());
 
         } else if (proto.getType() == UsersProto.UserAuthToken.Type.CLI) {
+            return UserAuthToken.forCli(proto.getTokenId(), proto.getUserId(), proto.getOrg());
 
         } else {
             throw new IllegalArgumentException();

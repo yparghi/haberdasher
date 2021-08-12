@@ -18,7 +18,9 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.ColumnFamilyDescriptorBuilder;
 import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
@@ -71,7 +73,7 @@ public final class HBaseAuthenticator implements HdAuthenticator {
         }
 
         String tokenId = UUID.randomUUID().toString();
-        UserAuthToken token = UserAuthToken.forWeb(tokenId, user);
+        UserAuthToken token = UserAuthToken.forWeb(tokenId, user.getUserId(), user.getOrg());
 
         Table tokensTable = conn.getTable(TableName.valueOf("Tokens"));
         byte[] rowKey = tokenId.getBytes(StandardCharsets.UTF_8);
@@ -86,19 +88,43 @@ public final class HBaseAuthenticator implements HdAuthenticator {
     }
 
     @Override
-    public UserAuthToken webTokenForId(String tokenId) {
-        return null;
+    public UserAuthToken webTokenForId(String tokenId) throws IOException {
+        UserAuthToken token = getFromTable(tokenId);
+        if (token.getType() != UserAuthToken.Type.WEB) {
+            throw new IllegalStateException("Expected web token, got type: " + token.getType());
+        }
+        return token;
     }
 
     @Override
     // TODO: Create a CLI token through the web UI.
-    public UserAuthToken cliTokenForId(String tokenId) {
-        return null;
+    public UserAuthToken cliTokenForId(String tokenId) throws IOException {
+        UserAuthToken token = getFromTable(tokenId);
+        if (token.getType() != UserAuthToken.Type.CLI) {
+            throw new IllegalStateException("Expected CLI token, got type: " + token.getType());
+        }
+        return token;
+    }
+
+    private UserAuthToken getFromTable(String tokenId) throws IOException {
+        final Table tokensTable = conn.getTable(TableName.valueOf("Tokens"));
+        final String columnFamilyName = "cfMain";
+        byte[] rowKey = tokenId.getBytes(StandardCharsets.UTF_8);
+        Get get = new Get(rowKey);
+        Result result = tokensTable.get(get);
+        byte[] value = result.getValue(
+                Bytes.toBytes(columnFamilyName), Bytes.toBytes("token"));
+
+        return byteConv.userAuthTokenFromBytes(value);
     }
 
     @Override
     // TODO: Real auth
     public AuthResult canAccessRepo(UserAuthToken authToken, String org, String repo) {
-        return null;
+        if (authToken.getOrg().equals(org)) {
+            return new AuthResult(AuthResult.Type.PERMITTED, "Ok");
+        } else {
+            return new AuthResult(AuthResult.Type.FORBIDDEN, "Mismatched org");
+        }
     }
 }

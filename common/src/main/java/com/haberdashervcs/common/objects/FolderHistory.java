@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 
+// TODO: Delete this class entirely, inc. the protos.
 public final class FolderHistory {
 
     public static FolderHistory ofMerged(

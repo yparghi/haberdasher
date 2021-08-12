@@ -9,23 +9,25 @@ public final class UserAuthToken {
     }
 
 
-    public static UserAuthToken forCli(String tokenId, HdUser user) {
-        return new UserAuthToken(Type.CLI, tokenId, user);
+    public static UserAuthToken forCli(String tokenId, String userId, String org) {
+        return new UserAuthToken(Type.CLI, tokenId, userId, org);
     }
 
-    public static UserAuthToken forWeb(String tokenId, HdUser user) {
-        return new UserAuthToken(Type.WEB, tokenId, user);
+    public static UserAuthToken forWeb(String tokenId, String userId, String org) {
+        return new UserAuthToken(Type.WEB, tokenId, userId, org);
     }
 
 
     private final Type type;
     private final String tokenId;
-    private final HdUser user;
+    private final String userId;
+    private final String org;
 
-    private UserAuthToken(Type type, String tokenId, HdUser user) {
+    private UserAuthToken(Type type, String tokenId, String userId, String org) {
         this.type = type;
         this.tokenId = tokenId;
-        this.user = user;
+        this.userId = userId;
+        this.org = org;
     }
 
     public Type getType() {
@@ -36,7 +38,11 @@ public final class UserAuthToken {
         return tokenId;
     }
 
-    public HdUser getUser() {
-        return user;
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getOrg() {
+        return org;
     }
 }
