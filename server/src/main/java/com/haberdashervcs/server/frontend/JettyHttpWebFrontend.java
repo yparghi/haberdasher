@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.html.HtmlEscapers;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
@@ -22,6 +23,7 @@ import com.haberdashervcs.common.objects.user.AuthResult;
 import com.haberdashervcs.common.objects.user.UserAuthToken;
 import com.haberdashervcs.common.objects.user.HdAuthenticator;
 import com.haberdashervcs.common.objects.user.HdUserStore;
+import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,6 +84,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
         private final HdUserStore userStore;
         private final HdAuthenticator authenticator;
         private final HdObjectByteConverter byteConv;
+        private final Configuration templateConfig;
 
         private RootHandler(HdDatastore datastore, HdUserStore userStore, HdAuthenticator authenticator) {
             this.datastore = datastore;
@@ -89,6 +92,10 @@ public class JettyHttpWebFrontend implements WebFrontend {
             this.authenticator = authenticator;
             // TODO: Pass this in.
             this.byteConv = ProtobufObjectByteConverter.getInstance();
+
+            this.templateConfig = new Configuration(Configuration.VERSION_2_3_31);
+            templateConfig.setClassForTemplateLoading(this.getClass(), "/webtemplates");
+            templateConfig.setDefaultEncoding("UTF-8");
         }
 
         @Override
@@ -96,8 +103,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 String target,
                 Request baseRequest,
                 HttpServletRequest request,
-                HttpServletResponse response)
-                throws IOException {
+                HttpServletResponse response) {
             try {
                 handleInternal(target, baseRequest, request, response);
             } catch (Throwable ex) {
@@ -111,8 +117,19 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 Request baseRequest,
                 HttpServletRequest request,
                 HttpServletResponse response)
-                throws IOException {
+                throws Exception {
             baseRequest.setHandled(true);
+
+            final String path = request.getPathInfo().substring(1);
+            final Map<String, String[]> params = request.getParameterMap();
+            if (path.equals("health")) {
+                response.setStatus(HttpStatus.OK_200);
+                return;
+            } else if (path.equals("templatetest")) {
+                // TEMP!
+                handleHello(baseRequest, request, response, params);
+                return;
+            }
 
             // TODO! special case for login
             String webTokenId = request.getHeader("X-Haberdasher-Web-Auth-Token");
@@ -122,13 +139,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
             }
             UserAuthToken token = authenticator.webTokenForId(webTokenId);
 
-            final String path = request.getPathInfo().substring(1);
-            if (path.equals("health")) {
-                response.setStatus(HttpStatus.OK_200);
-                return;
-            }
             final List<String> parts = PATH_PART_SPLITTER.splitToList(path);
-            final Map<String, String[]> params = request.getParameterMap();
             if (parts.size() != 4) {
                 LOG.info("Got parts: %s", String.join(", ", parts));
                 notFound(response);
@@ -164,10 +175,6 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 case "diff":
                     handleDiff(baseRequest, request, response, org, repo, params);
                     break;
-                case "hello":
-                    // TEMP!
-                    handleHello(baseRequest, request, response, org, repo, params);
-                    break;
                 default:
                     notFound(response);
                     break;
@@ -175,10 +182,15 @@ public class JettyHttpWebFrontend implements WebFrontend {
         }
 
 
-        private void handleHello(Request baseRequest, HttpServletRequest request, HttpServletResponse response, String org, String repo, Map<String, String[]> params) {
-            // TODO!: freemarker quickstart guide, bookmarked
-            // - do I need to figure out how to read template files from the jar?
-            Template template = null;
+        private void handleHello(
+                Request baseRequest,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                Map<String, String[]> params)
+                throws Exception {
+            response.setStatus(HttpStatus.OK_200);
+            Template template = templateConfig.getTemplate("hello.ftlh");
+            template.process(ImmutableMap.of(), response.getWriter());
         }
 
 
