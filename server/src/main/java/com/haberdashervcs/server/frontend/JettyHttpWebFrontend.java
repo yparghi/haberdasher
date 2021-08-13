@@ -22,6 +22,7 @@ import com.haberdashervcs.common.objects.user.AuthResult;
 import com.haberdashervcs.common.objects.user.UserAuthToken;
 import com.haberdashervcs.common.objects.user.HdAuthenticator;
 import com.haberdashervcs.common.objects.user.HdUserStore;
+import freemarker.template.Template;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
@@ -29,6 +30,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 
 public class JettyHttpWebFrontend implements WebFrontend {
@@ -51,7 +53,9 @@ public class JettyHttpWebFrontend implements WebFrontend {
 
     @Override
     public void startInBackground() throws Exception {
-        Server server = new Server();
+        QueuedThreadPool threadPool = new QueuedThreadPool(20, 5);
+        Server server = new Server(threadPool);
+
         ServerConnector httpConnector = new ServerConnector(server);
         httpConnector.setHost("0.0.0.0");
         httpConnector.setPort(15368);
@@ -160,10 +164,21 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 case "diff":
                     handleDiff(baseRequest, request, response, org, repo, params);
                     break;
+                case "hello":
+                    // TEMP!
+                    handleHello(baseRequest, request, response, org, repo, params);
+                    break;
                 default:
                     notFound(response);
                     break;
             }
+        }
+
+
+        private void handleHello(Request baseRequest, HttpServletRequest request, HttpServletResponse response, String org, String repo, Map<String, String[]> params) {
+            // TODO!: freemarker quickstart guide, bookmarked
+            // - do I need to figure out how to read template files from the jar?
+            Template template = null;
         }
 
 
