@@ -1,6 +1,7 @@
 package com.haberdashervcs.server.frontend;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -119,19 +121,18 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 HttpServletResponse response)
                 throws Exception {
             baseRequest.setHandled(true);
-
             final String path = request.getPathInfo().substring(1);
+            LOG.info("Web: Got path: %s", path);
+
             final Map<String, String[]> params = request.getParameterMap();
             if (path.equals("health")) {
                 response.setStatus(HttpStatus.OK_200);
                 return;
-            } else if (path.equals("templatetest")) {
-                // TEMP!
-                handleHello(baseRequest, request, response, params);
+            } else if (path.equals("login")) {
+                handleLogin(baseRequest, request, response, params);
                 return;
             }
 
-            // TODO! special case for login
             String webTokenId = request.getHeader("X-Haberdasher-Web-Auth-Token");
             if (webTokenId == null) {
                 notAuthorized(response, "Please log in to perform this action.");
@@ -182,15 +183,34 @@ public class JettyHttpWebFrontend implements WebFrontend {
         }
 
 
-        private void handleHello(
+        private void handleLogin(
                 Request baseRequest,
                 HttpServletRequest request,
                 HttpServletResponse response,
                 Map<String, String[]> params)
                 throws Exception {
-            response.setStatus(HttpStatus.OK_200);
-            Template template = templateConfig.getTemplate("hello.ftlh");
-            template.process(ImmutableMap.of(), response.getWriter());
+            // TODO! If the user is already logged in, redirect...
+
+            if (request.getMethod().equals("GET")) {
+                response.setStatus(HttpStatus.OK_200);
+                Template template = templateConfig.getTemplate("login.ftlh");
+                template.process(ImmutableMap.of(), response.getWriter());
+
+            } else if (request.getMethod().equals("POST") && request.getHeader("Content-Type").equals("application/x-www-form-urlencoded")) {
+                LOG.info("Got urlencoded params: %s", params);
+                response.setStatus(HttpStatus.OK_200);
+                response.getWriter().print("<html><body><p>OK, logged in</p></body></html>");
+
+            } else if (request.getMethod().equals("POST") && request.getHeader("Content-Type").equals("multipart/form-data")) {
+                Collection<Part> formParts = request.getParts();
+                LOG.info("Got form parts: %s", formParts);
+                response.setStatus(HttpStatus.OK_200);
+                response.getWriter().print("<html><body><p>OK, logged in</p></body></html>");
+
+            } else {
+                response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+                return;
+            }
         }
 
 
