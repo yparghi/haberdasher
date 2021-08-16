@@ -60,11 +60,11 @@ public final class HBaseUserStore implements HdUserStore {
 
     @Override
     public HdUser getByEmail(String email) throws IOException {
-        final Table filesTable = conn.getTable(TableName.valueOf("Files"));
+        final Table usersTable = conn.getTable(TableName.valueOf("Users"));
         final String columnFamilyName = "cfEmailToId";
         byte[] rowKey = email.getBytes(StandardCharsets.UTF_8);
         Get get = new Get(rowKey);
-        Result result = filesTable.get(get);
+        Result result = usersTable.get(get);
         byte[] value = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("id"));
 
@@ -75,11 +75,11 @@ public final class HBaseUserStore implements HdUserStore {
 
     @Override
     public HdUser getById(String userId) throws IOException {
-        final Table filesTable = conn.getTable(TableName.valueOf("Files"));
+        final Table usersTable = conn.getTable(TableName.valueOf("Users"));
         final String columnFamilyName = "cfIdToUser";
         byte[] rowKey = userId.getBytes(StandardCharsets.UTF_8);
         Get get = new Get(rowKey);
-        Result result = filesTable.get(get);
+        Result result = usersTable.get(get);
         byte[] value = result.getValue(
                 Bytes.toBytes(columnFamilyName), Bytes.toBytes("user"));
 

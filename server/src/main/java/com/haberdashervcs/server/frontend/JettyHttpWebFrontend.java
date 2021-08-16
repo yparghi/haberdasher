@@ -15,17 +15,19 @@ import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchEntry;
 import com.haberdashervcs.common.objects.FolderListing;
+import com.haberdashervcs.common.objects.user.AuthResult;
+import com.haberdashervcs.common.objects.user.HdAuthenticator;
+import com.haberdashervcs.common.objects.user.HdUser;
+import com.haberdashervcs.common.objects.user.HdUserStore;
+import com.haberdashervcs.common.objects.user.UserAuthToken;
 import com.haberdashervcs.server.browser.BranchDiff;
 import com.haberdashervcs.server.browser.FileDiff;
 import com.haberdashervcs.server.browser.LineDiff;
 import com.haberdashervcs.server.browser.RepoBrowser;
 import com.haberdashervcs.server.datastore.HdDatastore;
-import com.haberdashervcs.common.objects.user.AuthResult;
-import com.haberdashervcs.common.objects.user.UserAuthToken;
-import com.haberdashervcs.common.objects.user.HdAuthenticator;
-import com.haberdashervcs.common.objects.user.HdUserStore;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
@@ -55,6 +57,12 @@ public class JettyHttpWebFrontend implements WebFrontend {
         this.authenticator = authenticator;
     }
 
+    private void loadTestData() throws IOException {
+        HdUser testUser = new HdUser("testuser-id", "testuser@example.com", "some_org", "testpass");
+        userStore.putUser(testUser);
+    }
+
+
     @Override
     public void startInBackground() throws Exception {
         QueuedThreadPool threadPool = new QueuedThreadPool(20, 5);
@@ -66,6 +74,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
         server.addConnector(httpConnector);
 
         server.setHandler(new RootHandler(datastore, userStore, authenticator));
+        loadTestData();  // TEMP!
         server.start();
     }
 
@@ -189,7 +198,19 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 HttpServletResponse response,
                 Map<String, String[]> params)
                 throws Exception {
-            // TODO! If the user is already logged in, redirect...
+
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    LOG.info("handleLogin: Got cookie: %s", cookie);
+                    if (cookie.getName().equals("haberdasher.web.authtoken")) {
+                        String tokenId = cookie.getValue();
+                        UserAuthToken token = authenticator.webTokenForId(tokenId);
+                        response.setStatus(HttpStatus.OK_200);
+                        response.getWriter().print("<html><body><p>You are already logged in.</p></body></html>");
+                        return;
+                    }
+                }
+            }
 
             if (request.getMethod().equals("GET")) {
                 response.setStatus(HttpStatus.OK_200);
@@ -199,18 +220,36 @@ public class JettyHttpWebFrontend implements WebFrontend {
             } else if (request.getMethod().equals("POST") && request.getHeader("Content-Type").equals("application/x-www-form-urlencoded")) {
                 LOG.info("Got urlencoded params: %s", params);
                 response.setStatus(HttpStatus.OK_200);
-                response.getWriter().print("<html><body><p>OK, logged in</p></body></html>");
+                String username = getOneParam("username", params);
+                String password = getOneParam("password", params);
+                doLogin(username, password, response);
 
             } else if (request.getMethod().equals("POST") && request.getHeader("Content-Type").equals("multipart/form-data")) {
                 Collection<Part> formParts = request.getParts();
                 LOG.info("Got form parts: %s", formParts);
                 response.setStatus(HttpStatus.OK_200);
-                response.getWriter().print("<html><body><p>OK, logged in</p></body></html>");
+                response.getWriter().print("<html><body><p>Multi-part form auth TODO</p></body></html>");
 
             } else {
                 response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+            }
+        }
+
+
+        private void doLogin(String username, String password, HttpServletResponse response) throws IOException {
+            Optional<UserAuthToken> token = authenticator.loginToWeb(username, password);
+            if (!token.isPresent()) {
+                response.setStatus(HttpStatus.UNAUTHORIZED_401);
+                response.getWriter().print("<html><body><p>No token found</p></body></html>");
                 return;
             }
+
+            Cookie authCookie = new Cookie("haberdasher.web.authtoken", token.get().getTokenId());
+            // TODO make this (and the frontend's config) customizable
+            authCookie.setDomain("haberdashervcs.com");
+            response.addCookie(authCookie);
+            response.setStatus(HttpStatus.OK_200);
+            response.getWriter().print("<html><body><p>Ok, logged in</p></body></html>");
         }
 
 

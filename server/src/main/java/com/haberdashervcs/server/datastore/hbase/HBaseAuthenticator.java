@@ -32,7 +32,7 @@ public final class HBaseAuthenticator implements HdAuthenticator {
     private static final HdLogger LOG = HdLoggers.create(HBaseAuthenticator.class);
 
 
-    public static HdAuthenticator forConnection(Connection conn, HdUserStore userStore) {
+    public static HBaseAuthenticator forConnection(Connection conn, HdUserStore userStore) {
         return new HBaseAuthenticator(conn, userStore);
     }
 
