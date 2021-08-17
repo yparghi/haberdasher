@@ -123,6 +123,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
             }
         }
 
+
         private void handleInternal(
                 String target,
                 Request baseRequest,
@@ -142,32 +143,27 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 return;
             }
 
-            String webTokenId = request.getHeader("X-Haberdasher-Web-Auth-Token");
-            if (webTokenId == null) {
-                notAuthorized(response, "Please log in to perform this action.");
+            Optional<UserAuthToken> token = getLoginToken(request);
+            if (!token.isPresent()) {
+                // This call sets the status to 302.
+                response.sendRedirect("/login");
                 return;
             }
-            UserAuthToken token = authenticator.webTokenForId(webTokenId);
 
             final List<String> parts = PATH_PART_SPLITTER.splitToList(path);
-            if (parts.size() != 4) {
-                LOG.info("Got parts: %s", String.join(", ", parts));
-                notFound(response);
+
+            if (parts.get(0).equals("home")) {
+                handleHome(token.get(), baseRequest, request, response, params);
                 return;
             }
 
-            final String backendType = parts.get(0);
-            if (!backendType.equals("web")) {
-                notFound(response);
-                return;
-            }
-
+            // TODO! some size checking here, for requests like /favicon.ico
             final String org = parts.get(1);
             final String repo = parts.get(2);
             final String op = parts.get(3);
             LOG.info("Org %s, Repo %s, op %s", org, repo, op);
 
-            AuthResult authResult = authenticator.canAccessRepo(token, org, repo);
+            AuthResult authResult = authenticator.canAccessRepo(token.get(), org, repo);
             if (authResult.getType() == AuthResult.Type.AUTH_EXPIRED) {
                 notAuthorized(response, "Your login session has expired. Please log in again.");
                 return;
@@ -192,6 +188,34 @@ public class JettyHttpWebFrontend implements WebFrontend {
         }
 
 
+        private void handleHome(
+                UserAuthToken token,
+                Request baseRequest,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                Map<String, String[]> params)
+                throws Exception {
+            response.setStatus(HttpStatus.OK_200);
+            Template template = templateConfig.getTemplate("home.ftlh");
+            template.process(ImmutableMap.of(), response.getWriter());
+        }
+
+
+        private Optional<UserAuthToken> getLoginToken(HttpServletRequest request) throws IOException {
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    LOG.info("getLoginToken: Got cookie: %s", cookie);
+                    if (cookie.getName().equals("haberdasher.web.authtoken")) {
+                        String tokenId = cookie.getValue();
+                        return Optional.of(authenticator.webTokenForId(tokenId));
+                    }
+                }
+            }
+
+            return Optional.empty();
+        }
+
+
         private void handleLogin(
                 Request baseRequest,
                 HttpServletRequest request,
@@ -199,17 +223,10 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 Map<String, String[]> params)
                 throws Exception {
 
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    LOG.info("handleLogin: Got cookie: %s", cookie);
-                    if (cookie.getName().equals("haberdasher.web.authtoken")) {
-                        String tokenId = cookie.getValue();
-                        UserAuthToken token = authenticator.webTokenForId(tokenId);
-                        response.setStatus(HttpStatus.OK_200);
-                        response.getWriter().print("<html><body><p>You are already logged in.</p></body></html>");
-                        return;
-                    }
-                }
+            Optional<UserAuthToken> token = getLoginToken(request);
+            if (token.isPresent()) {
+                response.sendRedirect("/home");
+                return;
             }
 
             if (request.getMethod().equals("GET")) {
@@ -222,7 +239,7 @@ public class JettyHttpWebFrontend implements WebFrontend {
                 response.setStatus(HttpStatus.OK_200);
                 String username = getOneParam("username", params);
                 String password = getOneParam("password", params);
-                doLogin(username, password, response);
+                doLogin(request, username, password, response);
 
             } else if (request.getMethod().equals("POST") && request.getHeader("Content-Type").equals("multipart/form-data")) {
                 Collection<Part> formParts = request.getParts();
@@ -236,7 +253,12 @@ public class JettyHttpWebFrontend implements WebFrontend {
         }
 
 
-        private void doLogin(String username, String password, HttpServletResponse response) throws IOException {
+        private void doLogin(
+                HttpServletRequest request,
+                String username,
+                String password,
+                HttpServletResponse response)
+                throws IOException {
             Optional<UserAuthToken> token = authenticator.loginToWeb(username, password);
             if (!token.isPresent()) {
                 response.setStatus(HttpStatus.UNAUTHORIZED_401);
@@ -245,8 +267,11 @@ public class JettyHttpWebFrontend implements WebFrontend {
             }
 
             Cookie authCookie = new Cookie("haberdasher.web.authtoken", token.get().getTokenId());
-            // TODO make this (and the frontend's config) customizable
-            authCookie.setDomain("haberdashervcs.com");
+            LOG.info("Request server name: %s", request.getServerName());
+            if (!request.getServerName().equals("localhost")) {
+                // TODO make this (and the frontend's config) customizable
+                authCookie.setDomain("haberdashervcs.com");
+            }
             response.addCookie(authCookie);
             response.setStatus(HttpStatus.OK_200);
             response.getWriter().print("<html><body><p>Ok, logged in</p></body></html>");
