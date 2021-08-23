@@ -77,6 +77,8 @@ final class CommitChangeHandler implements LocalChangeHandler {
                             FolderListing.Entry.forFile(comparison.getName(), ch.hashString()));
 
                 } else {
+                    // TODO! Here is where I should check whether the local file contents are binary or not.
+                    // Also: What if the old file is non-binary? Then it's a new file add...
                     HdHasher.ContentsAndHash ch = HdHasher.readLocalFile(comparison.getPathInLocalRepo());
                     FileEntry commitFile = db.getFile(comparison.getEntryInCommit().getId());
                     if (!ch.hashString().equals(commitFile.getId())) {
