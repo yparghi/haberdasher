@@ -46,6 +46,12 @@
             <version>5.11.0.202103091610-r</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.sigpipe</groupId>
+            <artifactId>jbsdiff</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
 
