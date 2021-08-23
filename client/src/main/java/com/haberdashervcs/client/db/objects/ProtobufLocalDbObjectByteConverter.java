@@ -24,7 +24,7 @@ public final class ProtobufLocalDbObjectByteConverter implements LocalDbObjectBy
     @Override
     public LocalFileState fileStateFromBytes(byte[] bytes) throws IOException {
         LocalDbProto.LocalFileState proto = LocalDbProto.LocalFileState.parseFrom(bytes);
-        return LocalFileState.of(proto.getPushedToServer());
+        return LocalFileState.withPushedToServerState(proto.getPushedToServer());
     }
 
     @Override

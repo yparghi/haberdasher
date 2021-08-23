@@ -267,13 +267,13 @@ public final class RebaseCommand implements Command {
                 throw new AssertionError("Unequal main bases!");
             } else {
                 FileEntry baseOnMain = db.getFile(branchChange.mainBaseFileId.get());
-                baseText = db.resolveDiffs(baseOnMain);
+                baseText = db.resolveDiffsToString(baseOnMain);
             }
 
             FileEntry changedOnMain = db.getFile(conflict.getValue().onMain.fileId);
             FileEntry changedOnBranch = db.getFile(conflict.getValue().onBranch.fileId);
-            String changedMainText = db.resolveDiffs(changedOnMain);
-            String changedBranchText = db.resolveDiffs(changedOnBranch);
+            String changedMainText = db.resolveDiffsToString(changedOnMain);
+            String changedBranchText = db.resolveDiffsToString(changedOnBranch);
 
             DmpMerger.DmpMergeResult mergeResult = new DmpMerger().mergeText(
                     baseText, changedMainText, changedBranchText);

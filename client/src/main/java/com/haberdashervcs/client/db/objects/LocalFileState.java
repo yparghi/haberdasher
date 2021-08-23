@@ -3,7 +3,7 @@ package com.haberdashervcs.client.db.objects;
 
 public class LocalFileState {
 
-    public static LocalFileState of(boolean pushedToServer) {
+    public static LocalFileState withPushedToServerState(boolean pushedToServer) {
         return new LocalFileState(pushedToServer);
     }
 

@@ -777,6 +777,14 @@ public final class FilesProto {
        * <code>DIFF_DMP = 1;</code>
        */
       DIFF_DMP(1),
+      /**
+       * <pre>
+       * Binary diff with bsdiff
+       * </pre>
+       *
+       * <code>DIFF_BS = 2;</code>
+       */
+      DIFF_BS(2),
       UNRECOGNIZED(-1),
       ;
 
@@ -792,6 +800,14 @@ public final class FilesProto {
        * <code>DIFF_DMP = 1;</code>
        */
       public static final int DIFF_DMP_VALUE = 1;
+      /**
+       * <pre>
+       * Binary diff with bsdiff
+       * </pre>
+       *
+       * <code>DIFF_BS = 2;</code>
+       */
+      public static final int DIFF_BS_VALUE = 2;
 
 
       public final int getNumber() {
@@ -820,6 +836,7 @@ public final class FilesProto {
         switch (value) {
           case 0: return FULL;
           case 1: return DIFF_DMP;
+          case 2: return DIFF_BS;
           default: return null;
         }
       }
@@ -1646,12 +1663,12 @@ public final class FilesProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\013files.proto\"\"\n\017DmpDiffContents\022\017\n\007patc" +
-      "hes\030\001 \003(\014\"\231\001\n\tFileEntry\022\n\n\002id\030\001 \001(\t\022\020\n\010c" +
+      "hes\030\001 \003(\014\"\246\001\n\tFileEntry\022\n\n\002id\030\001 \001(\t\022\020\n\010c" +
       "ontents\030\002 \001(\014\022-\n\014contentsType\030\003 \001(\0162\027.Fi" +
       "leEntry.ContentsType\022\027\n\017diffBaseEntryId\030" +
-      "\004 \001(\t\"&\n\014ContentsType\022\010\n\004FULL\020\000\022\014\n\010DIFF_" +
-      "DMP\020\001B2\n\"com.haberdashervcs.common.proto" +
-      "bufB\nFilesProtoP\000b\006proto3"
+      "\004 \001(\t\"3\n\014ContentsType\022\010\n\004FULL\020\000\022\014\n\010DIFF_" +
+      "DMP\020\001\022\013\n\007DIFF_BS\020\002B2\n\"com.haberdashervcs" +
+      ".common.protobufB\nFilesProtoP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -15,8 +15,12 @@ public class FileEntry {
         return new FileEntry(id, ContentsType.FULL, fullContents, null);
     }
 
-    public static FileEntry forDiff(String id, byte[] diffContents, String baseEntryId) {
+    public static FileEntry forDiffDmp(String id, byte[] diffContents, String baseEntryId) {
         return new FileEntry(id, ContentsType.DIFF_DMP, diffContents, baseEntryId);
+    }
+
+    public static FileEntry forDiffBs(String id, byte[] diffContents, String baseEntryId) {
+        return new FileEntry(id, ContentsType.DIFF_BS, diffContents, baseEntryId);
     }
 
     public static FileEntry forNewContents(byte[] bytes) {
@@ -25,7 +29,8 @@ public class FileEntry {
 
     public enum ContentsType {
         FULL,
-        DIFF_DMP
+        DIFF_DMP,
+        DIFF_BS
     }
 
 

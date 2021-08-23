@@ -49,6 +49,9 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
             case DIFF_DMP:
                 contentsType = FilesProto.FileEntry.ContentsType.DIFF_DMP;
                 break;
+            case DIFF_BS:
+                contentsType = FilesProto.FileEntry.ContentsType.DIFF_BS;
+                break;
             case FULL:
                 contentsType = FilesProto.FileEntry.ContentsType.FULL;
                 break;
@@ -96,8 +99,13 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
 
         if (proto.getContentsType() == FilesProto.FileEntry.ContentsType.FULL) {
             return FileEntry.forNewContents(proto.getId(), proto.getContents().toByteArray());
+
         } else if (proto.getContentsType() == FilesProto.FileEntry.ContentsType.DIFF_DMP) {
-            return FileEntry.forDiff(
+            return FileEntry.forDiffDmp(
+                    proto.getId(), proto.getContents().toByteArray(), proto.getDiffBaseEntryId());
+
+        } else if (proto.getContentsType() == FilesProto.FileEntry.ContentsType.DIFF_BS) {
+            return FileEntry.forDiffBs(
                     proto.getId(), proto.getContents().toByteArray(), proto.getDiffBaseEntryId());
 
         } else {

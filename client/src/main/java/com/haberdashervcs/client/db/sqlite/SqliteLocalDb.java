@@ -417,12 +417,28 @@ public final class SqliteLocalDb implements LocalDb {
     private static final int MAX_DIFF_SEARCH = 20;
 
     @Override
+    public String resolveDiffsToString(final FileEntry file) {
+        return new String(resolveDiffsToBytes(file), StandardCharsets.UTF_8);
+    }
+
+    @Override
     // TODO: Force writing a 'FULL' FileEntry when N diff entries are stacked in the history.
-    public String resolveDiffs(final FileEntry file) {
+    public byte[] resolveDiffsToBytes(final FileEntry file) {
         if (file.getContentsType() == FileEntry.ContentsType.FULL) {
-            return new String(file.getContents().getRawBytes(), StandardCharsets.UTF_8);
+            return file.getContents().getRawBytes();
         }
 
+        // TODO: Move this code somewhere common.
+        if (file.getContentsType() == FileEntry.ContentsType.DIFF_DMP) {
+            return resolveDmpDiffs(file);
+        } else if (file.getContentsType() == FileEntry.ContentsType.DIFF_BS) {
+            return resolveBsDiffs(file);
+        }
+
+    }
+
+
+    private byte[] resolveDmpDiffs(FileEntry file) {
         Preconditions.checkState(file.getContentsType() == FileEntry.ContentsType.DIFF_DMP);
         ArrayList<byte[]> diffs = new ArrayList<>();
         diffs.add(file.getContents().getRawBytes());
@@ -436,13 +452,14 @@ public final class SqliteLocalDb implements LocalDb {
 
             } else if (parent.getContentsType() == FileEntry.ContentsType.FULL) {
                 try {
-                    return DmpDiffer.applyPatches(diffs, parent);
+                    // This is wasteful, but maybe we can avoid this wasted conversion when moving off of DMP.
+                    return DmpDiffer.applyPatches(diffs, parent).getBytes(StandardCharsets.UTF_8);
                 } catch (IOException ioEx) {
                     throw new RuntimeException(ioEx);
                 }
 
             } else {
-                throw new IllegalStateException("Unknown contents type: " + parent.getContentsType());
+                throw new IllegalStateException("Unexpected contents type: " + parent.getContentsType());
             }
         }
         throw new IllegalStateException("Couldn't resolve a diff after " + MAX_DIFF_SEARCH + " entries");

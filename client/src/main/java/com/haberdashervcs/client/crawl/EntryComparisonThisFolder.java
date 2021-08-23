@@ -59,7 +59,7 @@ public final class EntryComparisonThisFolder {
         Preconditions.checkState(isDiffableText());
 
         FileEntry fromCommit = db.getFile(entryInCommit.getId());
-        String fromCommitContents = db.resolveDiffs(fromCommit);
+        String fromCommitContents = db.resolveDiffsToString(fromCommit);
         String fromLocalFile = Files.readString(pathInLocalRepo, StandardCharsets.UTF_8);
         return new DmpDiffer(fromCommitContents, fromLocalFile).compare();
     }

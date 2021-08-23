@@ -64,7 +64,7 @@ public final class CheckoutCommand implements Command {
                 case FILE:
                     FileEntry file = inStream.getFile();
                     String fileRowKey = rowKeyer.forFile(nextObj.get().getId());
-                    LocalFileState state = LocalFileState.of(true);
+                    LocalFileState state = LocalFileState.withPushedToServerState(true);
                     LOG.debug("TEMP: Putting file: %s", file.getDebugString());
                     db.putFile(fileRowKey, file, state);
                     break;

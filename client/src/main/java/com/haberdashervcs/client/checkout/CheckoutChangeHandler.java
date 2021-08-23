@@ -99,7 +99,7 @@ public final class CheckoutChangeHandler implements LocalChangeHandler {
 
         if (comparison.getEntryInCommit().getType() == FolderListing.Entry.Type.FILE) {
             FileEntry commitFile = db.getFile(comparison.getEntryInCommit().getId());
-            String contents = db.resolveDiffs(commitFile);
+            String contents = db.resolveDiffsToString(commitFile);
             Files.write(localToWrite, contents.getBytes(StandardCharsets.UTF_8));
 
         } else {

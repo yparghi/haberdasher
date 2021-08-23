@@ -142,7 +142,7 @@ final class GitChangeCrawler {
                     // New
                     if (baseEntry.isEmpty() || baseEntry.get().getType() == FolderListing.Entry.Type.FOLDER) {
                         FileEntry newFile = FileEntry.forNewContents(idForThisEntry, blobBytes);
-                        LocalFileState state = LocalFileState.of(false);
+                        LocalFileState state = LocalFileState.withPushedToServerState(false);
                         db.putFile(idForThisEntry, newFile, state);
 
                     // Modified or unchanged
@@ -151,7 +151,7 @@ final class GitChangeCrawler {
 
                         Optional<String> oldText;
                         if (oldFile.getContentsType() == FileEntry.ContentsType.DIFF_DMP) {
-                            oldText = Optional.of(db.resolveDiffs(oldFile));
+                            oldText = Optional.of(db.resolveDiffsToString(oldFile));
                         } else {
                             oldText = TextVsBinaryChecker.convertToString(oldFile.getContents().getRawBytes());
                         }
@@ -172,12 +172,12 @@ final class GitChangeCrawler {
                                 entry = baseEntry.get();
 
                             } else {
-                                newFile = FileEntry.forDiff(idForThisEntry, diffResult.getPatchesAsBytes(), baseEntry.get().getId());
+                                newFile = FileEntry.forDiffDmp(idForThisEntry, diffResult.getPatchesAsBytes(), baseEntry.get().getId());
                             }
                         }
 
                         if (newFile != null) {
-                            LocalFileState state = LocalFileState.of(false);
+                            LocalFileState state = LocalFileState.withPushedToServerState(false);
                             db.putFile(idForThisEntry, newFile, state);
                         }
                     }

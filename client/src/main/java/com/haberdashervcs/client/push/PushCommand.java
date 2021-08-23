@@ -162,7 +162,7 @@ public class PushCommand implements Command {
         serverPushContext.finish();
 
         for (String fileId : filesToSaveAsPushed) {
-            LocalFileState newState = LocalFileState.of(true);
+            LocalFileState newState = LocalFileState.withPushedToServerState(true);
             db.putFileState(fileId, newState);
         }
 

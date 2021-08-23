@@ -77,24 +77,33 @@ final class CommitChangeHandler implements LocalChangeHandler {
                             FolderListing.Entry.forFile(comparison.getName(), ch.hashString()));
 
                 } else {
-                    // TODO! Here is where I should check whether the local file contents are binary or not.
-                    // Also: What if the old file is non-binary? Then it's a new file add...
-                    HdHasher.ContentsAndHash ch = HdHasher.readLocalFile(comparison.getPathInLocalRepo());
+                    HdHasher.ContentsAndHash localCH = HdHasher.readLocalFile(comparison.getPathInLocalRepo());
                     FileEntry commitFile = db.getFile(comparison.getEntryInCommit().getId());
-                    if (!ch.hashString().equals(commitFile.getId())) {
+                    if (!localCH.hashString().equals(commitFile.getId())) {
                         newFolderShouldBeWritten = true;
                         LOG.debug("Adding diff for file %s: hashes %s / %s",
                                 path.forFolderListing() + comparison.getName(),
                                 commitFile.getId(),
-                                ch.hashString());
-                        FileEntry newFile = FileEntry.forNewContents(ch.hashString(), ch.getContents());
-                        LocalFileState state = LocalFileState.of(false);
-                        db.putFile(ch.hashString(), newFile, state);
+                                localCH.hashString());
+
+                        // TODO! Here is where I should check whether the local file contents are binary or not.
+                        // Also: What if the old file is non-binary? Then it's a new file add...
+                        byte[] localContents = localCH.getContents();
+                        byte[] commitContents = db.resolveDiffsToBytes(commitFile);
+                        FileEntry newFile = FileEntry.forNewContents(localCH.hashString(), localCH.getContents());
+
+
+
+
+
+
+                        LocalFileState state = LocalFileState.withPushedToServerState(false);
+                        db.putFile(localCH.hashString(), newFile, state);
                     } else {
                         LOG.debug("Unchanged file: %s", path.forFolderListing() + comparison.getName());
                     }
                     seenEntries.add(
-                            FolderListing.Entry.forFile(comparison.getName(), ch.hashString()));
+                            FolderListing.Entry.forFile(comparison.getName(), localCH.hashString()));
                 }
 
 
@@ -131,7 +140,7 @@ final class CommitChangeHandler implements LocalChangeHandler {
             throws IOException {
         HdHasher.ContentsAndHash ch = HdHasher.readLocalFile(comparison.getPathInLocalRepo());
         FileEntry newFile = FileEntry.forNewContents(ch.hashString(), ch.getContents());
-        LocalFileState state = LocalFileState.of(false);
+        LocalFileState state = LocalFileState.withPushedToServerState(false);
         db.putFile(ch.hashString(), newFile, state);
         return ch;
     }

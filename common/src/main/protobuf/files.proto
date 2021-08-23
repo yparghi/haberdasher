@@ -16,6 +16,8 @@ message FileEntry {
         FULL = 0;
         // Diffs parsed by diff-match-patch
         DIFF_DMP = 1;
+        // Binary diff with bsdiff
+        DIFF_BS = 2;;
     }
 
     string id = 1;

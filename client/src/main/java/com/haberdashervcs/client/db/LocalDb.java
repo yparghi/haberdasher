@@ -47,7 +47,8 @@ public interface LocalDb {
 
     void putFile(String key, FileEntry file, LocalFileState state);
 
-    String resolveDiffs(FileEntry file);
+    String resolveDiffsToString(FileEntry file);
+    byte[] resolveDiffsToBytes(final FileEntry file);
 
     // TODO: Do the same checked-out paths apply across all branches in the local repo?
     List<String> getCheckedOutPaths();
