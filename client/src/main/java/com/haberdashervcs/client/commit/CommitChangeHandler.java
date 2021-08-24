@@ -90,6 +90,7 @@ final class CommitChangeHandler implements LocalChangeHandler {
                         // Also: What if the old file is non-binary? Then it's a new file add...
                         byte[] localContents = localCH.getContents();
                         byte[] commitContents = db.resolveDiffsToBytes(commitFile);
+                        // TODO! Use some FileDiffer helper here? that handles large vs. small, text vs. binary, etc.?
                         FileEntry newFile = FileEntry.forNewContents(localCH.hashString(), localCH.getContents());
 
 

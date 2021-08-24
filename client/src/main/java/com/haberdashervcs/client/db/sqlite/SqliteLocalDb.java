@@ -24,6 +24,7 @@ import com.haberdashervcs.client.db.objects.LocalDbObjectByteConverter;
 import com.haberdashervcs.client.db.objects.LocalFileState;
 import com.haberdashervcs.client.db.objects.LocalRepoState;
 import com.haberdashervcs.client.db.objects.ProtobufLocalDbObjectByteConverter;
+import com.haberdashervcs.common.diff.BsDiffer;
 import com.haberdashervcs.common.diff.DmpDiffer;
 import com.haberdashervcs.common.io.HdObjectByteConverter;
 import com.haberdashervcs.common.io.ProtobufObjectByteConverter;
@@ -433,13 +434,45 @@ public final class SqliteLocalDb implements LocalDb {
             return resolveDmpDiffs(file);
         } else if (file.getContentsType() == FileEntry.ContentsType.DIFF_BS) {
             return resolveBsDiffs(file);
+        } else {
+            throw new IllegalStateException("Unexpected FileEntry type: " + file.getContentsType());
         }
-
     }
 
+    // TODO Can we merge any of this with resolveDmpDiffs() ?
+    private byte[] resolveBsDiffs(FileEntry file) {
+        Preconditions.checkArgument(file.getContentsType() == FileEntry.ContentsType.DIFF_BS);
+        ArrayList<byte[]> diffs = new ArrayList<>();
+        diffs.add(file.getContents().getRawBytes());
+        FileEntry current = file;
+        for (int i = 0; i < MAX_DIFF_SEARCH; ++i) {
+            FileEntry parent = getFile(current.getBaseEntryId().get());
+
+            if (parent.getContentsType() == FileEntry.ContentsType.DIFF_BS) {
+                diffs.add(0, parent.getContents().getRawBytes());
+                current = parent;
+                continue;
+
+            } else if (parent.getContentsType() == FileEntry.ContentsType.FULL) {
+                byte[] baseContents = parent.getContents().getRawBytes();
+                for (byte[] diff : diffs) {
+                    try {
+                         baseContents = BsDiffer.diff(baseContents, diff);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                return baseContents;
+
+            } else {
+                throw new IllegalStateException("Unexpected contents type: " + parent.getContentsType());
+            }
+        }
+        throw new IllegalStateException("Couldn't resolve a diff after " + MAX_DIFF_SEARCH + " entries");
+    }
 
     private byte[] resolveDmpDiffs(FileEntry file) {
-        Preconditions.checkState(file.getContentsType() == FileEntry.ContentsType.DIFF_DMP);
+        Preconditions.checkArgument(file.getContentsType() == FileEntry.ContentsType.DIFF_DMP);
         ArrayList<byte[]> diffs = new ArrayList<>();
         diffs.add(file.getContents().getRawBytes());
         FileEntry current = file;
