@@ -3,13 +3,17 @@ package com.haberdashervcs.client.commit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.haberdashervcs.client.crawl.EntryComparisonThisFolder;
 import com.haberdashervcs.client.crawl.LocalChangeHandler;
 import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.client.db.objects.LocalFileState;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDbRowKeyer;
+import com.haberdashervcs.common.diff.DmpDiffResult;
+import com.haberdashervcs.common.diff.DmpDiffer;
 import com.haberdashervcs.common.diff.HdHasher;
+import com.haberdashervcs.common.diff.TextVsBinaryChecker;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
@@ -47,6 +51,7 @@ final class CommitChangeHandler implements LocalChangeHandler {
                 newFolderShouldBeWritten = true;
                 HdHasher.ContentsAndHash ch = putNewFile(comparison);
                 LOG.debug("Adding new file: %s", path.forFolderListing() + comparison.getName());
+                String TODO = /*Check if new file is binary*/;
                 seenEntries.add(
                         FolderListing.Entry.forFile(comparison.getName(), ch.hashString()));
 
@@ -86,12 +91,20 @@ final class CommitChangeHandler implements LocalChangeHandler {
                                 commitFile.getId(),
                                 localCH.hashString());
 
-                        // TODO! Here is where I should check whether the local file contents are binary or not.
-                        // Also: What if the old file is non-binary? Then it's a new file add...
-                        byte[] localContents = localCH.getContents();
                         byte[] commitContents = db.resolveDiffsToBytes(commitFile);
-                        // TODO! Use some FileDiffer helper here? that handles large vs. small, text vs. binary, etc.?
-                        FileEntry newFile = FileEntry.forNewContents(localCH.hashString(), localCH.getContents());
+                        byte[] localContents = localCH.getContents();
+                        // TODO: Use some FileDiffer helper here? That handles large vs. small, text vs. binary, etc.?
+                        Optional<String> commitAsText = TextVsBinaryChecker.convertToString(commitContents);
+                        Optional<String> localAsText = TextVsBinaryChecker.convertToString(localContents);
+
+                        FileEntry newEntry;
+                        if (commitAsText.isPresent() && localAsText.isPresent()) {
+                            // TODO Move off of DmpDiffer
+                            DmpDiffer differ = new DmpDiffer(commitAsText.get(), localAsText.get());
+                            DmpDiffResult diffResult = differ.compare();
+                            newEntry = FileEntry.forDiffDmp(
+                                    localCH.hashString(), diffResult.getPatchesAsBytes(), commitFile.getId());
+                        } /* else if ... */
 
 
 
@@ -99,7 +112,8 @@ final class CommitChangeHandler implements LocalChangeHandler {
 
 
                         LocalFileState state = LocalFileState.withPushedToServerState(false);
-                        db.putFile(localCH.hashString(), newFile, state);
+                        db.putFile(localCH.hashString(), newEntry, state);
+
                     } else {
                         LOG.debug("Unchanged file: %s", path.forFolderListing() + comparison.getName());
                     }

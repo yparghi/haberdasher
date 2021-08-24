@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public final class TextVsBinaryChecker {
 
-    // TODO: Something more rigorous?
+    // TODO: Something more rigorous
     public static Optional<String> convertToString(byte[] contents) {
         try {
             String utf8 = new String(contents, StandardCharsets.UTF_8);
