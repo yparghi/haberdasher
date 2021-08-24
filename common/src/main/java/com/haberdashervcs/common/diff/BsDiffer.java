@@ -3,6 +3,7 @@ package com.haberdashervcs.common.diff;
 import java.io.ByteArrayOutputStream;
 
 import io.sigpipe.jbsdiff.Diff;
+import io.sigpipe.jbsdiff.Patch;
 
 
 public final class BsDiffer {
@@ -18,6 +19,12 @@ public final class BsDiffer {
     public static byte[] diff(byte[] oldBytes, byte[] newBytes) throws Exception {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         Diff.diff(oldBytes, newBytes, byteOut);
+        return byteOut.toByteArray();
+    }
+
+    public static byte[] patch(byte[] oldBytes, byte[] patchBytes) throws Exception {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        Patch.patch(oldBytes, patchBytes, byteOut);
         return byteOut.toByteArray();
     }
 }

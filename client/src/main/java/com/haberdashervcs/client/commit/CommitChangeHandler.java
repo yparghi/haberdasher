@@ -1,5 +1,6 @@
 package com.haberdashervcs.client.commit;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.haberdashervcs.client.crawl.LocalChangeHandler;
 import com.haberdashervcs.client.db.LocalDb;
 import com.haberdashervcs.client.db.objects.LocalFileState;
 import com.haberdashervcs.client.db.sqlite.SqliteLocalDbRowKeyer;
+import com.haberdashervcs.common.diff.BsDiffer;
 import com.haberdashervcs.common.diff.DmpDiffResult;
 import com.haberdashervcs.common.diff.DmpDiffer;
 import com.haberdashervcs.common.diff.HdHasher;
@@ -51,7 +53,7 @@ final class CommitChangeHandler implements LocalChangeHandler {
                 newFolderShouldBeWritten = true;
                 HdHasher.ContentsAndHash ch = putNewFile(comparison);
                 LOG.debug("Adding new file: %s", path.forFolderListing() + comparison.getName());
-                String TODO = /*Check if new file is binary*/;
+                // TODO: Should we differentiate b/w text and binary in a NEW file?
                 seenEntries.add(
                         FolderListing.Entry.forFile(comparison.getName(), ch.hashString()));
 
@@ -104,12 +106,19 @@ final class CommitChangeHandler implements LocalChangeHandler {
                             DmpDiffResult diffResult = differ.compare();
                             newEntry = FileEntry.forDiffDmp(
                                     localCH.hashString(), diffResult.getPatchesAsBytes(), commitFile.getId());
-                        } /* else if ... */
+                        } else if (!commitAsText.isPresent() && !localAsText.isPresent()) {
+                            // TODO: Can the diff tell if the new file is more or less a rewrite? Should I look at the
+                            // size of the array to decide?
+                            try {
+                                byte[] diffContents = BsDiffer.diff(commitContents, localContents);
+                                newEntry = FileEntry.forDiffBs(localCH.hashString(), diffContents, commitFile.getId());
+                            } catch (Exception ex) {
+                                throw new IOException(ex);
+                            }
 
-
-
-
-
+                        } else {
+                            newEntry = FileEntry.forNewContents(localCH.hashString(), localContents);
+                        }
 
                         LocalFileState state = LocalFileState.withPushedToServerState(false);
                         db.putFile(localCH.hashString(), newEntry, state);

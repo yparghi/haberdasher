@@ -457,7 +457,7 @@ public final class SqliteLocalDb implements LocalDb {
                 byte[] baseContents = parent.getContents().getRawBytes();
                 for (byte[] diff : diffs) {
                     try {
-                         baseContents = BsDiffer.diff(baseContents, diff);
+                         baseContents = BsDiffer.patch(baseContents, diff);
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
