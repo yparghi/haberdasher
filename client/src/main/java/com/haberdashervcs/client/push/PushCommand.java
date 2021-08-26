@@ -18,6 +18,7 @@ import com.haberdashervcs.common.io.ProtobufObjectOutputStream;
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
+import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.common.objects.HdFolderPath;
@@ -76,6 +77,13 @@ public class PushCommand implements Command {
         //     - Also, CACHE SEEN FILE IDs, since we're looking at the same folders repeatedly (at different commits).
 
         ServerTalker serverTalker = JettyServerTalker.forHost(config.getHost());
+
+        // Figure out the last pushed commit.
+        BranchAndCommit bcOnServer = serverTalker.headOnBranch(currentBC.getBranchName());
+        List<CommitEntry> newCommits = db.getCommitsSince(currentBC.getBranchName(), bcOnServer.getCommitId());
+        // TODO! push them to the outStream, maybe first thing below?
+
+
         ServerTalker.PushContext serverPushContext = serverTalker.push(
                 currentBC.getBranchName(), branchState.getBaseCommitId(), currentBC.getCommitId());
         HdObjectOutputStream outStream = ProtobufObjectOutputStream.forOutputStream(

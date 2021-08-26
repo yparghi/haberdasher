@@ -53,6 +53,8 @@ public interface LocalDb {
     // TODO: Do the same checked-out paths apply across all branches in the local repo?
     List<String> getCheckedOutPaths();
 
+    List<CommitEntry> getCommitsSince(String branchName, long commitId);
+
     List<FolderListing> getAllBranchHeadsSince(String branchName, long baseCommitId);
 
     Optional<FolderListing> getMostRecentListingForPath(

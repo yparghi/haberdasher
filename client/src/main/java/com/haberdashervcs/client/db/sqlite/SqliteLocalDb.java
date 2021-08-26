@@ -567,6 +567,39 @@ public final class SqliteLocalDb implements LocalDb {
         }
     }
 
+
+    @Override
+    public List<CommitEntry> getCommitsSince(String branchName, long commitId) {
+        try {
+            String idLike = String.format("'%s:%%'", branchName);
+            String idMinimum = String.format("%s:%020d", branchName, commitId);
+            PreparedStatement stmt = conn.get().prepareStatement(
+                    "SELECT contents FROM Commits WHERE id LIKE " + idLike + " AND id > ? ORDER BY id");
+            stmt.setString(1, idMinimum);
+
+            ResultSet rs = stmt.executeQuery();
+            ArrayList<CommitEntry> out = new ArrayList<>();
+            while (rs.next()) {
+                byte[] contentsBytes = rs.getBytes("contents");
+                CommitEntry commit = byteConv.commitFromBytes(contentsBytes);
+                if (!commit.getBranchName().equals(branchName)
+                        || commit.getCommitId() <= commitId) {
+                    throw new AssertionError(String.format(
+                            "getCommitsSince: Unexpected commit: Branch %s and commit %d",
+                            commit.getBranchName(),
+                            commit.getCommitId()));
+                }
+                out.add(commit);
+            }
+
+            return out;
+
+        } catch (SQLException | IOException ex) {
+            throw new RuntimeException("Error getting commits since: " + commitId, ex);
+        }
+    }
+
+
     @Override
     public List<FolderListing> getAllBranchHeadsSince(String branchName, long baseCommitId) {
         try {
