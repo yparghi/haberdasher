@@ -88,7 +88,10 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
     @Override
     public byte[] commitToBytes(CommitEntry commit) {
         CommitsProto.CommitEntry.Builder proto = CommitsProto.CommitEntry.newBuilder();
-        proto.setRootFolderId(commit.getRootFolderId());
+        proto.setBranchName(commit.getBranchName());
+        proto.setCommitId(commit.getCommitId());
+        proto.setAuthor(commit.getAuthor());
+        proto.setMessage(commit.getMessage());
         return proto.build().toByteArray();
     }
 
@@ -137,7 +140,8 @@ public final class ProtobufObjectByteConverter implements HdObjectByteConverter 
     @Override
     public CommitEntry commitFromBytes(byte[] commitBytes) throws IOException {
         CommitsProto.CommitEntry proto = CommitsProto.CommitEntry.parseFrom(commitBytes);
-        return CommitEntry.forRootFolderId(proto.getRootFolderId());
+        return CommitEntry.of(
+                proto.getBranchName(), proto.getCommitId(), proto.getAuthor(), proto.getMessage());
     }
 
     @Override

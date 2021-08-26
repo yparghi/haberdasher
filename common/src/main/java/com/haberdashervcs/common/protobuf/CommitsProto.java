@@ -19,16 +19,46 @@ public final class CommitsProto {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string rootFolderId = 1;</code>
-     * @return The rootFolderId.
+     * <code>string branchName = 1;</code>
+     * @return The branchName.
      */
-    java.lang.String getRootFolderId();
+    java.lang.String getBranchName();
     /**
-     * <code>string rootFolderId = 1;</code>
-     * @return The bytes for rootFolderId.
+     * <code>string branchName = 1;</code>
+     * @return The bytes for branchName.
      */
     com.google.protobuf.ByteString
-        getRootFolderIdBytes();
+        getBranchNameBytes();
+
+    /**
+     * <code>int64 commitId = 2;</code>
+     * @return The commitId.
+     */
+    long getCommitId();
+
+    /**
+     * <code>string author = 3;</code>
+     * @return The author.
+     */
+    java.lang.String getAuthor();
+    /**
+     * <code>string author = 3;</code>
+     * @return The bytes for author.
+     */
+    com.google.protobuf.ByteString
+        getAuthorBytes();
+
+    /**
+     * <code>string message = 4;</code>
+     * @return The message.
+     */
+    java.lang.String getMessage();
+    /**
+     * <code>string message = 4;</code>
+     * @return The bytes for message.
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
   }
   /**
    * Protobuf type {@code CommitEntry}
@@ -43,7 +73,9 @@ public final class CommitsProto {
       super(builder);
     }
     private CommitEntry() {
-      rootFolderId_ = "";
+      branchName_ = "";
+      author_ = "";
+      message_ = "";
     }
 
     @java.lang.Override
@@ -79,7 +111,24 @@ public final class CommitsProto {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              rootFolderId_ = s;
+              branchName_ = s;
+              break;
+            }
+            case 16: {
+
+              commitId_ = input.readInt64();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              author_ = s;
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
               break;
             }
             default: {
@@ -114,38 +163,125 @@ public final class CommitsProto {
               com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry.class, com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry.Builder.class);
     }
 
-    public static final int ROOTFOLDERID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object rootFolderId_;
+    public static final int BRANCHNAME_FIELD_NUMBER = 1;
+    private volatile java.lang.Object branchName_;
     /**
-     * <code>string rootFolderId = 1;</code>
-     * @return The rootFolderId.
+     * <code>string branchName = 1;</code>
+     * @return The branchName.
      */
     @java.lang.Override
-    public java.lang.String getRootFolderId() {
-      java.lang.Object ref = rootFolderId_;
+    public java.lang.String getBranchName() {
+      java.lang.Object ref = branchName_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        rootFolderId_ = s;
+        branchName_ = s;
         return s;
       }
     }
     /**
-     * <code>string rootFolderId = 1;</code>
-     * @return The bytes for rootFolderId.
+     * <code>string branchName = 1;</code>
+     * @return The bytes for branchName.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getRootFolderIdBytes() {
-      java.lang.Object ref = rootFolderId_;
+        getBranchNameBytes() {
+      java.lang.Object ref = branchName_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        rootFolderId_ = b;
+        branchName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int COMMITID_FIELD_NUMBER = 2;
+    private long commitId_;
+    /**
+     * <code>int64 commitId = 2;</code>
+     * @return The commitId.
+     */
+    @java.lang.Override
+    public long getCommitId() {
+      return commitId_;
+    }
+
+    public static final int AUTHOR_FIELD_NUMBER = 3;
+    private volatile java.lang.Object author_;
+    /**
+     * <code>string author = 3;</code>
+     * @return The author.
+     */
+    @java.lang.Override
+    public java.lang.String getAuthor() {
+      java.lang.Object ref = author_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        author_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string author = 3;</code>
+     * @return The bytes for author.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getAuthorBytes() {
+      java.lang.Object ref = author_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        author_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object message_;
+    /**
+     * <code>string message = 4;</code>
+     * @return The message.
+     */
+    @java.lang.Override
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string message = 4;</code>
+     * @return The bytes for message.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -166,8 +302,17 @@ public final class CommitsProto {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getRootFolderIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, rootFolderId_);
+      if (!getBranchNameBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, branchName_);
+      }
+      if (commitId_ != 0L) {
+        output.writeInt64(2, commitId_);
+      }
+      if (!getAuthorBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, author_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, message_);
       }
       unknownFields.writeTo(output);
     }
@@ -178,8 +323,18 @@ public final class CommitsProto {
       if (size != -1) return size;
 
       size = 0;
-      if (!getRootFolderIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, rootFolderId_);
+      if (!getBranchNameBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, branchName_);
+      }
+      if (commitId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, commitId_);
+      }
+      if (!getAuthorBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, author_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, message_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -196,8 +351,14 @@ public final class CommitsProto {
       }
       com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry other = (com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry) obj;
 
-      if (!getRootFolderId()
-          .equals(other.getRootFolderId())) return false;
+      if (!getBranchName()
+          .equals(other.getBranchName())) return false;
+      if (getCommitId()
+          != other.getCommitId()) return false;
+      if (!getAuthor()
+          .equals(other.getAuthor())) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -209,8 +370,15 @@ public final class CommitsProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ROOTFOLDERID_FIELD_NUMBER;
-      hash = (53 * hash) + getRootFolderId().hashCode();
+      hash = (37 * hash) + BRANCHNAME_FIELD_NUMBER;
+      hash = (53 * hash) + getBranchName().hashCode();
+      hash = (37 * hash) + COMMITID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCommitId());
+      hash = (37 * hash) + AUTHOR_FIELD_NUMBER;
+      hash = (53 * hash) + getAuthor().hashCode();
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -344,7 +512,13 @@ public final class CommitsProto {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        rootFolderId_ = "";
+        branchName_ = "";
+
+        commitId_ = 0L;
+
+        author_ = "";
+
+        message_ = "";
 
         return this;
       }
@@ -372,7 +546,10 @@ public final class CommitsProto {
       @java.lang.Override
       public com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry buildPartial() {
         com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry result = new com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry(this);
-        result.rootFolderId_ = rootFolderId_;
+        result.branchName_ = branchName_;
+        result.commitId_ = commitId_;
+        result.author_ = author_;
+        result.message_ = message_;
         onBuilt();
         return result;
       }
@@ -421,8 +598,19 @@ public final class CommitsProto {
 
       public Builder mergeFrom(com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry other) {
         if (other == com.haberdashervcs.common.protobuf.CommitsProto.CommitEntry.getDefaultInstance()) return this;
-        if (!other.getRootFolderId().isEmpty()) {
-          rootFolderId_ = other.rootFolderId_;
+        if (!other.getBranchName().isEmpty()) {
+          branchName_ = other.branchName_;
+          onChanged();
+        }
+        if (other.getCommitId() != 0L) {
+          setCommitId(other.getCommitId());
+        }
+        if (!other.getAuthor().isEmpty()) {
+          author_ = other.author_;
+          onChanged();
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -454,78 +642,261 @@ public final class CommitsProto {
         return this;
       }
 
-      private java.lang.Object rootFolderId_ = "";
+      private java.lang.Object branchName_ = "";
       /**
-       * <code>string rootFolderId = 1;</code>
-       * @return The rootFolderId.
+       * <code>string branchName = 1;</code>
+       * @return The branchName.
        */
-      public java.lang.String getRootFolderId() {
-        java.lang.Object ref = rootFolderId_;
+      public java.lang.String getBranchName() {
+        java.lang.Object ref = branchName_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          rootFolderId_ = s;
+          branchName_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string rootFolderId = 1;</code>
-       * @return The bytes for rootFolderId.
+       * <code>string branchName = 1;</code>
+       * @return The bytes for branchName.
        */
       public com.google.protobuf.ByteString
-          getRootFolderIdBytes() {
-        java.lang.Object ref = rootFolderId_;
+          getBranchNameBytes() {
+        java.lang.Object ref = branchName_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          rootFolderId_ = b;
+          branchName_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string rootFolderId = 1;</code>
-       * @param value The rootFolderId to set.
+       * <code>string branchName = 1;</code>
+       * @param value The branchName to set.
        * @return This builder for chaining.
        */
-      public Builder setRootFolderId(
+      public Builder setBranchName(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        rootFolderId_ = value;
+        branchName_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string rootFolderId = 1;</code>
+       * <code>string branchName = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearRootFolderId() {
+      public Builder clearBranchName() {
         
-        rootFolderId_ = getDefaultInstance().getRootFolderId();
+        branchName_ = getDefaultInstance().getBranchName();
         onChanged();
         return this;
       }
       /**
-       * <code>string rootFolderId = 1;</code>
-       * @param value The bytes for rootFolderId to set.
+       * <code>string branchName = 1;</code>
+       * @param value The bytes for branchName to set.
        * @return This builder for chaining.
        */
-      public Builder setRootFolderIdBytes(
+      public Builder setBranchNameBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        rootFolderId_ = value;
+        branchName_ = value;
+        onChanged();
+        return this;
+      }
+
+      private long commitId_ ;
+      /**
+       * <code>int64 commitId = 2;</code>
+       * @return The commitId.
+       */
+      @java.lang.Override
+      public long getCommitId() {
+        return commitId_;
+      }
+      /**
+       * <code>int64 commitId = 2;</code>
+       * @param value The commitId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCommitId(long value) {
+        
+        commitId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 commitId = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCommitId() {
+        
+        commitId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object author_ = "";
+      /**
+       * <code>string author = 3;</code>
+       * @return The author.
+       */
+      public java.lang.String getAuthor() {
+        java.lang.Object ref = author_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          author_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string author = 3;</code>
+       * @return The bytes for author.
+       */
+      public com.google.protobuf.ByteString
+          getAuthorBytes() {
+        java.lang.Object ref = author_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          author_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string author = 3;</code>
+       * @param value The author to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAuthor(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        author_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string author = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAuthor() {
+        
+        author_ = getDefaultInstance().getAuthor();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string author = 3;</code>
+       * @param value The bytes for author to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAuthorBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        author_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <code>string message = 4;</code>
+       * @return The message.
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string message = 4;</code>
+       * @return The bytes for message.
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string message = 4;</code>
+       * @param value The message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 4;</code>
+       * @param value The bytes for message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
         onChanged();
         return this;
       }
@@ -596,9 +967,11 @@ public final class CommitsProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rcommits.proto\"#\n\013CommitEntry\022\024\n\014rootFo" +
-      "lderId\030\001 \001(\tB4\n\"com.haberdashervcs.commo" +
-      "n.protobufB\014CommitsProtoP\000b\006proto3"
+      "\n\rcommits.proto\"T\n\013CommitEntry\022\022\n\nbranch" +
+      "Name\030\001 \001(\t\022\020\n\010commitId\030\002 \001(\003\022\016\n\006author\030\003" +
+      " \001(\t\022\017\n\007message\030\004 \001(\tB4\n\"com.haberdasher" +
+      "vcs.common.protobufB\014CommitsProtoP\000b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -609,7 +982,7 @@ public final class CommitsProto {
     internal_static_CommitEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CommitEntry_descriptor,
-        new java.lang.String[] { "RootFolderId", });
+        new java.lang.String[] { "BranchName", "CommitId", "Author", "Message", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

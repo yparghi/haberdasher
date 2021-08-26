@@ -1,28 +1,38 @@
 package com.haberdashervcs.common.objects;
 
 
-import com.google.common.base.MoreObjects;
+public final class CommitEntry {
 
-public class CommitEntry {
-
-    public static CommitEntry forRootFolderId(String rootFolderId) {
-        return new CommitEntry(rootFolderId);
+    public static CommitEntry of(String branchName, long commitId, String author, String message) {
+        return new CommitEntry(branchName, commitId, author, message);
     }
 
 
-    private final String rootFolderId;
+    private final String branchName;
+    private final long commitId;
+    private final String author;
+    private final String message;
 
-    private CommitEntry(String rootFolderId) {
-        this.rootFolderId = rootFolderId;
+    private CommitEntry(String branchName, long commitId, String author, String message) {
+        this.branchName = branchName;
+        this.commitId = commitId;
+        this.author = author;
+        this.message = message;
     }
 
-    public String getRootFolderId() {
-        return rootFolderId;
+    public String getBranchName() {
+        return branchName;
     }
 
-    public String getDebugString() {
-        return "CommitEntry: " + MoreObjects.toStringHelper(this)
-                .add("rootFolderId", rootFolderId)
-                .toString();
+    public long getCommitId() {
+        return commitId;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

@@ -6,5 +6,8 @@ option java_multiple_files = false;
 
 
 message CommitEntry {
-    string rootFolderId = 1;
+    string branchName = 1;
+    int64 commitId = 2;
+    string author = 3;
+    string message = 4;
 }
