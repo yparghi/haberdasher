@@ -81,13 +81,16 @@ public class PushCommand implements Command {
         // Figure out the last pushed commit.
         BranchAndCommit bcOnServer = serverTalker.headOnBranch(currentBC.getBranchName());
         List<CommitEntry> newCommits = db.getCommitsSince(currentBC.getBranchName(), bcOnServer.getCommitId());
-        // TODO! push them to the outStream, maybe first thing below?
 
 
         ServerTalker.PushContext serverPushContext = serverTalker.push(
                 currentBC.getBranchName(), branchState.getBaseCommitId(), currentBC.getCommitId());
         HdObjectOutputStream outStream = ProtobufObjectOutputStream.forOutputStream(
                 serverPushContext.getOutputStream());
+
+        for (CommitEntry commit : newCommits) {
+            outStream.writeCommit("TODO do I need commit ids?", commit);
+        }
 
         HashSet<String> seenFiles = new HashSet<>();
         HashSet<String> filesToSaveAsPushed = new HashSet<>();
