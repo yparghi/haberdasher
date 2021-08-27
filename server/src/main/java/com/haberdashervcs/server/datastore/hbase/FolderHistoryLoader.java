@@ -14,17 +14,17 @@ final class FolderHistoryLoader {
     private static final HdLogger LOG = HdLoggers.create(FolderHistoryLoader.class);
 
 
-    static FolderHistoryLoader forBranch(HBaseRowKeyMaker rowKeyer, String branch, HBaseRawHelper helper, long nowTs) {
+    static FolderHistoryLoader forBranch(HBaseRowKeyer rowKeyer, String branch, HBaseRawHelper helper, long nowTs) {
         return new FolderHistoryLoader(rowKeyer, branch, helper, nowTs);
     }
 
 
-    private final HBaseRowKeyMaker rowKeyer;
+    private final HBaseRowKeyer rowKeyer;
     private final String branchName;
     private final HBaseRawHelper helper;
     private final long nowTs;
 
-    private FolderHistoryLoader(HBaseRowKeyMaker rowKeyer, String branchName, HBaseRawHelper helper, long nowTs) {
+    private FolderHistoryLoader(HBaseRowKeyer rowKeyer, String branchName, HBaseRawHelper helper, long nowTs) {
         this.rowKeyer = rowKeyer;
         this.branchName = branchName;
         this.helper = helper;

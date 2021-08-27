@@ -4,23 +4,24 @@ import java.nio.charset.StandardCharsets;
 
 import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
+import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.MergeLock;
 
 
-public final class HBaseRowKeyMaker {
+public final class HBaseRowKeyer {
 
-    private static final HdLogger LOG = HdLoggers.create(HBaseRowKeyMaker.class);
+    private static final HdLogger LOG = HdLoggers.create(HBaseRowKeyer.class);
 
 
-    public static HBaseRowKeyMaker forRepo(String org, String repo) {
-        return new HBaseRowKeyMaker(org, repo);
+    public static HBaseRowKeyer forRepo(String org, String repo) {
+        return new HBaseRowKeyer(org, repo);
     }
 
 
     private final String org;
     private final String repo;
 
-    private HBaseRowKeyMaker(String org, String repo) {
+    private HBaseRowKeyer(String org, String repo) {
         this.org = org;
         this.repo = repo;
     }
@@ -33,8 +34,9 @@ public final class HBaseRowKeyMaker {
         return repo;
     }
 
-    public byte[] forCommit(String commitId) {
-        return String.format("%s:%s:%s", org, repo, commitId).getBytes(StandardCharsets.UTF_8);
+    public byte[] forCommit(CommitEntry commit) {
+        return String.format("%s:%s:%s:%020d", org, repo, commit.getBranchName(), commit.getCommitId())
+                .getBytes(StandardCharsets.UTF_8);
     }
 
     // TODO: Should the start/stop row prefixes for folder history scans also be implemented in this class?

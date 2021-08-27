@@ -36,7 +36,7 @@ public class MergerTest {
     private Connection conn;
     private Admin admin;
     private HBaseRawHelper helper;
-    private HBaseRowKeyMaker rowKeyer;
+    private HBaseRowKeyer rowKeyer;
     private long nowTs;
 
     @Before
@@ -52,7 +52,7 @@ public class MergerTest {
         createTables();
 
         helper = HBaseRawHelper.forConnection(conn);
-        rowKeyer = HBaseRowKeyMaker.forRepo(ORG, REPO);
+        rowKeyer = HBaseRowKeyer.forRepo(ORG, REPO);
     }
 
     // TODO: Commonize this stuff.

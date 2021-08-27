@@ -7,15 +7,15 @@ import com.haberdashervcs.common.objects.BranchEntry;
 
 final class HeadCommitNumberTaker {
 
-    static HeadCommitNumberTaker forDb(HBaseRawHelper helper, HBaseRowKeyMaker rowKeyer) {
+    static HeadCommitNumberTaker forDb(HBaseRawHelper helper, HBaseRowKeyer rowKeyer) {
         return new HeadCommitNumberTaker(helper, rowKeyer);
     }
 
 
     private final HBaseRawHelper helper;
-    private final HBaseRowKeyMaker rowKeyer;
+    private final HBaseRowKeyer rowKeyer;
 
-    private HeadCommitNumberTaker(HBaseRawHelper helper, HBaseRowKeyMaker rowKeyer) {
+    private HeadCommitNumberTaker(HBaseRawHelper helper, HBaseRowKeyer rowKeyer) {
         this.helper = helper;
         this.rowKeyer = rowKeyer;
     }

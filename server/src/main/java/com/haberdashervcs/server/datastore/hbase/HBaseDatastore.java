@@ -16,6 +16,7 @@ import com.haberdashervcs.common.logging.HdLogger;
 import com.haberdashervcs.common.logging.HdLoggers;
 import com.haberdashervcs.common.objects.BranchAndCommit;
 import com.haberdashervcs.common.objects.BranchEntry;
+import com.haberdashervcs.common.objects.CommitEntry;
 import com.haberdashervcs.common.objects.FileEntry;
 import com.haberdashervcs.common.objects.FolderListing;
 import com.haberdashervcs.server.browser.RepoBrowser;
@@ -34,7 +35,7 @@ public final class HBaseDatastore implements HdDatastore {
     private static HdLogger LOG = HdLoggers.create(HBaseDatastore.class);
 
 
-    public static HBaseDatastore forConnection (Connection conn) {
+    public static HBaseDatastore forConnection(Connection conn) {
         return new HBaseDatastore(conn);
     }
 
@@ -74,8 +75,7 @@ public final class HBaseDatastore implements HdDatastore {
             long newHeadCommitId,
             HdObjectInputStream objectsIn)
             throws IOException {
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
-        final boolean debug = false;  // This is temporary, for testing.
+        HBaseRowKeyer rowKeyer = HBaseRowKeyer.forRepo(org, repo);
         long highestSeenCommitId = -1;
 
         Optional<HdObjectId> nextOpt;
@@ -85,9 +85,7 @@ public final class HBaseDatastore implements HdDatastore {
                 case FILE:
                     FileEntry file = objectsIn.getFile();
                     LOG.debug("Got file: %s", file.getDebugString());
-                    if (!debug) {
-                        helper.putFile(rowKeyer.forFile(file.getId()), file);
-                    }
+                    helper.putFile(rowKeyer.forFile(file.getId()), file);
                     break;
 
                 case FOLDER:
@@ -96,16 +94,21 @@ public final class HBaseDatastore implements HdDatastore {
                     if (folder.getCommitId() > highestSeenCommitId) {
                         highestSeenCommitId = folder.getCommitId();
                     }
-                    if (!debug) {
-                        helper.putFolderIfNotExists(
-                                rowKeyer.forFolderAt(
-                                        branchName, folder.getPath(), folder.getCommitId()),
-                                folder);
-                    }
+                    helper.putFolderIfNotExists(
+                            rowKeyer.forFolderAt(
+                                    branchName, folder.getPath(), folder.getCommitId()),
+                            folder);
+                    break;
+
+                case COMMIT:
+                    CommitEntry commit = objectsIn.getCommit();
+                    LOG.debug("Got commit: %s", commit.getDebugString());
+                    byte[] rowKey = rowKeyer.forCommit(commit);
+                    // TODO: How do I make this transactionally safe, if this push ultimately fails?
+                    helper.putCommit(rowKey, commit);
                     break;
 
                 default:
-                case COMMIT:
                     throw new UnsupportedOperationException(
                             "Unexpected object: " + next.getType());
             }
@@ -145,7 +148,7 @@ public final class HBaseDatastore implements HdDatastore {
 
     @Override
     public CheckoutResult checkout(String org, String repo, String branch, long commitId, String folderToCheckout, HdObjectOutputStream out) {
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
+        HBaseRowKeyer rowKeyer = HBaseRowKeyer.forRepo(org, repo);
         try {
             return checkoutInternal(rowKeyer, branch, commitId, folderToCheckout, out);
         } catch (IOException ioEx) {
@@ -156,7 +159,7 @@ public final class HBaseDatastore implements HdDatastore {
 
     @Override
     public Optional<BranchAndCommit> getHeadCommitForBranch(String org, String repo, String branchName) {
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
+        HBaseRowKeyer rowKeyer = HBaseRowKeyer.forRepo(org, repo);
         try {
             // TODO Rewrite this to use the returned optional.
             BranchEntry branchEntry = helper.getBranch(rowKeyer.forBranch(branchName)).get();
@@ -176,7 +179,7 @@ public final class HBaseDatastore implements HdDatastore {
 
     // TODO! tests
     private CheckoutResult checkoutInternal(
-            HBaseRowKeyMaker rowKeyer, String branchName, long commitId, String path, HdObjectOutputStream out)
+            HBaseRowKeyer rowKeyer, String branchName, long commitId, String path, HdObjectOutputStream out)
             throws IOException {
         // TODO How do I generalize this check?
         Preconditions.checkArgument(path.startsWith("/"));
@@ -232,7 +235,7 @@ public final class HBaseDatastore implements HdDatastore {
     // TODO! This is incredibly temporary.
     public void loadTestData() throws IOException {
         HBaseRawHelper helper = HBaseRawHelper.forConnection(conn);
-        HBaseRowKeyMaker rowKeyer = HBaseRowKeyMaker.forRepo("some_org", "some_repo");
+        HBaseRowKeyer rowKeyer = HBaseRowKeyer.forRepo("some_org", "some_repo");
         Admin admin = conn.getAdmin();
 
         for (String nameStr : Arrays.asList("Branches", "Files", "Folders", "Merges")) {

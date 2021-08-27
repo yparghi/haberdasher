@@ -27,11 +27,11 @@ final class HBaseRepoBrowser implements RepoBrowser {
     }
 
 
-    private final HBaseRowKeyMaker rowKeyer;
+    private final HBaseRowKeyer rowKeyer;
     private final HBaseRawHelper helper;
 
     private HBaseRepoBrowser(String org, String repo, HBaseRawHelper helper) {
-        this.rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
+        this.rowKeyer = HBaseRowKeyer.forRepo(org, repo);
         this.helper = helper;
     }
 

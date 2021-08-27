@@ -17,7 +17,7 @@ final class MergeStates {
 
     // TODO! Don't use System.currentTimeMillis, just have callers pass in starting & ending timestamps
     static MergeStates fromPastSeconds(
-            long secondsAgo, HBaseRawHelper helper, HBaseRowKeyMaker rowKeyer)
+            long secondsAgo, HBaseRawHelper helper, HBaseRowKeyer rowKeyer)
             throws IOException {
         long now = System.currentTimeMillis();
         long ago = now - (TimeUnit.SECONDS.toMillis(secondsAgo));

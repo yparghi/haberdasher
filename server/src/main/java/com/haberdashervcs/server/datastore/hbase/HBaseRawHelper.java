@@ -414,7 +414,7 @@ public final class HBaseRawHelper {
     // TODO: Put this in one common place? Instead of copy-pasting it from SqliteLocalDb.
     private static final int MAX_DIFF_SEARCH = 20;
     // TODO: Internalize rowKeyer?
-    String resolveDiffs(final FileEntry file, HBaseRowKeyMaker rowKeyer) throws IOException {
+    String resolveDiffs(final FileEntry file, HBaseRowKeyer rowKeyer) throws IOException {
         if (file.getContentsType() == FileEntry.ContentsType.FULL) {
             return new String(file.getContents().getRawBytes(), StandardCharsets.UTF_8);
         }

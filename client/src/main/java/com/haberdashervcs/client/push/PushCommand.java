@@ -82,7 +82,6 @@ public class PushCommand implements Command {
         BranchAndCommit bcOnServer = serverTalker.headOnBranch(currentBC.getBranchName());
         List<CommitEntry> newCommits = db.getCommitsSince(currentBC.getBranchName(), bcOnServer.getCommitId());
 
-
         ServerTalker.PushContext serverPushContext = serverTalker.push(
                 currentBC.getBranchName(), branchState.getBaseCommitId(), currentBC.getCommitId());
         HdObjectOutputStream outStream = ProtobufObjectOutputStream.forOutputStream(

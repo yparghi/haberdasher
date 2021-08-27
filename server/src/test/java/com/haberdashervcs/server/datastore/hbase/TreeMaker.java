@@ -44,7 +44,7 @@ final class TreeMaker {
     private final String branchName;
     private final long commitId;
     private final HBaseRawHelper helper;
-    private final HBaseRowKeyMaker rowKeyer;
+    private final HBaseRowKeyer rowKeyer;
     private final @Nullable MergeLock mergeLock;
 
     private final HashSet<String> writtenPaths = new HashSet<>();
@@ -56,7 +56,7 @@ final class TreeMaker {
         this.branchName = branchName;
         this.commitId = commitId;
         this.helper = helper;
-        this.rowKeyer = HBaseRowKeyMaker.forRepo(org, repo);
+        this.rowKeyer = HBaseRowKeyer.forRepo(org, repo);
         this.mergeLock = mergeLock;
     }
 

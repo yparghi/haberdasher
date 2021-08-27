@@ -1,6 +1,8 @@
 package com.haberdashervcs.common.objects;
 
 
+import com.google.common.base.MoreObjects;
+
 public final class CommitEntry {
 
     public static CommitEntry of(String branchName, long commitId, String author, String message) {
@@ -34,5 +36,14 @@ public final class CommitEntry {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getDebugString() {
+        return MoreObjects.toStringHelper(this)
+                .add("branchName", branchName)
+                .add("commitId", commitId)
+                .add("author", author)
+                .add("message", message)
+                .toString();
     }
 }
